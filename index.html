@@ -1,1 +1,1732 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>🐾 Card Shop – Kolekcja Zwierząt</title>
+    <style>
+        :root {
+            --bg: #08080f;
+            --panel: #111122;
+            --text: #e0e0e0;
+            --gold: #f0c060;
+            --gem: #ff80c0;
+            --rzadki: #22c55e;
+            --bardzo: #3b82f6;
+            --epicki: #a855f7;
+            --mityczny: #ef4444;
+            --legendarny: #eab308;
+            --chroma: #ff6bff;
+            --border: #252540;
+            --btn: #1a1a30;
+            --btn-hover: #282845;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            background-image: radial-gradient(ellipse at 30% 0%, #141830 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 100%, #181025 0%, transparent 55%);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+            padding-bottom: 40px;
+        }
 
+        /* TOP BAR */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 18px;
+            background: rgba(15, 15, 28, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .currency-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .coin-badge,
+        .gem-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1rem;
+            white-space: nowrap;
+            border: 2px solid #3a3020;
+            background: #1a1a28;
+        }
+        .coin-badge {
+            color: var(--gold);
+            border-color: #4a3e20;
+        }
+        .gem-badge {
+            color: var(--gem);
+            border-color: #4a2040;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .nav-tab {
+            padding: 8px 15px;
+            border-radius: 22px;
+            border: 2px solid var(--border);
+            background: var(--btn);
+            color: #aaa;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.25s;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+        .nav-tab:hover {
+            background: var(--btn-hover);
+            color: #fff;
+            border-color: #555;
+        }
+        .nav-tab.active {
+            background: #2a2040;
+            color: #fff;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 18px rgba(139, 92, 246, 0.25);
+        }
+        .nav-tab.shop-tab.active {
+            border-color: #f0c060;
+            box-shadow: 0 0 18px rgba(240, 192, 96, 0.3);
+        }
+        .nav-tab.reward-tab {
+            border-color: #4ade80;
+            animation: rewardPulse 2s ease-in-out infinite;
+        }
+        .nav-tab.reward-tab.available {
+            border-color: #fbbf24;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+            animation: rewardGlow 1s ease-in-out infinite;
+        }
+        @keyframes rewardPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(74, 222, 128, 0.2);
+            }
+            50% {
+                box-shadow: 0 0 22px rgba(74, 222, 128, 0.5);
+            }
+        }
+        @keyframes rewardGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(251, 191, 36, 0.8);
+            }
+        }
+
+        /* MAIN */
+        .main-content {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 18px;
+        }
+        .view {
+            display: none;
+            animation: fadeSlide 0.35s ease;
+        }
+        .view.active {
+            display: block;
+        }
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 18px 0 10px;
+            padding-bottom: 7px;
+            border-bottom: 2px solid var(--border);
+            letter-spacing: 0.4px;
+        }
+
+        /* SHOP */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 18px;
+            margin-top: 10px;
+        }
+        .shop-card {
+            background: var(--panel);
+            border-radius: 20px;
+            padding: 22px;
+            border: 2px solid var(--border);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .shop-card:hover {
+            border-color: #555;
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+        }
+        .shop-card.pack-basic:hover {
+            border-color: #4ade80;
+        }
+        .shop-card.pack-spring {
+            border-color: #ff80c0;
+            background: linear-gradient(180deg, #1a1228 0%, #111122 100%);
+        }
+        .shop-card.pack-spring:hover {
+            border-color: #ffb0e0;
+            box-shadow: 0 16px 45px rgba(255, 130, 200, 0.3);
+        }
+        .shop-card .pack-icon {
+            font-size: 4.5rem;
+            animation: floatPack 3s ease-in-out infinite;
+        }
+        @keyframes floatPack {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-13px);
+            }
+        }
+        .shop-card .spring-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff80c0, #ff4080);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin: 5px 0;
+            animation: springShine 1.5s ease-in-out infinite;
+        }
+        @keyframes springShine {
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+            50% {
+                filter: brightness(1.5);
+            }
+        }
+        .shop-card .price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin: 8px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 11px 26px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.95rem;
+            letter-spacing: 0.4px;
+            transition: all 0.2s;
+        }
+        .btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.45);
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn:disabled {
+            background: #333;
+            color: #777;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn.green-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+        .btn.green-btn:hover {
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5);
+        }
+        .btn.pink-btn {
+            background: linear-gradient(135deg, #ff80c0, #e04090);
+        }
+        .btn.pink-btn:hover {
+            box-shadow: 0 8px 25px rgba(255, 130, 200, 0.5);
+        }
+
+        /* EXCHANGE SECTION */
+        .exchange-panel {
+            background: var(--panel);
+            border-radius: 20px;
+            padding: 20px;
+            border: 2px solid var(--border);
+            margin-top: 15px;
+            text-align: center;
+        }
+        .exchange-panel h3 {
+            margin-bottom: 8px;
+        }
+        .exchange-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 8px 0;
+        }
+        .exchange-row button {
+            padding: 9px 20px;
+            border-radius: 20px;
+            border: 2px solid #ff80c0;
+            background: transparent;
+            color: #ff80c0;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-size: 0.85rem;
+        }
+        .exchange-row button:hover {
+            background: rgba(255, 130, 200, 0.15);
+            box-shadow: 0 6px 20px rgba(255, 130, 200, 0.3);
+        }
+
+        /* OPENING OVERLAY */
+        .opening-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(6px);
+            cursor: pointer;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .rarity-label {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 35px currentColor;
+            transition: all 0.4s;
+            pointer-events: none;
+            text-align: center;
+        }
+        .box-3d {
+            width: 150px;
+            height: 175px;
+            perspective: 700px;
+            margin: 15px auto;
+            position: relative;
+            pointer-events: none;
+        }
+        .box-body {
+            width: 135px;
+            height: 145px;
+            background: linear-gradient(180deg, #3a3055, #1d1635);
+            border: 3px solid #6b5898;
+            border-radius: 12px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+        }
+        .box-lid {
+            width: 148px;
+            height: 26px;
+            background: linear-gradient(180deg, #5a4590, #382560);
+            border: 3px solid #7d6aae;
+            border-radius: 14px 14px 0 0;
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            transform-origin: bottom center;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .box-lid.flipped {
+            transform: translateX(-50%) rotateX(-130deg) translateY(-38px);
+            opacity: 0.65;
+        }
+        .glow-ring {
+            position: absolute;
+            inset: -22px;
+            border-radius: 30px;
+            pointer-events: none;
+            z-index: -1;
+            transition: all 0.5s;
+        }
+        .glow-rzadki {
+            box-shadow: 0 0 55px 14px rgba(34, 197, 94, 0.65);
+        }
+        .glow-bardzo-rzadki {
+            box-shadow: 0 0 60px 18px rgba(59, 130, 246, 0.7);
+        }
+        .glow-epicki {
+            box-shadow: 0 0 65px 20px rgba(168, 85, 247, 0.7);
+        }
+        .glow-mityczny {
+            box-shadow: 0 0 75px 25px rgba(239, 68, 68, 0.7);
+        }
+        .glow-legendarny {
+            box-shadow: 0 0 90px 30px rgba(234, 179, 8, 0.75);
+        }
+        .glow-chromatyczny {
+            box-shadow: 0 0 110px 38px rgba(255, 107, 255, 0.85);
+            animation: rainbowGlow 1.2s infinite;
+        }
+        @keyframes rainbowGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 110px 38px rgba(255, 107, 255, 0.85);
+            }
+            25% {
+                box-shadow: 0 0 110px 38px rgba(100, 255, 210, 0.85);
+            }
+            50% {
+                box-shadow: 0 0 110px 38px rgba(255, 210, 60, 0.85);
+            }
+            75% {
+                box-shadow: 0 0 110px 38px rgba(110, 150, 255, 0.85);
+            }
+        }
+        .clicks-info {
+            font-size: 1rem;
+            color: #ccc;
+            margin: 8px 0;
+            pointer-events: none;
+            letter-spacing: 0.5px;
+        }
+        .clicks-info span {
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.3rem;
+        }
+        .open-now-hint {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 6px;
+            pointer-events: none;
+        }
+        .click-ripple {
+            position: fixed;
+            pointer-events: none;
+            z-index: 210;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            animation: rippleOut 0.7s ease-out forwards;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes rippleOut {
+            0% {
+                width: 20px;
+                height: 20px;
+                opacity: 0.8;
+            }
+            100% {
+                width: 120px;
+                height: 120px;
+                opacity: 0;
+            }
+        }
+        .upgrade-flash {
+            position: fixed;
+            pointer-events: none;
+            z-index: 220;
+            font-size: 2rem;
+            font-weight: 900;
+            animation: flashUp 1s ease-out forwards;
+            letter-spacing: 1px;
+            left: 50%;
+            top: 40%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes flashUp {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            35% {
+                opacity: 1;
+                transform: translate(-50%, -70%) scale(1.3);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -120%) scale(0.7);
+            }
+        }
+
+        /* CARD REVEAL */
+        .reveal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 250;
+            pointer-events: none;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 25px;
+        }
+        .card-reveal {
+            background: #1a1a30;
+            border-radius: 14px;
+            width: 110px;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #555;
+            animation: cardPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: transform 0.25s;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+            text-align: center;
+            padding: 8px;
+        }
+        .card-reveal:hover {
+            transform: translateY(-10px) scale(1.05);
+            z-index: 5;
+        }
+        @keyframes cardPop {
+            0% {
+                opacity: 0;
+                transform: translateY(90px) scale(0.4) rotateY(100deg);
+            }
+            45% {
+                opacity: 1;
+                transform: translateY(-18px) scale(1.06) rotateY(0deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .card-reveal.rzadki {
+            border-color: #22c55e;
+            box-shadow: 0 0 28px rgba(34, 197, 94, 0.45);
+        }
+        .card-reveal.bardzo-rzadki {
+            border-color: #3b82f6;
+            box-shadow: 0 0 32px rgba(59, 130, 246, 0.5);
+        }
+        .card-reveal.epicki {
+            border-color: #a855f7;
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.5);
+        }
+        .card-reveal.mityczny {
+            border-color: #ef4444;
+            box-shadow: 0 0 40px rgba(239, 68, 68, 0.55);
+        }
+        .card-reveal.legendarny {
+            border-color: #eab308;
+            box-shadow: 0 0 50px rgba(234, 179, 8, 0.6);
+        }
+        .card-reveal.chromatyczny {
+            border-color: #ff6bff;
+            box-shadow: 0 0 60px rgba(255, 107, 255, 0.75);
+            animation: cardPop 0.7s ease, chromaShine 1.5s infinite;
+        }
+        @keyframes chromaShine {
+            0%,
+            100% {
+                box-shadow: 0 0 60px rgba(255, 107, 255, 0.75);
+            }
+            50% {
+                box-shadow: 0 0 60px rgba(255, 210, 60, 0.75);
+            }
+        }
+        .card-emoji {
+            font-size: 2.8rem;
+        }
+        .card-name {
+            font-weight: 700;
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+        .badge-rarity {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-top: 4px;
+            letter-spacing: 0.5px;
+        }
+        .badge-rzadki {
+            background: #22c55e;
+            color: #000;
+        }
+        .badge-bardzo-rzadki {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .badge-epicki {
+            background: #a855f7;
+            color: #fff;
+        }
+        .badge-mityczny {
+            background: #ef4444;
+            color: #fff;
+        }
+        .badge-legendarny {
+            background: #eab308;
+            color: #000;
+        }
+        .badge-chromatyczny {
+            background: linear-gradient(135deg, #ff6bff, #ffb347, #6bffb8, #6bb5ff);
+            color: #000;
+            font-weight: 900;
+        }
+        .reveal-close-btn {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            color: #000;
+            padding: 12px 32px;
+            border-radius: 28px;
+            font-weight: 700;
+            z-index: 260;
+            pointer-events: auto;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+        .reveal-close-btn:hover {
+            transform: translateX(-50%) scale(1.06);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.4);
+        }
+
+        /* INVENTORY & COLLECTION */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 14px;
+            margin-top: 10px;
+        }
+        .inv-card,
+        .coll-card {
+            background: #1a1a2e;
+            border: 2px solid #282845;
+            border-radius: 16px;
+            padding: 14px;
+            text-align: center;
+            transition: all 0.25s;
+        }
+        .inv-card:hover {
+            border-color: #555;
+            transform: translateY(-3px);
+        }
+        .coll-card {
+            opacity: 0.45;
+            filter: grayscale(0.7);
+        }
+        .coll-card.owned {
+            opacity: 1;
+            filter: none;
+            border-color: #4ade80;
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.2);
+        }
+        .inv-card .emoji {
+            font-size: 2.3rem;
+        }
+        .coll-card .emoji {
+            font-size: 2.3rem;
+        }
+        .inv-card .card-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin: 4px 0;
+        }
+        .coll-card .card-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin: 4px 0;
+        }
+        .inv-card .qty {
+            color: #aaa;
+            font-size: 0.75rem;
+        }
+        .inv-card .sell-btn {
+            padding: 5px 13px;
+            border-radius: 14px;
+            border: 1px solid #ff6b6b;
+            background: transparent;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 5px;
+            transition: all 0.2s;
+        }
+        .inv-card .sell-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+        }
+        .coll-card .status {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .coll-card .status.owned-text {
+            color: #4ade80;
+        }
+        .coll-card .status.missing {
+            color: #666;
+        }
+        .empty-msg {
+            text-align: center;
+            padding: 50px 20px;
+            color: #555;
+            font-size: 1.1rem;
+        }
+        .empty-msg .icon {
+            font-size: 3.5rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* SELL */
+        .sell-list .sell-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 14px;
+            border-bottom: 1px solid #1e1e30;
+            gap: 10px;
+            flex-wrap: wrap;
+            background: #111122;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+        .sell-row .btns {
+            display: flex;
+            gap: 6px;
+        }
+        .sell-row button {
+            padding: 6px 13px;
+            border-radius: 14px;
+            border: 1px solid #ff6b6b;
+            background: transparent;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .sell-row button.sell-all-btn {
+            border-color: #ff4444;
+            color: #ff4444;
+            font-weight: 700;
+        }
+        .sell-row button:hover {
+            background: rgba(255, 107, 107, 0.15);
+        }
+
+        /* DAILY REWARDS MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal {
+            background: #16162a;
+            border: 2px solid #3a3a55;
+            border-radius: 22px;
+            padding: 25px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+        }
+        .modal h2 {
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        .daily-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin: 12px 0;
+        }
+        .daily-day {
+            background: #1e1e32;
+            border-radius: 12px;
+            padding: 10px 4px;
+            text-align: center;
+            border: 2px solid #2a2a40;
+            font-size: 0.7rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .daily-day.claimed {
+            border-color: #4ade80;
+            background: #1a2a1a;
+            opacity: 0.7;
+        }
+        .daily-day.current {
+            border-color: #fbbf24;
+            box-shadow: 0 0 18px rgba(251, 191, 36, 0.5);
+            animation: rewardGlow 1s infinite;
+        }
+        .daily-day.locked {
+            opacity: 0.5;
+        }
+        .daily-day .day-num {
+            font-weight: 900;
+            font-size: 1rem;
+        }
+        .daily-day .day-prize {
+            font-size: 0.65rem;
+            color: #ccc;
+            margin-top: 2px;
+        }
+        .daily-day .check-mark {
+            color: #4ade80;
+            font-size: 1rem;
+        }
+        .claim-btn {
+            margin-top: 14px;
+            padding: 12px 30px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #000;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            transition: all 0.25s;
+        }
+        .claim-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.5);
+        }
+        .claim-btn:disabled {
+            background: #333;
+            color: #777;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .modal-close {
+            margin-top: 10px;
+            background: transparent;
+            border: 1px solid #555;
+            color: #aaa;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #222;
+            color: #fff;
+            padding: 11px 22px;
+            border-radius: 26px;
+            z-index: 400;
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            border: 1px solid #555;
+            animation: toastAnim 2.5s forwards;
+            pointer-events: none;
+        }
+        @keyframes toastAnim {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-25px);
+            }
+            12% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            82% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .top-bar {
+                padding: 8px 10px;
+                gap: 5px;
+            }
+            .nav-tab {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+            }
+            .box-3d {
+                width: 120px;
+                height: 140px;
+            }
+            .box-body {
+                width: 105px;
+                height: 115px;
+                font-size: 2.5rem;
+            }
+            .box-lid {
+                width: 118px;
+                height: 20px;
+                top: -10px;
+            }
+            .card-reveal {
+                width: 85px;
+                height: 120px;
+                padding: 5px;
+            }
+            .card-reveal .card-emoji {
+                font-size: 2rem;
+            }
+            .card-reveal .card-name {
+                font-size: 0.6rem;
+            }
+            .rarity-label {
+                font-size: 1.3rem;
+            }
+            .daily-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============ TOP BAR ============ -->
+    <div class="top-bar" id="topBar">
+        <div class="currency-row">
+            <div class="coin-badge">🪙 <span id="coinsDisplay">100</span></div>
+            <div class="gem-badge">💎 <span id="gemsDisplay">5</span></div>
+        </div>
+        <div class="nav-tabs" id="navTabs">
+            <div class="nav-tab shop-tab active" data-view="shop">🏪 Sklep</div>
+            <div class="nav-tab inv-tab" data-view="inventory">🎒 Ekwipunek</div>
+            <div class="nav-tab coll-tab" data-view="collection">📚 Kolekcja</div>
+            <div class="nav-tab sell-tab" data-view="sell">💰 Sprzedaż</div>
+            <div class="nav-tab reward-tab" data-view="daily" id="dailyTab">🎁 Nagrody</div>
+        </div>
+    </div>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <div class="main-content">
+
+        <!-- SHOP VIEW -->
+        <div class="view active" id="shopView">
+            <h2 style="text-align:center;letter-spacing:0.5px;">🏪 Sklep z Paczkami</h2>
+            <div class="shop-grid">
+                <!-- Basic Pack -->
+                <div class="shop-card pack-basic" id="basicPackCard">
+                    <div class="pack-icon">📦</div>
+                    <h3>Podstawowa Paczka</h3>
+                    <p style="color:#999;font-size:0.85rem;">Start: <b style="color:#22c55e;">Rzadki</b> • Kliknij 1-5 razy</p>
+                    <p class="price">🪙 10 monet</p>
+                    <button class="btn green-btn" onclick="buyPack('basic')">🛒 Kup Paczkę</button>
+                </div>
+                <!-- Spring Pack (visible when springEnabled) -->
+                <div class="shop-card pack-spring" id="springPackCard" style="display:none;">
+                    <div class="pack-icon">🌸</div>
+                    <span class="spring-badge">🌿 WIOSENNE</span>
+                    <h3>Wiosenne Pudło</h3>
+                    <p style="color:#ffb0e0;font-size:0.85rem;">3x większe szanse! • Start: <b style="color:#22c55e;">Rzadki</b></p>
+                    <p class="price">🪙 250 monet</p>
+                    <button class="btn pink-btn" onclick="buyPack('spring')">🌸 Kup Wiosenne</button>
+                </div>
+            </div>
+            <!-- Gem Exchange -->
+            <div class="exchange-panel">
+                <h3>💎 Wymiana Gemów na Monety</h3>
+                <p style="color:#999;font-size:0.8rem;">1 Gem = 80 monet</p>
+                <div class="exchange-row">
+                    <button onclick="exchangeGems(1)">💎1 → 🪙80</button>
+                    <button onclick="exchangeGems(5)">💎5 → 🪙400</button>
+                    <button onclick="exchangeGems(10)">💎10 → 🪙800</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVENTORY VIEW -->
+        <div class="view" id="inventoryView">
+            <h2 class="section-title">🎒 Twój Ekwipunek</h2>
+            <div class="card-grid" id="inventoryGrid"></div>
+            <div class="empty-msg" id="invEmpty"><span class="icon">📭</span> Brak kart. Kup paczkę!</div>
+        </div>
+
+        <!-- COLLECTION VIEW -->
+        <div class="view" id="collectionView">
+            <h2 class="section-title">📚 Wszystkie Karty (Kolekcja)</h2>
+            <div class="card-grid" id="collectionGrid"></div>
+        </div>
+
+        <!-- SELL VIEW -->
+        <div class="view" id="sellView">
+            <h2 class="section-title">💰 Sprzedaż Kart</h2>
+            <div class="sell-list" id="sellContainer"></div>
+            <div class="empty-msg" id="sellEmpty"><span class="icon">💸</span> Nic do sprzedania.</div>
+        </div>
+
+        <!-- DAILY REWARDS VIEW (modal trigger) -->
+        <div class="view" id="dailyView" style="text-align:center;">
+            <h2 class="section-title">🎁 Codzienne Nagrody</h2>
+            <p style="color:#999;">Kliknij poniżej, aby otworzyć panel nagród.</p>
+            <button class="btn" style="margin-top:15px;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;"
+            onclick="openDailyModal()">📅 Otwórz Kalendarz Nagród</button>
+        </div>
+    </div>
+
+    <!-- ============ DAILY REWARDS MODAL (hidden) ============ -->
+    <div class="modal-overlay" id="dailyModal" style="display:none;">
+        <div class="modal">
+            <h2>🎁 Codzienne Nagrody (7 dni)</h2>
+            <div class="daily-grid" id="dailyGrid"></div>
+            <p id="dailyStatus" style="color:#ccc;font-size:0.85rem;margin:6px 0;"></p>
+            <button class="claim-btn" id="claimDailyBtn" onclick="claimDailyReward()">Odbierz nagrodę</button>
+            <br>
+            <button class="modal-close" onclick="closeDailyModal()">Zamknij</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        //  GAME ENGINE
+        // ============================================
+
+        // --- RARITY CONFIG (updated colors) ---
+        const RARITY_CONFIG = {
+            "Rzadki": { upgradeChance: 0.40, color: "#22c55e", cssClass: "rzadki", sellPrice: 8, label: "Rzadki" },
+            "Bardzo Rzadki": { upgradeChance: 0.30, color: "#3b82f6", cssClass: "bardzo-rzadki", sellPrice: 20,
+                label: "Bardzo Rzadki" },
+            "Epicki": { upgradeChance: 0.10, color: "#a855f7", cssClass: "epicki", sellPrice: 55, label: "Epicki" },
+            "Mityczny": { upgradeChance: 0.05, color: "#ef4444", cssClass: "mityczny", sellPrice: 130, label: "Mityczny" },
+            "Legendarny": { upgradeChance: 0.01, color: "#eab308", cssClass: "legendarny", sellPrice: 350,
+            label: "Legendarny" },
+            "Chromatyczny": { upgradeChance: 0, color: "#ff6bff", cssClass: "chromatyczny", sellPrice: 900,
+                label: "Chromatyczny" }
+        };
+        const RARITY_ORDER = ["Rzadki", "Bardzo Rzadki", "Epicki", "Mityczny", "Legendarny", "Chromatyczny"];
+
+        // --- ANIMALS ---
+        const ANIMALS = [
+            { name: "Lew", emoji: "🦁" }, { name: "Tygrys", emoji: "🐯" }, { name: "Wilk", emoji: "🐺" },
+            { name: "Lis", emoji: "🦊" }, { name: "Jeleń", emoji: "🦌" }, { name: "Sowa", emoji: "🦉" },
+            { name: "Orzeł", emoji: "🦅" }, { name: "Rekin", emoji: "🦈" }, { name: "Wieloryb", emoji: "🐋" },
+            { name: "Krokodyl", emoji: "🐊" }, { name: "Panda", emoji: "🐼" }, { name: "Koń", emoji: "🐴" },
+            { name: "Papuga", emoji: "🦜" }, { name: "Żółw", emoji: "🐢" }, { name: "Wąż", emoji: "🐍" }
+        ];
+
+        // --- STATE ---
+        let coins = 100;
+        let gems = 5;
+        let inventory = [];
+        let collectedAnimals = new Set();
+
+        // Opening state
+        let currentRarity = null;
+        let clicksRemaining = 0;
+        let maxClicks = 5;
+        let springMode = false; // true when opening a spring pack
+
+        // Daily rewards state
+        let dailyStreak = 1;
+        let dailyLastClaimDate = null;
+        let dailyClaimedToday = false;
+
+        // --- SPRING CONFIG (separate module concept) ---
+        // This flag controls whether the Spring Box appears in the shop.
+        // Set to true to enable the Wiosenne Pudło with 3x luck.
+        const springEnabled = true; // <-- CHANGE THIS TO false TO DISABLE SPRING BOX
+
+        // ============================================
+        //  LOCAL STORAGE
+        // ============================================
+        function saveState() {
+            const data = {
+                coins,
+                gems,
+                inventory,
+                collected: [...collectedAnimals],
+                dailyStreak,
+                dailyLastClaimDate,
+                dailyClaimedToday
+            };
+            localStorage.setItem('cardgame_state', JSON.stringify(data));
+        }
+
+        function loadState() {
+            const raw = localStorage.getItem('cardgame_state');
+            if (!raw) return;
+            try {
+                const data = JSON.parse(raw);
+                coins = data.coins ?? 100;
+                gems = data.gems ?? 5;
+                inventory = data.inventory ?? [];
+                collectedAnimals = new Set(data.collected ?? []);
+                dailyStreak = data.dailyStreak ?? 1;
+                dailyLastClaimDate = data.dailyLastClaimDate ?? null;
+                dailyClaimedToday = data.dailyClaimedToday ?? false;
+            } catch (e) {
+                console.warn('State load failed, using defaults.');
+            }
+        }
+        loadState();
+
+        // Check if daily streak is still valid
+        function checkDailyStreak() {
+            const today = getTodayString();
+            if (dailyLastClaimDate === today) {
+                dailyClaimedToday = true;
+                return;
+            }
+            if (!dailyLastClaimDate) {
+                dailyStreak = 1;
+                dailyClaimedToday = false;
+                return;
+            }
+            const yesterday = getYesterdayString();
+            if (dailyLastClaimDate === yesterday && !dailyClaimedToday) {
+                // streak continues, already set
+                dailyClaimedToday = false;
+            } else if (dailyLastClaimDate !== today) {
+                // streak broken
+                if (dailyLastClaimDate !== yesterday) {
+                    dailyStreak = 1;
+                }
+                dailyClaimedToday = false;
+            }
+            saveState();
+        }
+
+        function getTodayString() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function getYesterdayString() {
+            const d = new Date();
+            d.setDate(d.getDate() - 1);
+            return d.toISOString().split('T')[0];
+        }
+        checkDailyStreak();
+
+        // ============================================
+        //  UI UPDATES
+        // ============================================
+        function updateCurrencyDisplay() {
+            document.getElementById('coinsDisplay').textContent = coins;
+            document.getElementById('gemsDisplay').textContent = gems;
+        }
+
+        function getSellPrice(rarity) {
+            return RARITY_CONFIG[rarity]?.sellPrice ?? 5;
+        }
+
+        function showToast(msg, bgColor = '#222') {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            t.style.background = bgColor;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2600);
+        }
+
+        // ============================================
+        //  INVENTORY & COLLECTION RENDERING
+        // ============================================
+        function renderInventory() {
+            const grid = document.getElementById('inventoryGrid');
+            const empty = document.getElementById('invEmpty');
+            if (!grid) return;
+            grid.innerHTML = '';
+            if (inventory.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            inventory.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'inv-card';
+                card.innerHTML = `
+              <div class="emoji">${item.emoji}</div>
+              <div class="card-title">${item.animalName}</div>
+              <div class="badge-rarity badge-${item.rarity.toLowerCase().replace(/ /g,'-')}" style="font-size:0.65rem;">${item.rarity}</div>
+              <div class="qty">Ilość: ${item.quantity}</div>
+              <div style="color:#f0c060;font-size:0.7rem;">🪙${getSellPrice(item.rarity)} / szt.</div>
+              <button class="sell-btn" onclick="sellOne('${item.animalName}','${item.rarity}')">Sprzedaj 1</button>
+            `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderCollection() {
+            const grid = document.getElementById('collectionGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            ANIMALS.forEach(animal => {
+                const owned = collectedAnimals.has(animal.name);
+                const card = document.createElement('div');
+                card.className = `coll-card ${owned ? 'owned' : ''}`;
+                card.innerHTML = `
+              <div class="emoji">${animal.emoji}</div>
+              <div class="card-title">${animal.name}</div>
+              <div class="status ${owned ? 'owned-text' : 'missing'}">${owned ? '✓ Posiadana' : 'Niezdobyta'}</div>
+            `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderSellPanel() {
+            const container = document.getElementById('sellContainer');
+            const empty = document.getElementById('sellEmpty');
+            if (!container) return;
+            container.innerHTML = '';
+            if (inventory.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            inventory.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'sell-row';
+                row.innerHTML = `
+              <span>${item.emoji} <b>${item.animalName}</b> [${item.rarity}] ×${item.quantity}</span>
+              <span class="btns">
+                <button onclick="sellOne('${item.animalName}','${item.rarity}')">1 szt.</button>
+                <button class="sell-all-btn" onclick="sellAll('${item.animalName}','${item.rarity}')">Wszystkie</button>
+              </span>
+            `;
+                container.appendChild(row);
+            });
+        }
+
+        function refreshAllViews() {
+            renderInventory();
+            renderCollection();
+            renderSellPanel();
+            updateDailyTabIndicator();
+        }
+
+        // ============================================
+        //  SELL FUNCTIONS
+        // ============================================
+        window.sellOne = function(animalName, rarity) {
+            const entry = inventory.find(e => e.animalName === animalName && e.rarity === rarity);
+            if (!entry || entry.quantity < 1) return;
+            entry.quantity--;
+            if (entry.quantity <= 0) {
+                inventory = inventory.filter(e => !(e.animalName === animalName && e.rarity === rarity));
+            }
+            coins += getSellPrice(rarity);
+            updateCurrencyDisplay();
+            saveState();
+            refreshAllViews();
+            showToast(`Sprzedano ${animalName} (${rarity}) za ${getSellPrice(rarity)}🪙`);
+        };
+
+        window.sellAll = function(animalName, rarity) {
+            const entry = inventory.find(e => e.animalName === animalName && e.rarity === rarity);
+            if (!entry) return;
+            const count = entry.quantity;
+            const total = getSellPrice(rarity) * count;
+            inventory = inventory.filter(e => !(e.animalName === animalName && e.rarity === rarity));
+            coins += total;
+            updateCurrencyDisplay();
+            saveState();
+            refreshAllViews();
+            showToast(`Sprzedano ${count}× ${animalName} za ${total}🪙`);
+        };
+
+        // ============================================
+        //  GEM EXCHANGE
+        // ============================================
+        window.exchangeGems = function(amount) {
+            if (gems < amount) {
+                showToast('Za mało gemów! 💎', '#442222');
+                return;
+            }
+            gems -= amount;
+            coins += amount * 80;
+            updateCurrencyDisplay();
+            saveState();
+            showToast(`Wymieniono ${amount}💎 → ${amount*80}🪙`, '#224422');
+            refreshAllViews();
+        };
+
+        // ============================================
+        //  PACK BUYING & OPENING
+        // ============================================
+        window.buyPack = function(type) {
+            const price = type === 'spring' ? 250 : 10;
+            if (coins < price) {
+                showToast('Za mało monet! 🪙', '#442222');
+                return;
+            }
+            coins -= price;
+            updateCurrencyDisplay();
+            saveState();
+            springMode = (type === 'spring');
+            startOpening();
+        };
+
+        function startOpening() {
+            currentRarity = "Rzadki";
+            clicksRemaining = maxClicks;
+            showOpeningOverlay();
+        }
+
+        function showOpeningOverlay() {
+            const old = document.getElementById('openingOverlay');
+            if (old) old.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'openingOverlay';
+            overlay.className = 'opening-overlay';
+            overlay.innerHTML = `
+            <div class="rarity-label" id="rarityLabel" style="color:${RARITY_CONFIG[currentRarity].color}">${currentRarity}</div>
+            <div class="box-3d" id="box3d">
+              <div class="box-lid" id="boxLid"></div>
+              <div class="box-body">❓</div>
+              <div class="glow-ring glow-${RARITY_CONFIG[currentRarity].cssClass}" id="glowRing"></div>
+            </div>
+            <div class="clicks-info">Kliknięcia: <span id="clicksCount">${clicksRemaining}</span> / ${maxClicks}</div>
+            <div class="open-now-hint">🖱️ Kliknij gdziekolwiek na ekranie, by ulepszyć!</div>
+            <div class="open-now-hint" style="margin-top:2px;color:#f0c060;">Lub naciśnij <b>SPACJĘ</b> by otworzyć teraz</div>
+          `;
+            overlay.addEventListener('click', onOverlayClick);
+            document.body.appendChild(overlay);
+
+            // Keyboard support: space to open now
+            const keyHandler = (e) => {
+                if (e.code === 'Space' && document.getElementById('openingOverlay')) {
+                    e.preventDefault();
+                    openPackNow();
+                    document.removeEventListener('keydown', keyHandler);
+                }
+            };
+            document.addEventListener('keydown', keyHandler);
+            overlay._keyHandler = keyHandler;
+
+            updateOpeningUI();
+        }
+
+        function updateOpeningUI() {
+            const label = document.getElementById('rarityLabel');
+            const glow = document.getElementById('glowRing');
+            const clicksSpan = document.getElementById('clicksCount');
+            if (label) {
+                label.textContent = currentRarity;
+                label.style.color = RARITY_CONFIG[currentRarity].color;
+            }
+            if (glow) {
+                glow.className = 'glow-ring glow-' + RARITY_CONFIG[currentRarity].cssClass;
+            }
+            if (clicksSpan) clicksSpan.textContent = clicksRemaining;
+        }
+
+        function onOverlayClick(e) {
+            if (clicksRemaining <= 0 || currentRarity === "Chromatyczny") {
+                // If no clicks left, auto-open
+                if (clicksRemaining <= 0 || currentRarity === "Chromatyczny") {
+                    openPackNow();
+                }
+                return;
+            }
+            // Ripple effect at click position
+            const ripple = document.createElement('div');
+            ripple.className = 'click-ripple';
+            ripple.style.left = e.clientX + 'px';
+            ripple.style.top = e.clientY + 'px';
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 700);
+
+            attemptUpgrade();
+        }
+
+        function attemptUpgrade() {
+            if (clicksRemaining <= 0 || currentRarity === "Chromatyczny") return;
+            clicksRemaining--;
+
+            // Shake animation on box
+            const box = document.getElementById('box3d');
+            if (box) {
+                box.style.animation = 'none';
+                box.offsetHeight;
+                box.style.animation = 'shake 0.45s ease';
+                setTimeout(() => { box.style.animation = ''; }, 450);
+            }
+
+            const cfg = RARITY_CONFIG[currentRarity];
+            let effectiveChance = cfg.upgradeChance;
+            if (springMode) effectiveChance *= 3;
+
+            // Handle overflow (chance > 1)
+            let remainingChance = effectiveChance;
+            let upgraded = false;
+            let currentIdx = RARITY_ORDER.indexOf(currentRarity);
+
+            while (remainingChance > 0 && currentIdx < RARITY_ORDER.length - 1) {
+                if (Math.random() < remainingChance) {
+                    currentIdx++;
+                    currentRarity = RARITY_ORDER[currentIdx];
+                    remainingChance -= 1;
+                    if (remainingChance < 0) remainingChance = 0;
+                    upgraded = true;
+                    // Flash effect
+                    showUpgradeFlash(RARITY_ORDER[currentIdx - 1], currentRarity);
+                    // Play sound hook (user can add sounds here)
+                    playSoundEffect(currentRarity);
+                } else {
+                    break;
+                }
+            }
+
+            if (!upgraded && springMode && effectiveChance >= 1 && currentIdx < RARITY_ORDER.length - 1) {
+                // Guaranteed at least one upgrade if chance >= 1
+                currentIdx++;
+                currentRarity = RARITY_ORDER[currentIdx];
+                showUpgradeFlash(RARITY_ORDER[currentIdx - 1], currentRarity);
+                playSoundEffect(currentRarity);
+            }
+
+            updateOpeningUI();
+
+            if (clicksRemaining <= 0 || currentRarity === "Chromatyczny") {
+                setTimeout(() => {
+                    if (document.getElementById('openingOverlay')) openPackNow();
+                }, 700);
+            }
+        }
+
+        function showUpgradeFlash(from, to) {
+            const flash = document.createElement('div');
+            flash.className = 'upgrade-flash';
+            flash.style.color = RARITY_CONFIG[to].color;
+            flash.textContent = `✨ ${from} → ${to} !`;
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 1100);
+        }
+
+        function playSoundEffect(rarity) {
+            // Placeholder for user-added sound effects
+            // console.log(`🔊 Sound: ${rarity}`);
+        }
+
+        window.openPackNow = function() {
+            const overlay = document.getElementById('openingOverlay');
+            if (overlay) {
+                if (overlay._keyHandler) {
+                    document.removeEventListener('keydown', overlay._keyHandler);
+                }
+                overlay.remove();
+            }
+            // Flip lid animation
+            const lid = document.getElementById('boxLid');
+            if (lid) lid.classList.add('flipped');
+
+            const finalRarity = currentRarity;
+            const cardCount = finalRarity === "Chromatyczny" ? 5 :
+                finalRarity === "Legendarny" ? 4 :
+                finalRarity === "Mityczny" ? 3 : 2;
+
+            const selectedAnimals = [];
+            for (let i = 0; i < cardCount; i++) {
+                const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+                selectedAnimals.push(animal);
+                addCardToInventory(animal, finalRarity);
+            }
+            saveState();
+            refreshAllViews();
+            updateCurrencyDisplay();
+            showCardReveal(selectedAnimals, finalRarity);
+        };
+
+        function addCardToInventory(animal, rarity) {
+            let entry = inventory.find(e => e.animalName === animal.name && e.rarity === rarity);
+            if (entry) {
+                entry.quantity++;
+            } else {
+                inventory.push({ animalName: animal.name, emoji: animal.emoji, rarity: rarity, quantity: 1 });
+            }
+            collectedAnimals.add(animal.name);
+        }
+
+        function showCardReveal(animals, rarity) {
+            const revealDiv = document.createElement('div');
+            revealDiv.className = 'reveal-overlay';
+            revealDiv.id = 'revealOverlay';
+            document.body.appendChild(revealDiv);
+
+            animals.forEach((animal, i) => {
+                setTimeout(() => {
+                    const card = document.createElement('div');
+                    card.className = `card-reveal ${RARITY_CONFIG[rarity].cssClass}`;
+                    card.innerHTML = `
+                <div class="card-emoji">${animal.emoji}</div>
+                <div class="card-name">${animal.name}</div>
+                <div class="badge-rarity badge-${rarity.toLowerCase().replace(/ /g,'-')}">${rarity}</div>
+              `;
+                    revealDiv.appendChild(card);
+                }, i * 180);
+            });
+
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'reveal-close-btn';
+            closeBtn.textContent = '✔ Zamknij';
+            closeBtn.onclick = () => {
+                revealDiv.remove();
+                updateCurrencyDisplay();
+            };
+            setTimeout(() => {
+                if (document.getElementById('revealOverlay')) {
+                    revealDiv.appendChild(closeBtn);
+                }
+            }, animals.length * 180 + 350);
+        }
+
+        // ============================================
+        //  DAILY REWARDS
+        // ============================================
+        const DAILY_PRIZES = [
+            { day: 1, desc: '100 monet', reward: { coins: 100 } },
+            { day: 2, desc: '2 paczki podst.', reward: { packs: 2 } },
+            { day: 3, desc: '10 gemów', reward: { gems: 10 } },
+            { day: 4, desc: '500 monet', reward: { coins: 500 } },
+            { day: 5, desc: '5 paczek podst.', reward: { packs: 5 } },
+            { day: 6, desc: '5 gemów', reward: { gems: 5 } },
+            { day: 7, desc: '10 gemów', reward: { gems: 10 } },
+        ];
+
+        function updateDailyTabIndicator() {
+            const tab = document.getElementById('dailyTab');
+            if (!tab) return;
+            tab.classList.remove('available');
+            if (!dailyClaimedToday) {
+                tab.classList.add('available');
+            }
+        }
+
+        function openDailyModal() {
+            const modal = document.getElementById('dailyModal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            renderDailyGrid();
+        }
+
+        function closeDailyModal() {
+            const modal = document.getElementById('dailyModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function renderDailyGrid() {
+            const grid = document.getElementById('dailyGrid');
+            const status = document.getElementById('dailyStatus');
+            const btn = document.getElementById('claimDailyBtn');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const today = getTodayString();
+            for (let i = 1; i <= 7; i++) {
+                const prize = DAILY_PRIZES[i - 1];
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'daily-day';
+                if (i < dailyStreak) dayDiv.classList.add('claimed');
+                if (i === dailyStreak && !dailyClaimedToday) dayDiv.classList.add('current');
+                if (i > dailyStreak) dayDiv.classList.add('locked');
+                if (dailyClaimedToday && i === dailyStreak) dayDiv.classList.add('claimed');
+
+                let content = `<div class="day-num">Dzień ${i}</div>`;
+                if (i < dailyStreak || (i === dailyStreak && dailyClaimedToday)) {
+                    content += `<div class="check-mark">✓</div>`;
+                } else {
+                    content += `<div class="day-prize">${prize.desc}</div>`;
+                }
+                dayDiv.innerHTML = content;
+                grid.appendChild(dayDiv);
+            }
+
+            if (dailyClaimedToday) {
+                status.textContent = '✅ Dzisiejsza nagroda odebrana. Wróć jutro!';
+                btn.disabled = true;
+                btn.textContent = 'Odebrano';
+            } else {
+                status.textContent = `🔥 Dzień ${dailyStreak} – odbierz nagrodę!`;
+                btn.disabled = false;
+                btn.textContent = '🎁 Odbierz nagrodę';
+            }
+        }
+
+        window.claimDailyReward = function() {
+            if (dailyClaimedToday) {
+                showToast('Dzisiejsza nagroda już odebrana!', '#444422');
+                return;
+            }
+            const prize = DAILY_PRIZES[dailyStreak - 1];
+            if (!prize) return;
+
+            // Grant reward
+            if (prize.reward.coins) coins += prize.reward.coins;
+            if (prize.reward.gems) gems += prize.reward.gems;
+            if (prize.reward.packs) {
+                for (let i = 0; i < prize.reward.packs; i++) {
+                    const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+                    addCardToInventory(animal, "Rzadki");
+                }
+            }
+
+            dailyClaimedToday = true;
+            dailyLastClaimDate = getTodayString();
+
+            // Advance streak for next day
+            if (dailyStreak < 7) {
+                dailyStreak++;
+            } else {
+                dailyStreak = 1; // loop back after day 7
+            }
+
+            updateCurrencyDisplay();
+            saveState();
+            refreshAllViews();
+            renderDailyGrid();
+            showToast(`🎉 Odebrano nagrodę dnia ${prize.day}: ${prize.desc}!`, '#224422');
+        };
+
+        // ============================================
+        //  VIEW SWITCHING
+        // ============================================
+        function switchView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            const targetView = document.getElementById(viewName + 'View');
+            if (targetView) targetView.classList.add('active');
+
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            const activeTab = document.querySelector(`.nav-tab[data-view="${viewName}"]`);
+            if (activeTab) activeTab.classList.add('active');
+
+            refreshAllViews();
+            if (viewName === 'daily') {
+                openDailyModal();
+            }
+        }
+
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const view = tab.dataset.view;
+                switchView(view);
+            });
+        });
+
+        // ============================================
+        //  SPRING BOX UI
+        // ============================================
+        function updateSpringBoxVisibility() {
+            const springCard = document.getElementById('springPackCard');
+            if (springCard) {
+                springCard.style.display = springEnabled ? 'block' : 'none';
+            }
+        }
+
+        // ============================================
+        //  INITIALIZATION
+        // ============================================
+        function init() {
+            updateCurrencyDisplay();
+            updateSpringBoxVisibility();
+            refreshAllViews();
+            updateDailyTabIndicator();
+
+            // Close daily modal on overlay click
+            const modal = document.getElementById('dailyModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) closeDailyModal();
+                });
+            }
+        }
+        init();
+
+        // ============================================
+        //  "spring.js" MODULE CONCEPT
+        //  The springEnabled flag above controls the
+        //  Spring Box. External spring.js would set:
+        //  window.springEnabled = true/false;
+        //  and could also override behavior.
+        //  For now, it's embedded. Change the flag
+        //  at line ~"springEnabled = true" above.
+        // ============================================
+
+        console.log('🐾 Card Shop ready!');
+        console.log('🌸 Spring mode:', springEnabled ? 'ENABLED' : 'DISABLED');
+        console.log('💡 Tip: Kliknij gdziekolwiek na ekranie podczas otwierania paczki!');
+        console.log('💎 Gemy:', gems, '| 🪙 Monety:', coins);
+    </script>
+</body>
+</html>
