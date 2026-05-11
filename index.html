@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Zooventures 🐾</title>
-  <link rel="icon" href="icon.png">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #0a0a14;
@@ -88,14 +86,43 @@
       white-space: nowrap;
       transition: all 0.2s;
     }
-    .nav-tab:hover { background: #282845; color: #fff; }
-    .nav-tab.active { background: #2a2040; color: #fff; border-color: #8b5cf6; }
-    .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
-    .view { display: none; animation: fadeIn 0.3s ease; }
-    .view.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    h2 { margin: 15px 0 10px; font-size: 1.3rem; border-bottom: 2px solid var(--border); padding-bottom: 5px; }
-    .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 15px 0; }
+    .nav-tab:hover {
+      background: #282845;
+      color: #fff;
+    }
+    .nav-tab.active {
+      background: #2a2040;
+      color: #fff;
+      border-color: #8b5cf6;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+    .view {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .view.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      margin: 15px 0 10px;
+      font-size: 1.3rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 5px;
+    }
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin: 15px 0;
+    }
     .shop-card {
       background: var(--panel);
       border: 2px solid var(--border);
@@ -104,8 +131,14 @@
       text-align: center;
       transition: all 0.3s;
     }
-    .shop-card:hover { transform: translateY(-3px); border-color: #555; }
-    .pack-icon { font-size: 3.5rem; margin-bottom: 8px; }
+    .shop-card:hover {
+      transform: translateY(-3px);
+      border-color: #555;
+    }
+    .pack-icon {
+      font-size: 3.5rem;
+      margin-bottom: 8px;
+    }
     .btn {
       display: inline-block;
       padding: 10px 22px;
@@ -119,11 +152,24 @@
       margin: 4px;
       transition: all 0.2s;
     }
-    .btn:hover { transform: scale(1.03); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); }
-    .btn:active { transform: scale(0.97); }
-    .btn.sell-btn { background: #ff5e5e; font-size: 0.75rem; padding: 5px 12px; }
-    .btn.discord-btn { background: linear-gradient(135deg, #5865F2, #404EED); display: flex; align-items: center; gap: 6px; justify-content: center; }
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-top: 10px; }
+    .btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn.sell-btn {
+      background: #ff5e5e;
+      font-size: 0.75rem;
+      padding: 5px 12px;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
     .card {
       background: #1a1a2e;
       border: 2px solid #282845;
@@ -131,8 +177,14 @@
       padding: 12px;
       text-align: center;
     }
-    .card .emoji { font-size: 2.2rem; }
-    .card .name { font-weight: 700; font-size: 0.85rem; margin: 4px 0; }
+    .card .emoji {
+      font-size: 2.2rem;
+    }
+    .card .name {
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin: 4px 0;
+    }
     .badge {
       display: inline-block;
       font-size: 0.6rem;
@@ -148,8 +200,17 @@
     .badge-mityczny { background: #ef4444; color: #fff; }
     .badge-legendarny { background: #eab308; color: #000; }
     .badge-chromatyczny { background: linear-gradient(135deg, #ff6bff, #ffb347); color: #000; }
-    .collection-card { opacity: 0.5; filter: grayscale(0.6); }
-    .collection-card.owned { opacity: 1; filter: none; border-color: #4ade80; }
+
+    .collection-card {
+      opacity: 0.5;
+      filter: grayscale(0.6);
+    }
+    .collection-card.owned {
+      opacity: 1;
+      filter: none;
+      border-color: #4ade80;
+    }
+
     .modal {
       position: fixed;
       inset: 0;
@@ -159,7 +220,9 @@
       align-items: center;
       justify-content: center;
     }
-    .modal.active { display: flex; }
+    .modal.active {
+      display: flex;
+    }
     .modal-content {
       background: #16162a;
       border: 2px solid #3a3a55;
@@ -169,7 +232,10 @@
       width: 90%;
       text-align: center;
     }
-    .modal-content h2 { border: none; margin-bottom: 10px; }
+    .modal-content h2 {
+      border: none;
+      margin-bottom: 10px;
+    }
     input {
       background: #1a1a2e;
       border: 2px solid var(--border);
@@ -199,6 +265,7 @@
       85% { opacity: 1; }
       100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
     }
+
     .opening-overlay {
       position: fixed;
       inset: 0;
@@ -223,15 +290,26 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
       transition: all 0.3s;
     }
-    .opening-box.shake { animation: shake 0.5s ease; }
+    .opening-box.shake {
+      animation: shake 0.5s ease;
+    }
     @keyframes shake {
       0%, 100% { transform: rotate(0); }
       25% { transform: rotate(-5deg); }
       50% { transform: rotate(5deg); }
       75% { transform: rotate(-3deg); }
     }
-    .rarity-text { font-size: 2rem; font-weight: 800; margin: 15px 0; text-shadow: 0 0 30px currentColor; }
-    .clicks-left { font-size: 1rem; color: #ccc; margin: 5px 0; }
+    .rarity-text {
+      font-size: 2rem;
+      font-weight: 800;
+      margin: 15px 0;
+      text-shadow: 0 0 30px currentColor;
+    }
+    .clicks-left {
+      font-size: 1rem;
+      color: #ccc;
+      margin: 5px 0;
+    }
     .reveal-area {
       position: fixed;
       inset: 0;
@@ -359,27 +437,9 @@
       <label style="margin-top:10px;">🔔 SFX: <span id="sfxVal">80</span>%</label>
       <input type="range" id="sfxSlider" min="0" max="100" value="80" style="width:100%;">
     </div>
-    <div style="background:var(--panel); border-radius:16px; padding:20px; margin-bottom:15px;">
-      <h3>🔐 Konto</h3>
-      <div id="authSection">
-        <button class="btn discord-btn" onclick="signInWithDiscord()">
-          <span style="font-size:1.2rem;">🎮</span> Zaloguj przez Discord
-        </button>
-        <div style="margin: 12px 0; color: #aaa;">lub</div>
-        <input type="email" id="authEmail" placeholder="Email" class="redeem-input"><br>
-        <input type="password" id="authPassword" placeholder="Hasło" class="redeem-input"><br>
-        <button class="btn" onclick="signUp()">Zarejestruj</button>
-        <button class="btn" onclick="signIn()">Zaloguj</button>
-        <p id="authError" style="color:red; margin-top:6px;"></p>
-      </div>
-      <div id="userInfoBlock" style="display:none;">
-        <p>Zalogowany jako <strong id="userNameDisplay"></strong></p>
-        <button class="btn" style="background:#ff6b6b;" onclick="signOut()">Wyloguj</button>
-      </div>
-    </div>
     <div style="background:var(--panel); border-radius:16px; padding:20px; color:#aaa;">
-      <div><b>Zooventures</b> v1.0.5</div>
-      <div>Copyright © 2026 SzyszoTeam</div>
+      <div><b>Zooventures</b> v2.0</div>
+      <div>Copyright © 2025 SzyszoTeam</div>
       <div>Made with ❤️</div>
     </div>
   </div>
@@ -408,18 +468,9 @@
 
 <script>
 // ==================== TRYB KONSERWACJI ====================
-const MAINTENANCE_MODE = false; // true → break.html
-if (MAINTENANCE_MODE) window.location.href = 'break.html';
-
-// ==================== SUPABASE ====================
-const SUPABASE_URL = 'https://wjbzishechoxiafyfypr.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqYnppc2hlY2hveGlhZnlmeXByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTIwODAsImV4cCI6MjA5NDAyODA4MH0.x8aOXVkB0WLDwmuLDBAhUyn1laTF8gxSi4hMFc2u_sg';
-
-let supabase = null;
-try {
-  supabase = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) || null;
-} catch(e) {
-  console.warn('Supabase offline – gra działa lokalnie');
+const MAINTENANCE_MODE = false; // zmień na true, aby przekierować do break.html
+if (MAINTENANCE_MODE) {
+  window.location.href = 'break.html';
 }
 
 // ==================== STAŁE GRY ====================
@@ -433,355 +484,505 @@ const RARITY = {
 };
 const RORDER = Object.keys(RARITY);
 const ANIMALS = {
-  "Rzadki": [{n:"Lew",e:"🦁"},{n:"Wilk",e:"🐺"},{n:"Jeleń",e:"🦌"},{n:"Żółw",e:"🐢"}],
-  "Bardzo Rzadki": [{n:"Lis",e:"🦊"},{n:"Sowa",e:"🦉"},{n:"Papuga",e:"🦜"}],
-  "Epicki": [{n:"Tygrys",e:"🐯"},{n:"Orzeł",e:"🦅"},{n:"Wąż",e:"🐍"}],
-  "Mityczny": [{n:"Rekin",e:"🦈"},{n:"Panda",e:"🐼"}],
-  "Legendarny": [{n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"}],
-  "Chromatyczny": [{n:"Krokodyl",e:"🐊"}]
+  "Rzadki": [{ n: "Lew", e: "🦁" }, { n: "Wilk", e: "🐺" }, { n: "Jeleń", e: "🦌" }, { n: "Żółw", e: "🐢" }],
+  "Bardzo Rzadki": [{ n: "Lis", e: "🦊" }, { n: "Sowa", e: "🦉" }, { n: "Papuga", e: "🦜" }],
+  "Epicki": [{ n: "Tygrys", e: "🐯" }, { n: "Orzeł", e: "🦅" }, { n: "Wąż", e: "🐍" }],
+  "Mityczny": [{ n: "Rekin", e: "🦈" }, { n: "Panda", e: "🐼" }],
+  "Legendarny": [{ n: "Wieloryb", e: "🐋" }, { n: "Koń", e: "🐴" }],
+  "Chromatyczny": [{ n: "Krokodyl", e: "🐊" }]
 };
 const DROP_TABLE = {
-  "Rzadki": { "Rzadki":0.70, "Bardzo Rzadki":0.25, "Epicki":0.05 },
-  "Bardzo Rzadki": { "Rzadki":0.10, "Bardzo Rzadki":0.60, "Epicki":0.25, "Mityczny":0.05 },
-  "Epicki": { "Rzadki":0.05, "Bardzo Rzadki":0.10, "Epicki":0.50, "Mityczny":0.25, "Legendarny":0.10 },
-  "Mityczny": { "Bardzo Rzadki":0.05, "Epicki":0.10, "Mityczny":0.40, "Legendarny":0.30, "Chromatyczny":0.15 },
-  "Legendarny": { "Epicki":0.10, "Mityczny":0.20, "Legendarny":0.40, "Chromatyczny":0.30 },
-  "Chromatyczny": { "Mityczny":0.05, "Legendarny":0.15, "Chromatyczny":0.80 }
+  "Rzadki": { "Rzadki": 0.70, "Bardzo Rzadki": 0.25, "Epicki": 0.05 },
+  "Bardzo Rzadki": { "Rzadki": 0.10, "Bardzo Rzadki": 0.60, "Epicki": 0.25, "Mityczny": 0.05 },
+  "Epicki": { "Rzadki": 0.05, "Bardzo Rzadki": 0.10, "Epicki": 0.50, "Mityczny": 0.25, "Legendarny": 0.10 },
+  "Mityczny": { "Bardzo Rzadki": 0.05, "Epicki": 0.10, "Mityczny": 0.40, "Legendarny": 0.30, "Chromatyczny": 0.15 },
+  "Legendarny": { "Epicki": 0.10, "Mityczny": 0.20, "Legendarny": 0.40, "Chromatyczny": 0.30 },
+  "Chromatyczny": { "Mityczny": 0.05, "Legendarny": 0.15, "Chromatyczny": 0.80 }
 };
 
 // ==================== STAN GRY ====================
 let coins = 100, gems = 5;
-let inventory = [];
+let inventory = []; // { animalName, emoji, rarity, quantity }
 let collected = new Set();
 let curRarity = "Rzadki", clicksLeft = 5, maxClicks = 5, springMode = false;
 let dailyStreak = 1, dailyLastDate = null, dailyClaimed = false;
 let usedCodes = {};
 let musicVol = 70, sfxVol = 80;
-let currentUser = null;
 
 // ==================== AUDIO ====================
 function playSfx(name) {
   if (sfxVol <= 0) return;
-  try { new Audio(`sounds/${name}.ogg`).play().catch(()=>{}); } catch(e) {}
+  try {
+    const audio = new Audio(`sounds/${name}.ogg`);
+    audio.volume = sfxVol / 100;
+    audio.play().catch(() => {});
+  } catch (e) {}
 }
 
-// ==================== LOKALNY SAVE/LOAD ====================
-function saveLocal() {
-  localStorage.setItem('zoo', JSON.stringify({
-    coins,gems,inventory,collected:[...collected],
-    dailyStreak,dailyLastDate,dailyClaimed,usedCodes,musicVol,sfxVol
+// ==================== SAVE / LOAD ====================
+function save() {
+  localStorage.setItem('zooventures', JSON.stringify({
+    coins, gems, inventory, collected: [...collected],
+    dailyStreak, dailyLastDate, dailyClaimed, usedCodes, musicVol, sfxVol
   }));
 }
-function loadLocal() {
-  const d = JSON.parse(localStorage.getItem('zoo')||'{}');
-  coins=d.coins??100; gems=d.gems??5; inventory=d.inventory??[];
-  collected=new Set(d.collected??[]);
-  dailyStreak=d.dailyStreak??1; dailyLastDate=d.dailyLastDate??null; dailyClaimed=d.dailyClaimed??false;
-  usedCodes=d.usedCodes??{}; musicVol=d.musicVol??70; sfxVol=d.sfxVol??80;
+function load() {
+  const data = JSON.parse(localStorage.getItem('zooventures') || '{}');
+  coins = data.coins ?? 100;
+  gems = data.gems ?? 5;
+  inventory = data.inventory ?? [];
+  collected = new Set(data.collected ?? []);
+  dailyStreak = data.dailyStreak ?? 1;
+  dailyLastDate = data.dailyLastDate ?? null;
+  dailyClaimed = data.dailyClaimed ?? false;
+  usedCodes = data.usedCodes ?? {};
+  musicVol = data.musicVol ?? 70;
+  sfxVol = data.sfxVol ?? 80;
 }
-loadLocal();
-
-// ==================== SUPABASE SYNC ====================
-async function saveCloud() {
-  if(!supabase||!currentUser) { saveLocal(); return; }
-  await supabase.from('profiles').upsert({
-    id:currentUser.id, coins, gems,
-    daily_streak:dailyStreak, daily_last_date:dailyLastDate, daily_claimed_today:dailyClaimed,
-    used_codes:usedCodes, collected_animals:[...collected]
-  });
-  await supabase.from('user_inventory').delete().eq('user_id',currentUser.id);
-  const rows = inventory.map(i=>({
-    user_id:currentUser.id, animal_name:i.animalName, rarity:i.rarity, quantity:i.quantity
-  }));
-  if(rows.length) await supabase.from('user_inventory').insert(rows);
-  saveLocal();
-}
-
-async function loadCloud() {
-  if(!supabase||!currentUser) return false;
-  const {data:p} = await supabase.from('profiles').select('*').eq('id',currentUser.id).single();
-  if(p) {
-    coins=p.coins; gems=p.gems; dailyStreak=p.daily_streak;
-    dailyLastDate=p.daily_last_date; dailyClaimed=p.daily_claimed_today;
-    usedCodes=p.used_codes||{}; collected=new Set(p.collected_animals||[]);
-  } else {
-    await supabase.from('profiles').insert({id:currentUser.id});
-  }
-  const {data:inv} = await supabase.from('user_inventory').select('*').eq('user_id',currentUser.id);
-  inventory = inv.map(i => ({
-    animalName: i.animal_name,
-    emoji: getEmoji(i.animal_name),
-    rarity: i.rarity,
-    quantity: i.quantity
-  }));
-  updateUI(); refreshViews();
-  return true;
-}
+load();
 
 // ==================== UI ====================
 function updateUI() {
   document.getElementById('coinsDisplay').textContent = coins;
   document.getElementById('gemsDisplay').textContent = gems;
 }
-function toast(msg,bg='#222') {
-  const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
-  t.style.background=bg; document.body.appendChild(t);
-  setTimeout(()=>t.remove(),2500);
+function toast(msg, bg = '#222') {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  t.style.background = bg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
 }
 function getEmoji(name) {
-  for(const arr of Object.values(ANIMALS)) {
-    const f = arr.find(a=>a.n===name);
-    if(f) return f.e;
+  for (const arr of Object.values(ANIMALS)) {
+    const found = arr.find(a => a.n === name);
+    if (found) return found.e;
   }
   return '🐾';
 }
 
-function refreshViews() {
-  renderInventory(); renderCollection(); renderSell();
-}
+// ==================== WIDOKI ====================
 function renderInventory() {
-  const grid = document.getElementById('inventoryGrid'); if(!grid) return;
+  const grid = document.getElementById('inventoryGrid');
+  if (!grid) return;
   grid.innerHTML = '';
-  if(inventory.length===0) { grid.innerHTML='<p style="color:#666;grid-column:1/-1;text-align:center;">Brak kart.</p>'; return; }
-  inventory.forEach(i=>{
-    const c = document.createElement('div'); c.className='card';
-    c.innerHTML = `<div class="emoji">${i.emoji}</div><div class="name">${i.animalName}</div>
-      <div class="badge badge-${i.rarity.toLowerCase().replace(' ','-')}">${i.rarity}</div>
-      <div style="color:#ccc;">x${i.quantity}</div>
-      <div style="color:#f0c060;font-size:0.7rem;">🪙${RARITY[i.rarity].price}</div>
-      <button class="btn sell-btn" onclick="sellOne('${i.animalName}','${i.rarity}')">Sprzedaj 1</button>`;
-    grid.appendChild(c);
+  if (inventory.length === 0) {
+    grid.innerHTML = '<p style="color:#666; text-align:center; grid-column:1/-1;">Brak kart.</p>';
+    return;
+  }
+  inventory.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="emoji">${item.emoji}</div>
+      <div class="name">${item.animalName}</div>
+      <div class="badge badge-${item.rarity.toLowerCase().replace(' ', '-')}">${item.rarity}</div>
+      <div style="color:#ccc;">x${item.quantity}</div>
+      <div style="color:#f0c060; font-size:0.7rem;">🪙${RARITY[item.rarity].price}</div>
+      <button class="btn sell-btn" onclick="sellOne('${item.animalName}','${item.rarity}')">Sprzedaj 1</button>
+    `;
+    grid.appendChild(card);
   });
 }
+
 function renderCollection() {
-  const grid = document.getElementById('collectionGrid'); if(!grid) return;
+  const grid = document.getElementById('collectionGrid');
+  if (!grid) return;
   grid.innerHTML = '';
-  for(const [r,animals] of Object.entries(ANIMALS)) {
-    animals.forEach(a=>{
-      const owned = collected.has(a.n);
-      const c = document.createElement('div'); c.className=`card collection-card ${owned?'owned':''}`;
-      c.innerHTML = `<div class="emoji">${a.e}</div><div class="name">${a.n}</div>
-        <div class="badge badge-${r.toLowerCase().replace(' ','-')}">${r}</div>
-        <div style="font-size:0.7rem; color:${owned?'#4ade80':'#666'};">${owned?'✓ Posiadana':'Niezdobyta'}</div>`;
-      grid.appendChild(c);
+  for (const [rarity, animals] of Object.entries(ANIMALS)) {
+    animals.forEach(animal => {
+      const owned = collected.has(animal.n);
+      const card = document.createElement('div');
+      card.className = `card collection-card ${owned ? 'owned' : ''}`;
+      card.innerHTML = `
+        <div class="emoji">${animal.e}</div>
+        <div class="name">${animal.n}</div>
+        <div class="badge badge-${rarity.toLowerCase().replace(' ', '-')}">${rarity}</div>
+        <div style="font-size:0.7rem; color:${owned ? '#4ade80' : '#666'};">${owned ? '✓ Posiadana' : 'Niezdobyta'}</div>
+      `;
+      grid.appendChild(card);
     });
   }
 }
+
 function renderSell() {
-  const cont = document.getElementById('sellContainer'); if(!cont) return;
-  cont.innerHTML = '';
-  if(inventory.length===0) { cont.innerHTML='<p style="color:#666;text-align:center;">Nic do sprzedania.</p>'; return; }
-  inventory.forEach(i=>{
+  const container = document.getElementById('sellContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  if (inventory.length === 0) {
+    container.innerHTML = '<p style="color:#666; text-align:center;">Nic do sprzedania.</p>';
+    return;
+  }
+  inventory.forEach(item => {
     const row = document.createElement('div');
-    row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #2a2a40;';
-    row.innerHTML = `<span>${i.emoji} <b>${i.animalName}</b> [${i.rarity}] x${i.quantity}</span>
-      <span><button class="btn sell-btn" onclick="sellOne('${i.animalName}','${i.rarity}')">1</button>
-      <button class="btn sell-btn" onclick="sellAll('${i.animalName}','${i.rarity}')">Wszystkie</button></span>`;
-    cont.appendChild(row);
+    row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #2a2a40;';
+    row.innerHTML = `
+      <span>${item.emoji} <b>${item.animalName}</b> [${item.rarity}] x${item.quantity}</span>
+      <span>
+        <button class="btn sell-btn" onclick="sellOne('${item.animalName}','${item.rarity}')">1</button>
+        <button class="btn sell-btn" onclick="sellAll('${item.animalName}','${item.rarity}')">Wszystkie</button>
+      </span>
+    `;
+    container.appendChild(row);
   });
+}
+
+function refreshViews() {
+  renderInventory();
+  renderCollection();
+  renderSell();
 }
 
 // ==================== SPRZEDAŻ ====================
 function sellOne(animalName, rarity) {
-  const entry = inventory.find(i=>i.animalName===animalName&&i.rarity===rarity);
-  if(!entry||entry.quantity<1) return;
+  const entry = inventory.find(i => i.animalName === animalName && i.rarity === rarity);
+  if (!entry || entry.quantity < 1) return;
   entry.quantity--;
-  if(entry.quantity<=0) inventory = inventory.filter(i=>!(i.animalName===animalName&&i.rarity===rarity));
+  if (entry.quantity <= 0) {
+    inventory = inventory.filter(i => !(i.animalName === animalName && i.rarity === rarity));
+  }
   coins += RARITY[rarity].price;
-  updateUI(); saveCloud(); refreshViews();
+  updateUI();
+  save();
+  refreshViews();
   playSfx('money');
   toast(`Sprzedano ${animalName} za ${RARITY[rarity].price}🪙`);
 }
+
 function sellAll(animalName, rarity) {
-  const entry = inventory.find(i=>i.animalName===animalName&&i.rarity===rarity);
-  if(!entry) return;
-  const count = entry.quantity, total = RARITY[rarity].price*count;
-  inventory = inventory.filter(i=>!(i.animalName===animalName&&i.rarity===rarity));
+  const entry = inventory.find(i => i.animalName === animalName && i.rarity === rarity);
+  if (!entry) return;
+  const count = entry.quantity;
+  const total = RARITY[rarity].price * count;
+  inventory = inventory.filter(i => !(i.animalName === animalName && i.rarity === rarity));
   coins += total;
-  updateUI(); saveCloud(); refreshViews();
+  updateUI();
+  save();
+  refreshViews();
   playSfx('money');
   toast(`Sprzedano ${count}x ${animalName} za ${total}🪙`);
 }
+
 window.sellOne = sellOne;
 window.sellAll = sellAll;
 
 // ==================== WYMIANA GEMÓW ====================
 window.exchangeGems = function(amount) {
-  if(gems < amount) { toast('Za mało gemów!'); return; }
-  gems -= amount; coins += amount*80;
-  updateUI(); saveCloud();
-  toast(`Wymieniono ${amount}💎 → ${amount*80}🪙`);
+  if (gems < amount) {
+    toast('Za mało gemów!');
+    return;
+  }
+  gems -= amount;
+  coins += amount * 80;
+  updateUI();
+  save();
+  toast(`Wymieniono ${amount}💎 → ${amount * 80}🪙`);
 };
 
 // ==================== KODY ====================
-function openCodeModal() { document.getElementById('codeModal').classList.add('active'); }
-function closeCodeModal() { document.getElementById('codeModal').classList.remove('active'); }
+function openCodeModal() {
+  document.getElementById('codeModal').classList.add('active');
+}
+function closeCodeModal() {
+  document.getElementById('codeModal').classList.remove('active');
+}
 window.redeemCode = function() {
-  const inp = document.getElementById('codeInput'); if(!inp) return;
-  const code = inp.value.trim();
-  if(!code) return;
-  if(code==='CardZoo') {
-    if(usedCodes['CardZoo']) { toast('Kod już wykorzystany!'); return; }
-    gems += 50; usedCodes['CardZoo'] = true;
-    toast('Otrzymałeś 50 gemów! 💎','#224422');
+  const input = document.getElementById('codeInput');
+  if (!input) return;
+  const code = input.value.trim();
+  if (!code) return;
+  if (code === 'CardZoo') {
+    if (usedCodes['CardZoo']) {
+      toast('Kod już wykorzystany!');
+      return;
+    }
+    gems += 50;
+    usedCodes['CardZoo'] = true;
+    toast('Otrzymałeś 50 gemów! 💎', '#224422');
     playSfx('code');
-    inp.value=''; updateUI(); saveCloud(); closeCodeModal();
-  } else { toast('Nieprawidłowy kod!'); }
+    input.value = '';
+    updateUI();
+    save();
+    closeCodeModal();
+  } else {
+    toast('Nieprawidłowy kod!');
+  }
 };
 
 // ==================== PACZKI I OTWIERANIE ====================
 function buyPack(type) {
-  const price = type==='spring'?250:10;
-  if(coins < price) { toast('Za mało monet!'); return; }
+  const price = type === 'spring' ? 250 : 10;
+  if (coins < price) {
+    toast('Za mało monet!');
+    return;
+  }
   coins -= price;
-  updateUI(); saveCloud();
-  springMode = (type==='spring');
+  updateUI();
+  save();
+  springMode = (type === 'spring');
   startOpening();
 }
 window.buyPack = buyPack;
 
 function startOpening() {
-  curRarity = "Rzadki"; clicksLeft = maxClicks;
+  curRarity = "Rzadki";
+  clicksLeft = maxClicks;
   showOpeningOverlay();
 }
+
 function showOpeningOverlay() {
+  // Usuń stary overlay jeśli istnieje
   const old = document.getElementById('openingOverlay');
-  if(old) { document.removeEventListener('keydown',old._kh); old.remove(); }
-  const ov = document.createElement('div');
-  ov.id='openingOverlay'; ov.className='opening-overlay';
-  ov.innerHTML = `<div class="opening-box" id="openingBox">❓</div>
+  if (old) {
+    document.removeEventListener('keydown', old._keyHandler);
+    old.remove();
+  }
+
+  const overlay = document.createElement('div');
+  overlay.id = 'openingOverlay';
+  overlay.className = 'opening-overlay';
+  overlay.innerHTML = `
+    <div class="opening-box" id="openingBox">❓</div>
     <div class="rarity-text" id="rarityLabel" style="color:${RARITY[curRarity].color}">${curRarity}</div>
     <div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div>
-    <p style="color:#aaa;margin-top:10px;">Kliknij gdziekolwiek, by ulepszyć</p>
-    <p style="color:#f0c060;">SPACJA = otwórz teraz</p>`;
-  ov.addEventListener('click', onOverlayClick);
-  const kh = (e)=>{ if(e.code==='Space') { e.preventDefault(); openPackNow(); } };
-  document.addEventListener('keydown', kh); ov._kh = kh;
-  document.body.appendChild(ov);
+    <p style="color:#aaa; margin-top:10px;">Kliknij gdziekolwiek, by ulepszyć</p>
+    <p style="color:#f0c060;">SPACJA = otwórz teraz</p>
+  `;
+
+  overlay.addEventListener('click', onOverlayClick);
+  const keyHandler = (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      openPackNow();
+    }
+  };
+  document.addEventListener('keydown', keyHandler);
+  overlay._keyHandler = keyHandler;
+
+  document.body.appendChild(overlay);
 }
+
 function onOverlayClick() {
-  if(clicksLeft<=0 || curRarity==="Chromatyczny") openPackNow();
-  else attemptUpgrade();
+  if (clicksLeft <= 0 || curRarity === "Chromatyczny") {
+    openPackNow();
+  } else {
+    attemptUpgrade();
+  }
 }
+
 function attemptUpgrade() {
-  if(clicksLeft<=0 || curRarity==="Chromatyczny") return;
+  if (clicksLeft <= 0 || curRarity === "Chromatyczny") return;
   clicksLeft--;
+
+  // Animacja potrząsania pudełkiem
   const box = document.getElementById('openingBox');
-  if(box) { box.classList.add('shake'); setTimeout(()=>box.classList.remove('shake'),500); }
+  if (box) {
+    box.classList.add('shake');
+    setTimeout(() => box.classList.remove('shake'), 500);
+  }
   playSfx('open');
+
+  // Szansa na ulepszenie
   let eff = RARITY[curRarity].up;
-  if(springMode) eff *= 3;
+  if (springMode) eff *= 3;
+
   let idx = RORDER.indexOf(curRarity);
-  while(eff>0 && idx<RORDER.length-1) {
-    if(Math.random() < eff) { idx++; curRarity=RORDER[idx]; eff-=1; }
-    else break;
-  }
-  const lb = document.getElementById('rarityLabel');
-  if(lb) { lb.textContent=curRarity; lb.style.color=RARITY[curRarity].color; }
-  document.getElementById('clicksCount').textContent = clicksLeft;
-  if(clicksLeft<=0 || curRarity==="Chromatyczny") {
-    setTimeout(()=>{ if(document.getElementById('openingOverlay')) openPackNow(); },600);
-  }
-}
-function genCard(packRarity) {
-  const table = DROP_TABLE[packRarity]||{"Rzadki":1};
-  const total = Object.values(table).reduce((a,b)=>a+b,0);
-  let rand = Math.random()*total;
-  for(const [rarity,weight] of Object.entries(table)) {
-    rand -= weight;
-    if(rand<=0) {
-      const animals = ANIMALS[rarity];
-      if(!animals||!animals.length) continue;
-      return { animal:animals[Math.floor(Math.random()*animals.length)], rarity };
+  while (eff > 0 && idx < RORDER.length - 1) {
+    if (Math.random() < eff) {
+      idx++;
+      curRarity = RORDER[idx];
+      eff -= 1;
+    } else {
+      break;
     }
   }
-  return { animal:ANIMALS["Rzadki"][0], rarity:"Rzadki" };
+
+  // Aktualizuj wyświetlacz
+  const label = document.getElementById('rarityLabel');
+  if (label) {
+    label.textContent = curRarity;
+    label.style.color = RARITY[curRarity].color;
+  }
+  document.getElementById('clicksCount').textContent = clicksLeft;
+
+  // Automatyczne otwarcie jeśli koniec kliknięć
+  if (clicksLeft <= 0 || curRarity === "Chromatyczny") {
+    setTimeout(() => {
+      if (document.getElementById('openingOverlay')) openPackNow();
+    }, 600);
+  }
 }
+
+function genCard(packRarity) {
+  const table = DROP_TABLE[packRarity] || { "Rzadki": 1 };
+  const total = Object.values(table).reduce((a, b) => a + b, 0);
+  let rand = Math.random() * total;
+  for (const [rarity, weight] of Object.entries(table)) {
+    rand -= weight;
+    if (rand <= 0) {
+      const animals = ANIMALS[rarity];
+      if (!animals || animals.length === 0) continue;
+      const animal = animals[Math.floor(Math.random() * animals.length)];
+      return { animal, rarity };
+    }
+  }
+  return { animal: ANIMALS["Rzadki"][0], rarity: "Rzadki" };
+}
+
 function openPackNow() {
-  const ov = document.getElementById('openingOverlay');
-  if(ov) { document.removeEventListener('keydown',ov._kh); ov.remove(); }
+  const overlay = document.getElementById('openingOverlay');
+  if (overlay) {
+    document.removeEventListener('keydown', overlay._keyHandler);
+    overlay.remove();
+  }
+
   playSfx('opened');
+
   const packRarity = curRarity;
-  const count = packRarity==="Chromatyczny"?5:(packRarity==="Legendarny"?4:(packRarity==="Mityczny"?3:2));
+  const cardCount = packRarity === "Chromatyczny" ? 5 :
+                    packRarity === "Legendarny" ? 4 :
+                    packRarity === "Mityczny" ? 3 : 2;
+
   const cards = [];
-  for(let i=0;i<count;i++) {
-    const {animal,rarity} = genCard(packRarity);
-    cards.push({animal,rarity});
-    let entry = inventory.find(e=>e.animalName===animal.n&&e.rarity===rarity);
-    if(entry) entry.quantity++;
-    else inventory.push({ animalName:animal.n, emoji:animal.e, rarity, quantity:1 });
+  for (let i = 0; i < cardCount; i++) {
+    const { animal, rarity } = genCard(packRarity);
+    cards.push({ animal, rarity });
+
+    // Dodaj do ekwipunku
+    let entry = inventory.find(e => e.animalName === animal.n && e.rarity === rarity);
+    if (entry) {
+      entry.quantity++;
+    } else {
+      inventory.push({
+        animalName: animal.n,
+        emoji: animal.e,
+        rarity: rarity,
+        quantity: 1
+      });
+    }
     collected.add(animal.n);
   }
-  saveCloud(); refreshViews(); updateUI();
+
+  save();
+  refreshViews();
+  updateUI();
   showReveal(cards);
 }
 window.openPackNow = openPackNow;
+
 function showReveal(cards) {
-  const area = document.createElement('div'); area.className='reveal-area'; area.id='revealArea';
-  cards.forEach((c,i)=>{
-    setTimeout(()=>{
-      const el = document.createElement('div'); el.className='reveal-card';
-      el.innerHTML = `<div style="font-size:2.5rem;">${c.animal.e}</div><div style="font-weight:700;">${c.animal.n}</div>
-        <div class="badge badge-${c.rarity.toLowerCase().replace(' ','-')}">${c.rarity}</div>`;
+  const area = document.createElement('div');
+  area.className = 'reveal-area';
+  area.id = 'revealArea';
+
+  cards.forEach((card, i) => {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'reveal-card';
+      el.innerHTML = `
+        <div style="font-size:2.5rem;">${card.animal.e}</div>
+        <div style="font-weight:700;">${card.animal.n}</div>
+        <div class="badge badge-${card.rarity.toLowerCase().replace(' ', '-')}">${card.rarity}</div>
+      `;
       area.appendChild(el);
-    }, i*200);
+    }, i * 200);
   });
-  const btn = document.createElement('button'); btn.className='reveal-close'; btn.textContent='✔ Zamknij';
-  btn.onclick = ()=>area.remove();
-  setTimeout(()=>area.appendChild(btn), cards.length*200+400);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'reveal-close';
+  closeBtn.textContent = '✔ Zamknij';
+  closeBtn.onclick = () => area.remove();
+  setTimeout(() => area.appendChild(closeBtn), cards.length * 200 + 400);
+
   document.body.appendChild(area);
 }
 
 // ==================== NAGRODY ====================
 function checkDailyReset() {
   const today = new Date().toISOString().split('T')[0];
-  if(dailyLastDate!==today) {
-    if(!dailyLastDate) dailyStreak=1;
-    else {
-      const y = new Date(Date.now()-86400000).toISOString().split('T')[0];
-      if(dailyLastDate!==y) dailyStreak=1;
+  if (dailyLastDate !== today) {
+    if (!dailyLastDate) {
+      dailyStreak = 1;
+    } else {
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      if (dailyLastDate !== yesterday) dailyStreak = 1;
     }
-    dailyClaimed=false; dailyLastDate=today;
+    dailyClaimed = false;
+    dailyLastDate = today;
   }
 }
 checkDailyReset();
-const DPRIZES = [
-  {d:1,desc:'100 monet',r:{c:100}},{d:2,desc:'2 paczki',r:{p:2}},{d:3,desc:'10 gemów',r:{g:10}},
-  {d:4,desc:'500 monet',r:{c:500}},{d:5,desc:'5 paczek',r:{p:5}},{d:6,desc:'5 gemów',r:{g:5}},
-  {d:7,desc:'10 gemów',r:{g:10}}
+
+const DAILY_PRIZES = [
+  { day: 1, desc: '100 monet', reward: { coins: 100 } },
+  { day: 2, desc: '2 paczki', reward: { packs: 2 } },
+  { day: 3, desc: '10 gemów', reward: { gems: 10 } },
+  { day: 4, desc: '500 monet', reward: { coins: 500 } },
+  { day: 5, desc: '5 paczek', reward: { packs: 5 } },
+  { day: 6, desc: '5 gemów', reward: { gems: 5 } },
+  { day: 7, desc: '10 gemów', reward: { gems: 10 } }
 ];
-function openDailyModal(){ document.getElementById('dailyModal').classList.add('active'); renderDailyGrid(); }
-function closeDailyModal(){ document.getElementById('dailyModal').classList.remove('active'); }
-function renderDailyGrid(){
-  const grid = document.getElementById('dailyGrid'); if(!grid) return;
-  grid.innerHTML='';
-  for(let i=1;i<=7;i++){
-    const p=DPRIZES[i-1]; const d=document.createElement('div');
-    d.style.cssText = 'background:#1e1e32;border-radius:10px;padding:8px 4px;text-align:center;border:2px solid #2a2a40;font-size:0.65rem;';
-    if(i<dailyStreak){ d.style.borderColor='#4ade80'; d.innerHTML='<div>✓</div>'; }
-    else if(i===dailyStreak&&!dailyClaimed){ d.style.borderColor='#fbbf24'; d.style.boxShadow='0 0 12px rgba(251,191,36,0.5)'; d.innerHTML=`<div><b>Dzień ${i}</b></div><div>${p.desc}</div>`; }
-    else if(i===dailyStreak&&dailyClaimed){ d.style.borderColor='#4ade80'; d.innerHTML='<div>✓</div>'; }
-    else { d.innerHTML=`<div>Dzień ${i}</div><div>${p.desc}</div>`; }
-    grid.appendChild(d);
+
+function openDailyModal() {
+  document.getElementById('dailyModal').classList.add('active');
+  renderDailyGrid();
+}
+function closeDailyModal() {
+  document.getElementById('dailyModal').classList.remove('active');
+}
+function renderDailyGrid() {
+  const grid = document.getElementById('dailyGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (let i = 1; i <= 7; i++) {
+    const prize = DAILY_PRIZES[i - 1];
+    const dayDiv = document.createElement('div');
+    dayDiv.style.cssText = 'background:#1e1e32; border-radius:10px; padding:8px 4px; text-align:center; border:2px solid #2a2a40; font-size:0.65rem;';
+    if (i < dailyStreak) {
+      dayDiv.style.borderColor = '#4ade80';
+      dayDiv.innerHTML = '<div>✓</div>';
+    } else if (i === dailyStreak && !dailyClaimed) {
+      dayDiv.style.borderColor = '#fbbf24';
+      dayDiv.style.boxShadow = '0 0 12px rgba(251,191,36,0.5)';
+      dayDiv.innerHTML = `<div><b>Dzień ${i}</b></div><div>${prize.desc}</div>`;
+    } else if (i === dailyStreak && dailyClaimed) {
+      dayDiv.style.borderColor = '#4ade80';
+      dayDiv.innerHTML = '<div>✓</div>';
+    } else {
+      dayDiv.innerHTML = `<div>Dzień ${i}</div><div>${prize.desc}</div>`;
+    }
+    grid.appendChild(dayDiv);
   }
-  document.getElementById('dailyStatus').textContent = dailyClaimed?'✅ Odebrano.':`🔥 Dzień ${dailyStreak} – odbierz!`;
+  document.getElementById('dailyStatus').textContent = dailyClaimed ? '✅ Odebrano dzisiaj.' : `🔥 Dzień ${dailyStreak} – odbierz!`;
   document.getElementById('claimDailyBtn').disabled = dailyClaimed;
 }
-window.claimDailyReward = function(){
-  if(dailyClaimed) return;
-  const p = DPRIZES[dailyStreak-1];
-  if(p.r.c) coins+=p.r.c; if(p.r.g) gems+=p.r.g;
-  if(p.r.p) for(let i=0;i<p.r.p;i++){
-    const animals = ANIMALS["Rzadki"];
-    const animal = animals[Math.floor(Math.random()*animals.length)];
-    let entry = inventory.find(e=>e.animalName===animal.n&&e.rarity==="Rzadki");
-    if(entry) entry.quantity++; else inventory.push({animalName:animal.n,emoji:animal.e,rarity:"Rzadki",quantity:1});
-    collected.add(animal.n);
+window.claimDailyReward = function() {
+  if (dailyClaimed) return;
+  const prize = DAILY_PRIZES[dailyStreak - 1];
+  if (prize.reward.coins) coins += prize.reward.coins;
+  if (prize.reward.gems) gems += prize.reward.gems;
+  if (prize.reward.packs) {
+    for (let i = 0; i < prize.reward.packs; i++) {
+      const animals = ANIMALS["Rzadki"];
+      const animal = animals[Math.floor(Math.random() * animals.length)];
+      let entry = inventory.find(e => e.animalName === animal.n && e.rarity === "Rzadki");
+      if (entry) {
+        entry.quantity++;
+      } else {
+        inventory.push({ animalName: animal.n, emoji: animal.e, rarity: "Rzadki", quantity: 1 });
+      }
+      collected.add(animal.n);
+    }
   }
-  dailyClaimed = true; dailyLastDate = new Date().toISOString().split('T')[0];
-  if(dailyStreak<7) dailyStreak++; else dailyStreak=1;
-  updateUI(); saveCloud(); refreshViews(); renderDailyGrid();
-  toast(`Odebrano nagrodę dnia ${p.d}!`);
+  dailyClaimed = true;
+  dailyLastDate = new Date().toISOString().split('T')[0];
+  if (dailyStreak < 7) dailyStreak++; else dailyStreak = 1;
+  updateUI();
+  save();
+  refreshViews();
+  renderDailyGrid();
+  toast(`Odebrano nagrodę dnia ${prize.day}!`);
 };
 
 // ==================== USTAWIENIA ====================
@@ -790,93 +991,32 @@ function updateVolume() {
   sfxVol = parseInt(document.getElementById('sfxSlider').value);
   document.getElementById('musicVal').textContent = musicVol;
   document.getElementById('sfxVal').textContent = sfxVol;
-  saveLocal();
+  save();
 }
 document.getElementById('musicSlider').addEventListener('input', updateVolume);
-document.getElementById('sfxSlider').addEventListener('input', ()=>{ updateVolume(); playSfx('sfx'); });
+document.getElementById('sfxSlider').addEventListener('input', () => {
+  updateVolume();
+  playSfx('sfx');
+});
 document.getElementById('musicSlider').value = musicVol;
 document.getElementById('sfxSlider').value = sfxVol;
 updateVolume();
 
-// ==================== SUPABASE AUTH UI ====================
-async function updateAuthUI() {
-  if(!supabase) { document.getElementById('authSection').style.display='none'; return; }
-  const {data:{user}} = await supabase.auth.getUser();
-  currentUser = user;
-  if(currentUser) {
-    document.getElementById('authSection').style.display = 'none';
-    document.getElementById('userInfoBlock').style.display = 'block';
-    document.getElementById('userNameDisplay').textContent = currentUser.user_metadata?.full_name || currentUser.email;
-  } else {
-    document.getElementById('authSection').style.display = 'block';
-    document.getElementById('userInfoBlock').style.display = 'none';
-  }
-}
-
-// Discord OAuth
-window.signInWithDiscord = async () => {
-  if(!supabase) { toast('Supabase offline'); return; }
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'discord',
-    options: { redirectTo: window.location.origin }
-  });
-  if(error) toast(error.message);
-};
-
-window.signUp = async () => {
-  if(!supabase) { toast('Supabase offline'); return; }
-  const email = document.getElementById('authEmail').value;
-  const password = document.getElementById('authPassword').value;
-  const { error } = await supabase.auth.signUp({ email, password });
-  if(error) document.getElementById('authError').textContent = error.message;
-  else toast('Sprawdź email!');
-};
-
-window.signIn = async () => {
-  if(!supabase) { toast('Supabase offline'); return; }
-  const email = document.getElementById('authEmail').value;
-  const password = document.getElementById('authPassword').value;
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if(error) document.getElementById('authError').textContent = error.message;
-  else { toast('Zalogowano!'); await updateAuthUI(); await loadCloud(); }
-};
-
-window.signOut = async () => {
-  if(supabase) await supabase.auth.signOut();
-  currentUser = null;
-  await updateAuthUI();
-  loadLocal();
-  updateUI();
-  refreshViews();
-};
-
-if(supabase) {
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    if(session?.user) {
-      currentUser = session.user;
-      await updateAuthUI();
-      await loadCloud();
-    } else {
-      currentUser = null;
-      await updateAuthUI();
-    }
-  });
-  updateAuthUI();
-}
-
 // ==================== NAWIGACJA ====================
-function switchView(name) {
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  const target = document.getElementById(name+'View');
-  if(target) target.classList.add('active');
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  const tab = document.querySelector(`.nav-tab[data-view="${name}"]`);
-  if(tab) tab.classList.add('active');
-  if(name==='daily') openDailyModal();
+function switchView(viewName) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById(viewName + 'View');
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const tab = document.querySelector(`.nav-tab[data-view="${viewName}"]`);
+  if (tab) tab.classList.add('active');
+
+  if (viewName === 'daily') openDailyModal();
   refreshViews();
 }
-document.querySelectorAll('.nav-tab').forEach(tab=>{
-  tab.addEventListener('click', ()=> switchView(tab.dataset.view));
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => switchView(tab.dataset.view));
 });
 
 // ==================== START ====================
