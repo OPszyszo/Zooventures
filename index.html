@@ -112,6 +112,11 @@
       33%{box-shadow:0 0 100px 35px rgba(0,255,200,0.9);}
       66%{box-shadow:0 0 100px 35px rgba(255,200,0,0.9);}
     }
+    .discord-btn {
+      background: linear-gradient(135deg, #5865F2, #404EED);
+      display: flex; align-items: center; gap: 8px; justify-content: center;
+    }
+    .discord-btn:hover { box-shadow: 0 8px 25px rgba(88,101,242,0.5); }
   </style>
 </head>
 <body>
@@ -195,6 +200,10 @@
     <div style="background:var(--panel);border-radius:20px;padding:20px;margin-bottom:15px;">
       <h3>🔐 Konto</h3>
       <div id="authSection">
+        <button class="btn discord-btn" onclick="signInWithDiscord()">
+          <span style="font-size:1.3rem;">🎮</span> Zaloguj przez Discord
+        </button>
+        <div style="margin: 15px 0; color: #aaa;">lub</div>
         <input type="email" id="authEmail" placeholder="Email" class="redeem-input"><br>
         <input type="password" id="authPassword" placeholder="Hasło" class="redeem-input"><br>
         <button class="btn" onclick="signUp()">Zarejestruj</button>
@@ -236,7 +245,7 @@
 </div>
 
 <script>
-// ==================== SUPABASE (tylko jedna deklaracja!) ====================
+// ==================== SUPABASE ====================
 const SUPABASE_URL = 'https://wjbzishechoxiafyfypr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqYnppc2hlY2hveGlhZnlmeXByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTIwODAsImV4cCI6MjA5NDAyODA4MH0.x8aOXVkB0WLDwmuLDBAhUyn1laTF8gxSi4hMFc2u_sg';
 
@@ -244,7 +253,7 @@ let supabaseClient = null;
 try {
   supabaseClient = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) || null;
 } catch(e) {
-  console.warn('Supabase nie załadowany – logowanie offline');
+  console.warn('Supabase nie załadowany – tryb offline');
 }
 
 // ==================== STAN GRY ====================
@@ -423,16 +432,39 @@ document.getElementById('musicSlider').value=musicVol; document.getElementById('
 
 async function updateAuthUI(){
   const as=document.getElementById('authSection'), ub=document.getElementById('userInfoBlock');
-  if(!supabaseClient){if(as)as.style.display='none';if(ub)ub.style.display='none';return;}
+  if(!supabaseClient){if(as)as.style.display='block';if(ub)ub.style.display='none';return;}
   const {data}=await supabaseClient.auth.getUser(); currentUser=data?.user||null;
-  if(currentUser){if(as)as.style.display='none';if(ub)ub.style.display='block';document.getElementById('userNameDisplay').textContent=currentUser.email;}
-  else{if(as)as.style.display='block';if(ub)ub.style.display='none';}
+  if(currentUser){
+    if(as)as.style.display='none';
+    if(ub)ub.style.display='block';
+    const nameEl = document.getElementById('userNameDisplay');
+    if(nameEl) nameEl.textContent = currentUser.user_metadata?.full_name || currentUser.email;
+  }else{
+    if(as)as.style.display='block';
+    if(ub)ub.style.display='none';
+  }
 }
+
+// ---- Discord OAuth ----
+async function signInWithDiscord() {
+  if(!supabaseClient) return toast('Supabase offline');
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: 'discord',
+    options: {
+      redirectTo: window.location.origin // po powrocie z Discorda wracamy do gry
+    }
+  });
+  if(error) toast(error.message);
+}
+
 window.signUp=async()=>{ if(!supabaseClient)return toast('Supabase offline'); const e=document.getElementById('authEmail').value, p=document.getElementById('authPassword').value; const {error}=await supabaseClient.auth.signUp({email:e,password:p}); if(error)document.getElementById('authError').textContent=error.message; else toast('Sprawdź email!'); };
 window.signIn=async()=>{ if(!supabaseClient)return toast('Supabase offline'); const e=document.getElementById('authEmail').value, p=document.getElementById('authPassword').value; const {error}=await supabaseClient.auth.signInWithPassword({email:e,password:p}); if(error)document.getElementById('authError').textContent=error.message; else{toast('Zalogowano!');await updateAuthUI();await loadCloud();} };
 window.signOut=async()=>{ if(supabaseClient)await supabaseClient.auth.signOut(); currentUser=null; await updateAuthUI(); loadLocal(); updateUI(); refreshViews(); };
 if(supabaseClient){
-  supabaseClient.auth.onAuthStateChange(async(e,s)=>{ if(s?.user){currentUser=s.user;await updateAuthUI();await loadCloud();}else{currentUser=null;await updateAuthUI();} });
+  supabaseClient.auth.onAuthStateChange(async(e,s)=>{
+    if(s?.user){currentUser=s.user;await updateAuthUI();await loadCloud();}
+    else{currentUser=null;await updateAuthUI();}
+  });
   updateAuthUI();
 }
 
