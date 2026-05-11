@@ -236,12 +236,16 @@
 </div>
 
 <script>
-// ==================== SUPABASE ====================
+// ==================== SUPABASE (tylko jedna deklaracja!) ====================
 const SUPABASE_URL = 'https://wjbzishechoxiafyfypr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqYnppc2hlY2hveGlhZnlmeXByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTIwODAsImV4cCI6MjA5NDAyODA4MH0.x8aOXVkB0WLDwmuLDBAhUyn1laTF8gxSi4hMFc2u_sg';
 
-let supabase = null;
-try { supabase = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) || null; } catch(e) {}
+let supabaseClient = null;
+try {
+  supabaseClient = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) || null;
+} catch(e) {
+  console.warn('Supabase nie załadowany – logowanie offline');
+}
 
 // ==================== STAN GRY ====================
 const RARITY = {
@@ -298,19 +302,19 @@ function loadLocal() {
 loadLocal();
 
 async function saveCloud() {
-  if(!supabase||!currentUser){saveLocal();return;}
-  await supabase.from('profiles').upsert({id:currentUser.id,coins,gems,daily_streak:dailyStreak,daily_last_date:dailyLastDate,daily_claimed_today:dailyClaimed,used_codes:usedCodes,collected_animals:[...collected]});
-  await supabase.from('user_inventory').delete().eq('user_id',currentUser.id);
+  if(!supabaseClient||!currentUser){saveLocal();return;}
+  await supabaseClient.from('profiles').upsert({id:currentUser.id,coins,gems,daily_streak:dailyStreak,daily_last_date:dailyLastDate,daily_claimed_today:dailyClaimed,used_codes:usedCodes,collected_animals:[...collected]});
+  await supabaseClient.from('user_inventory').delete().eq('user_id',currentUser.id);
   const rows=inventory.map(i=>({user_id:currentUser.id,animal_name:i.animalName,rarity:i.rarity,quantity:i.quantity}));
-  if(rows.length) await supabase.from('user_inventory').insert(rows);
+  if(rows.length) await supabaseClient.from('user_inventory').insert(rows);
   saveLocal();
 }
 async function loadCloud() {
-  if(!supabase||!currentUser) return false;
-  const {data:p}=await supabase.from('profiles').select('*').eq('id',currentUser.id).single();
+  if(!supabaseClient||!currentUser) return false;
+  const {data:p}=await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).single();
   if(p){coins=p.coins;gems=p.gems;dailyStreak=p.daily_streak;dailyLastDate=p.daily_last_date;dailyClaimed=p.daily_claimed_today;usedCodes=p.used_codes||{};collected=new Set(p.collected_animals||[]);}
-  else await supabase.from('profiles').insert({id:currentUser.id});
-  const {data:inv}=await supabase.from('user_inventory').select('*').eq('user_id',currentUser.id);
+  else await supabaseClient.from('profiles').insert({id:currentUser.id});
+  const {data:inv}=await supabaseClient.from('user_inventory').select('*').eq('user_id',currentUser.id);
   inventory=inv.map(i=>({animalName:i.animal_name,emoji:getEmoji(i.animal_name),rarity:i.rarity,quantity:i.quantity}));
   updateUI(); refreshViews(); return true;
 }
@@ -345,7 +349,7 @@ window.redeemCode=async()=>{
   }else{toast('Nieprawidłowy kod!');}
 };
 
-// ==================== PACZKI ====================
+// ==================== PACZKI I OTWIERANIE ====================
 window.buyPack=async(t)=>{ const p=t==='spring'?250:10; if(coins<p){toast('Za mało monet!');return;} coins-=p; updateUI(); await saveCloud(); springMode=(t==='spring'); startOpen(); };
 function startOpen(){ curRarity='Rzadki'; clicksLeft=maxClicks; showOpenOverlay(); }
 function showOpenOverlay(){
@@ -419,15 +423,18 @@ document.getElementById('musicSlider').value=musicVol; document.getElementById('
 
 async function updateAuthUI(){
   const as=document.getElementById('authSection'), ub=document.getElementById('userInfoBlock');
-  if(!supabase){if(as)as.style.display='none';if(ub)ub.style.display='none';return;}
-  const {data}=await supabase.auth.getUser(); currentUser=data?.user||null;
+  if(!supabaseClient){if(as)as.style.display='none';if(ub)ub.style.display='none';return;}
+  const {data}=await supabaseClient.auth.getUser(); currentUser=data?.user||null;
   if(currentUser){if(as)as.style.display='none';if(ub)ub.style.display='block';document.getElementById('userNameDisplay').textContent=currentUser.email;}
   else{if(as)as.style.display='block';if(ub)ub.style.display='none';}
 }
-window.signUp=async()=>{ if(!supabase)return toast('Supabase offline'); const e=document.getElementById('authEmail').value, p=document.getElementById('authPassword').value; const {error}=await supabase.auth.signUp({email:e,password:p}); if(error)document.getElementById('authError').textContent=error.message; else toast('Sprawdź email!'); };
-window.signIn=async()=>{ if(!supabase)return toast('Supabase offline'); const e=document.getElementById('authEmail').value, p=document.getElementById('authPassword').value; const {error}=await supabase.auth.signInWithPassword({email:e,password:p}); if(error)document.getElementById('authError').textContent=error.message; else{toast('Zalogowano!');await updateAuthUI();await loadCloud();} };
-window.signOut=async()=>{ if(supabase)await supabase.auth.signOut(); currentUser=null; await updateAuthUI(); loadLocal(); updateUI(); refreshViews(); };
-if(supabase){ supabase.auth.onAuthStateChange(async(e,s)=>{ if(s?.user){currentUser=s.user;await updateAuthUI();await loadCloud();}else{currentUser=null;await updateAuthUI();} }); updateAuthUI(); }
+window.signUp=async()=>{ if(!supabaseClient)return toast('Supabase offline'); const e=document.getElementById('authEmail').value, p=document.getElementById('authPassword').value; const {error}=await supabaseClient.auth.signUp({email:e,password:p}); if(error)document.getElementById('authError').textContent=error.message; else toast('Sprawdź email!'); };
+window.signIn=async()=>{ if(!supabaseClient)return toast('Supabase offline'); const e=document.getElementById('authEmail').value, p=document.getElementById('authPassword').value; const {error}=await supabaseClient.auth.signInWithPassword({email:e,password:p}); if(error)document.getElementById('authError').textContent=error.message; else{toast('Zalogowano!');await updateAuthUI();await loadCloud();} };
+window.signOut=async()=>{ if(supabaseClient)await supabaseClient.auth.signOut(); currentUser=null; await updateAuthUI(); loadLocal(); updateUI(); refreshViews(); };
+if(supabaseClient){
+  supabaseClient.auth.onAuthStateChange(async(e,s)=>{ if(s?.user){currentUser=s.user;await updateAuthUI();await loadCloud();}else{currentUser=null;await updateAuthUI();} });
+  updateAuthUI();
+}
 
 // ==================== NAWIGACJA ====================
 function switchView(v){
