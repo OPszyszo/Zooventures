@@ -64,6 +64,8 @@
     .reveal-card { background:#1a1a30; border-radius:14px; padding:12px; width:110px; height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:3px solid #555; animation:cardJump 0.6s ease-out both; }
     @keyframes cardJump { 0%{opacity:0;transform:translateY(50px) rotateY(90deg);} 50%{opacity:1;transform:translateY(-10px) rotateY(0);} 100%{transform:translateY(0);} }
     .reveal-close { position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#fff; color:#000; padding:10px 28px; border-radius:25px; font-weight:700; z-index:170; cursor:pointer; border:none; }
+    .ban-modal { position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:999; display:flex; align-items:center; justify-content:center; }
+    .ban-content { background:#1a1212; border:2px solid #ff4444; border-radius:24px; padding:40px; text-align:center; max-width:400px; box-shadow:0 0 40px rgba(255,0,0,0.3); }
   </style>
 </head>
 <body>
@@ -115,14 +117,6 @@
         <button class="btn buy-now-btn" data-pack="fire">Kup</button>
         <button class="btn buy-inv-btn" data-pack="fire" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button>
       </div>
-      <div class="shop-card">
-        <div class="pack-icon">💎</div>
-        <h3>Paczka Gemów</h3>
-        <p>Losowa ilość gemów (1-10)</p>
-        <p>🪙 100</p>
-        <button class="btn buy-now-btn" data-pack="gem">Kup</button>
-        <button class="btn buy-inv-btn" data-pack="gem" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button>
-      </div>
     </div>
     <div style="background:var(--panel);border-radius:16px;padding:20px;margin-top:15px;text-align:center;">
       <h3>💎 Wymiana Gemów na Monety</h3>
@@ -132,17 +126,13 @@
     </div>
   </div>
 
-  <!-- EKWIPUNEK -->
   <div class="view" id="inventoryView"><h2>🎒 Ekwipunek</h2><div class="card-grid" id="inventoryGrid"></div></div>
-  <!-- KOLEKCJA -->
   <div class="view" id="collectionView"><h2>📚 Kolekcja</h2><div class="card-grid" id="collectionGrid"></div></div>
-  <!-- SPRZEDAŻ -->
   <div class="view" id="sellView"><h2>💰 Sprzedaż</h2><div id="sellContainer"></div></div>
-  <!-- TRADY -->
   <div class="view" id="tradeView">
     <h2>🔄 Wyślij przedmioty</h2>
     <input type="email" id="tradeEmail" placeholder="Email odbiorcy" style="max-width:400px; margin:0 auto 10px auto;">
-    <div class="trade-gem-box" style="background:var(--panel);border-radius:12px;padding:15px;margin:10px 0;">
+    <div style="background:var(--panel);border-radius:12px;padding:15px;margin:10px 0;">
       <strong>💎 Gemy</strong> (posiadasz: <span id="tradeGemsCount">0</span>)
       <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
         <input type="number" id="tradeGemAmount" placeholder="Ilość" min="0" value="0" style="width:80px;">
@@ -152,11 +142,8 @@
     <h3 style="margin-top:20px;">🃏 Karty</h3>
     <div id="tradeCardsContainer"></div>
   </div>
-  <!-- NAGRODY -->
   <div class="view" id="dailyView" style="text-align:center;"><h2>🎁 Nagrody</h2><button class="btn" id="openDailyBtn">📅 Kalendarz</button></div>
-  <!-- TOP 10 -->
   <div class="view" id="leaderboardView"><h2>🏆 Top 10 graczy (monety)</h2><div id="leaderboardList" style="text-align:center;color:#aaa;">Zaloguj się, aby zobaczyć ranking.</div></div>
-  <!-- USTAWIENIA -->
   <div class="view" id="settingsView">
     <h2>⚙️ Ustawienia</h2>
     <div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;">
@@ -190,7 +177,6 @@
   </div>
 </div>
 
-<!-- MODAL NAGRÓD -->
 <div class="modal" id="dailyModal">
   <div class="modal-content">
     <h2>🎁 Codzienne Nagrody</h2>
@@ -200,7 +186,6 @@
     <br><button class="btn" id="closeDailyModalBtn" style="background:transparent;border:1px solid #555;margin-top:5px;">Zamknij</button>
   </div>
 </div>
-<!-- MODAL KODÓW -->
 <div class="modal" id="codeModal">
   <div class="modal-content">
     <h2>🎟️ Wpisz kod</h2>
@@ -253,7 +238,7 @@ const FIRE_DROP = {
 };
 
 let coins = 100, gems = 5, inv = [], collected = new Set();
-let curRar = "Rzadki", clicksLeft = maxClicks = 5, packType = 'basic';
+let curRar = "Rzadki", clicksLeft = 5, maxClicks = 5, packType = 'basic';
 let dailyStreak = 1, dailyLastDate = null, dailyClaimed = false;
 let usedCodes = {};
 let musicVol = 70, sfxVol = 80;
@@ -292,10 +277,46 @@ async function loadCloud() {
   refreshViews(); updateUI();
 }
 
+// ==================== BAN CHECK ====================
+async function checkBan(userId) {
+  if(!supabaseClient) return;
+  const { data: bans, error } = await supabaseClient.from('bans').select('*').eq('user_id', userId).gt('expires_at', new Date().toISOString());
+  if(error) console.error('Ban check error:', error);
+  if(bans && bans.length > 0) {
+    const ban = bans[0];
+    showBanScreen(ban.reason, ban.expires_at);
+  }
+}
+function showBanScreen(reason, expiresAt) {
+  const existing = document.getElementById('banOverlay');
+  if(existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'banOverlay';
+  overlay.className = 'ban-modal';
+  const remaining = Math.max(0, new Date(expiresAt) - Date.now());
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+  let timeStr = '';
+  if(days > 0) timeStr += `${days} dni `;
+  if(hours > 0) timeStr += `${hours} godz. `;
+  if(minutes > 0) timeStr += `${minutes} min `;
+  timeStr += `${seconds} sek.`;
+  overlay.innerHTML = `
+    <div class="ban-content">
+      <div style="font-size:4rem;">❗</div>
+      <h2 style="color:#ff4444;">Zostałeś Zbanowany</h2>
+      <p style="color:#ccc; margin:15px 0;">Zostałeś zbanowany z Zooventures z powodu <b>${reason || 'nie podano'}</b> na <b>${timeStr}</b>.</p>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
 // ==================== UI ====================
 function updateUI(){ document.getElementById('coinsDisplay').textContent=coins; document.getElementById('gemsDisplay').textContent=gems; }
 function toast(msg,bg='#222'){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; t.style.background=bg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
-function getEmoji(name){ if(name==='Paczka Gemów') return '🎁'; for(const arr of Object.values(ANIMALS)){ const f=arr.find(a=>a.n===name); if(f)return f.e; } return '🐾'; }
+function getEmoji(name){ for(const arr of Object.values(ANIMALS)){ const f=arr.find(a=>a.n===name); if(f)return f.e; } return '🐾'; }
 
 // ==================== RENDER ====================
 function refreshViews(){ renderInventory(); renderCollection(); renderSell(); renderTrade(); }
@@ -305,7 +326,7 @@ function renderInventory(){
   if(inv.length===0){ grid.innerHTML='<p style="color:#666;text-align:center;grid-column:1/-1;">Brak kart.</p>'; return; }
   inv.forEach(i=>{
     const card = document.createElement('div'); card.className = 'card';
-    const isPack = i.n==='Paczka Gemów'||i.n==='Podstawowa Paczka'||i.n==='Wiosenne Pudło'||i.n==='Ogniowa Paczka';
+    const isPack = i.n==='Podstawowa Paczka'||i.n==='Wiosenne Pudło'||i.n==='Ogniowa Paczka';
     const rarityClass = isPack ? 'specjalny' : i.r.toLowerCase().replace(' ','-');
     card.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-${rarityClass}">${i.r}</div><div style="color:#ccc;">x${i.q}</div>${isPack?'<button class="btn open-pack-btn">Otwórz</button>':`<div style="color:#f0c060;font-size:0.7rem;">🪙${RARITY[i.r]?.price??0}</div><button class="btn sell-btn">Sprzedaj 1</button>`}`;
     if(isPack) card.querySelector('.open-pack-btn').addEventListener('click',()=>openPackFromInventory(i));
@@ -314,21 +335,17 @@ function renderInventory(){
   });
 }
 function renderCollection(){
-  const grid = document.getElementById('collectionGrid'); if(!grid)return;
-  grid.innerHTML='';
-  for(const [rarity,animals] of Object.entries(ANIMALS)){
-    animals.forEach(a=>{
-      const owned = collected.has(a.n);
-      const card = document.createElement('div'); card.className=`card collection-card ${owned?'owned':''}`;
-      card.innerHTML=`<div class="emoji">${a.e}</div><div class="name">${a.n}</div><div class="badge badge-${rarity.toLowerCase().replace(' ','-')}">${rarity}</div><div style="font-size:0.7rem;color:${owned?'#4ade80':'#666'};">${owned?'✓ Posiadana':'Niezdobyta'}</div>`;
-      grid.appendChild(card);
-    });
-  }
+  const grid = document.getElementById('collectionGrid'); if(!grid)return; grid.innerHTML='';
+  for(const [rarity,animals] of Object.entries(ANIMALS)) animals.forEach(a=>{
+    const owned = collected.has(a.n);
+    const card = document.createElement('div'); card.className=`card collection-card ${owned?'owned':''}`;
+    card.innerHTML=`<div class="emoji">${a.e}</div><div class="name">${a.n}</div><div class="badge badge-${rarity.toLowerCase().replace(' ','-')}">${rarity}</div><div style="font-size:0.7rem;color:${owned?'#4ade80':'#666'};">${owned?'✓ Posiadana':'Niezdobyta'}</div>`;
+    grid.appendChild(card);
+  });
 }
 function renderSell(){
-  const cont = document.getElementById('sellContainer'); if(!cont)return;
-  cont.innerHTML='';
-  const sellable = inv.filter(i=>i.n!=='Paczka Gemów'&&i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka');
+  const cont = document.getElementById('sellContainer'); if(!cont)return; cont.innerHTML='';
+  const sellable = inv.filter(i=>i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka');
   if(sellable.length===0){ cont.innerHTML='<p style="color:#666;text-align:center;">Nic do sprzedania.</p>'; return; }
   sellable.forEach(i=>{
     const row = document.createElement('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #2a2a40;';
@@ -343,7 +360,7 @@ function renderTrade(){
   const gemInput = document.getElementById('tradeGemAmount'); if(gemInput) gemInput.max=gems;
   const container = document.getElementById('tradeCardsContainer'); if(!container)return;
   container.innerHTML='';
-  const sellable = inv.filter(i=>i.n!=='Paczka Gemów'&&i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka');
+  const sellable = inv.filter(i=>i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka');
   if(sellable.length===0){ container.innerHTML='<p style="color:#666;">Nie masz kart do wysłania.</p>'; return; }
   sellable.forEach(i=>{
     const box = document.createElement('div'); box.className='trade-card-box'; box.style.cssText='background:var(--panel);border-radius:12px;padding:15px;margin:5px 0;display:flex;align-items:center;justify-content:space-between;';
@@ -409,25 +426,15 @@ function redeemCode(){
 
 // ==================== PACZKI ====================
 function buyAndOpen(pack){
-  if(pack==='gem'){
-    if(coins<100){ toast('Za mało monet!'); return; }
-    coins-=100;
-    const rand = Math.random()*100;
-    let amt=1;
-    if(rand<60) amt=1; else if(rand<85) amt=2; else if(rand<95) amt=3; else if(rand<99) amt=5; else amt=10;
-    gems+=amt; updateUI(); saveCloud(); refreshViews();
-    toast(`Kupiono paczkę gemów! +${amt} 💎`);
-  } else {
-    const prices = { basic:10, spring:250, fire:200 };
-    if(coins<prices[pack]){ toast('Za mało monet!'); return; }
-    coins-=prices[pack]; updateUI(); saveCloud();
-    packType=pack; startOpening();
-  }
+  const prices = { basic:10, spring:250, fire:200 };
+  if(coins<prices[pack]){ toast('Za mało monet!'); return; }
+  coins-=prices[pack]; updateUI(); saveCloud();
+  packType=pack; startOpening();
 }
 function buyToInventory(pack){
-  const prices = { basic:10, spring:250, fire:200, gem:100 };
-  const names = { basic:'Podstawowa Paczka', spring:'Wiosenne Pudło', fire:'Ogniowa Paczka', gem:'Paczka Gemów' };
-  const emojis = { basic:'📦', spring:'🌸', fire:'🔥', gem:'🎁' };
+  const prices = { basic:10, spring:250, fire:200 };
+  const names = { basic:'Podstawowa Paczka', spring:'Wiosenne Pudło', fire:'Ogniowa Paczka' };
+  const emojis = { basic:'📦', spring:'🌸', fire:'🔥' };
   if(coins<prices[pack]){ toast('Za mało monet!'); return; }
   coins-=prices[pack];
   let existing = inv.find(i=>i.n===names[pack]);
@@ -484,21 +491,12 @@ function openNow(){
   setTimeout(()=>area.appendChild(btn),cards.length*200+400); document.body.appendChild(area);
 }
 function openPackFromInventory(item){
-  if(item.n==='Paczka Gemów'){
-    item.q--; if(item.q<=0) inv=inv.filter(i=>i!==item);
-    const rand = Math.random()*100;
-    let amt=1;
-    if(rand<60) amt=1; else if(rand<85) amt=2; else if(rand<95) amt=3; else if(rand<99) amt=5; else amt=10;
-    gems+=amt; updateUI(); saveCloud(); refreshViews();
-    toast(`Otworzono paczkę! +${amt} 💎`);
-  } else {
-    const typeMap = {'Podstawowa Paczka':'basic','Wiosenne Pudło':'spring','Ogniowa Paczka':'fire'};
-    const type = typeMap[item.n]||'basic';
-    packType = type;
-    item.q--; if(item.q<=0) inv=inv.filter(i=>i!==item);
-    saveCloud(); refreshViews();
-    startOpening();
-  }
+  const typeMap = {'Podstawowa Paczka':'basic','Wiosenne Pudło':'spring','Ogniowa Paczka':'fire'};
+  const type = typeMap[item.n]||'basic';
+  packType = type;
+  item.q--; if(item.q<=0) inv=inv.filter(i=>i!==item);
+  saveCloud(); refreshViews();
+  startOpening();
 }
 
 // ==================== NAGRODY ====================
@@ -566,6 +564,7 @@ async function updateAuthUI(){
     document.getElementById('authSection').style.display='none';
     document.getElementById('userInfoBlock').style.display='block';
     document.getElementById('userNameDisplay').textContent = currentUser.user_metadata?.full_name||currentUser.email;
+    await checkBan(currentUser.id);
   } else {
     document.getElementById('authSection').style.display='block';
     document.getElementById('userInfoBlock').style.display='none';
@@ -583,9 +582,15 @@ async function signUp(){
 async function signIn(){
   if(!supabaseClient)return toast('Supabase offline');
   const email=document.getElementById('authEmail').value, pass=document.getElementById('authPassword').value;
-  const {error} = await supabaseClient.auth.signInWithPassword({email,password:pass});
-  if(error) document.getElementById('authError').textContent=error.message;
-  else { toast('Zalogowano!'); await updateAuthUI(); await loadCloud(); }
+  const {data, error} = await supabaseClient.auth.signInWithPassword({email,password:pass});
+  if(error) {
+    document.getElementById('authError').textContent = error.message;
+    console.error('SignIn error:', error);
+  } else {
+    toast('Zalogowano!');
+    await updateAuthUI();
+    await loadCloud();
+  }
 }
 async function signOut(){
   if(supabaseClient) await supabaseClient.auth.signOut();
