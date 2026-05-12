@@ -11,6 +11,7 @@
       --bg: #0a0a14; --panel: #151525; --text: #e0e0e0; --gold: #f0c060; --gem: #ff80c0;
       --border: #2a2a40; --btn: #1e1e32; --rzadki: #22c55e; --bardzo: #3b82f6;
       --epicki: #a855f7; --mityczny: #ef4444; --legendarny: #eab308; --chroma: #ff6bff;
+      --hyper: #c084fc;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -33,6 +34,7 @@
     .shop-card { background:var(--panel); border:2px solid var(--border); border-radius:18px; padding:20px; text-align:center; transition:all 0.3s; }
     .shop-card:hover { transform:translateY(-3px); border-color:#555; }
     .pack-icon { font-size:3.5rem; margin-bottom:8px; }
+    .pack-icon-img { width: 100px; height: 100px; object-fit: contain; margin: 0 auto 8px; display: block; }
     .btn { display:inline-block; padding:10px 22px; border-radius:25px; border:none; background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-weight:700; cursor:pointer; font-size:0.9rem; margin:4px; transition:all 0.2s; }
     .btn:hover { transform:scale(1.03); box-shadow:0 6px 20px rgba(139,92,246,0.4); } .btn:active { transform:scale(0.97); }
     .btn.sell-btn { background:#ff5e5e; font-size:0.75rem; padding:5px 12px; }
@@ -45,6 +47,7 @@
     .badge-rzadki { background:#22c55e; color:#000; } .badge-bardzo-rzadki { background:#3b82f6; color:#fff; }
     .badge-epicki { background:#a855f7; color:#fff; } .badge-mityczny { background:#ef4444; color:#fff; }
     .badge-legendarny { background:#eab308; color:#000; } .badge-chromatyczny { background:linear-gradient(135deg,#ff6bff,#ffb347); color:#000; }
+    .badge-hyper { background:#c084fc; color:#000; }
     .badge-specjalny { background:#888; color:#fff; }
     .collection-card { opacity:0.5; filter:grayscale(0.6); } .collection-card.owned { opacity:1; filter:none; border-color:#4ade80; }
     .modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:200; display:none; align-items:center; justify-content:center; }
@@ -117,6 +120,15 @@
         <button class="btn buy-now-btn" data-pack="fire">Kup</button>
         <button class="btn buy-inv-btn" data-pack="fire" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button>
       </div>
+      <div class="shop-card">
+        <img src="assets/hyper.png" alt="Hyper Paczka" class="pack-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div class="pack-icon" style="display:none; color:#c084fc;">📦</div>
+        <h3>Hyper Paczka</h3>
+        <p>Zawiera Hyper karty (2x wartość)</p>
+        <p>🪙 1000</p>
+        <button class="btn buy-now-btn" data-pack="hyper">Kup</button>
+        <button class="btn buy-inv-btn" data-pack="hyper" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button>
+      </div>
     </div>
     <div style="background:var(--panel);border-radius:16px;padding:20px;margin-top:15px;text-align:center;">
       <h3>💎 Wymiana Gemów na Monety</h3>
@@ -170,7 +182,7 @@
       </div>
     </div>
     <div style="background:var(--panel);border-radius:16px;padding:20px;color:#aaa;">
-      <div><b>Zooventures</b> v1.5</div>
+      <div><b>Zooventures</b> v2.0</div>
       <div>Copyright © 2026 SzyszoTeam</div>
       <div>Made with ❤️</div>
     </div>
@@ -217,7 +229,7 @@ const ANIMALS = {
   "Bardzo Rzadki": [{n:"Lis",e:"🦊"},{n:"Sowa",e:"🦉"},{n:"Papuga",e:"🦜"}],
   "Epicki": [{n:"Tygrys",e:"🐯"},{n:"Orzeł",e:"🦅"},{n:"Wąż",e:"🐍"}],
   "Mityczny": [{n:"Rekin",e:"🦈"},{n:"Panda",e:"🐼"}],
-  "Legendarny": [{n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"},{n:"Szynszyla",e:"🐹"},{n:"Salamandra Ognista",e:"🐉"}],
+  "Legendarny": [{n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"},{n:"Szynszyla",e:"🐹"},{n:"Salamandra Ognista",e:"🦎"}],
   "Chromatyczny": [{n:"Krokodyl",e:"🐊"},{n:"Smok Gór",e:"🐉"},{n:"Phoenix",e:"🐦‍🔥"}]
 };
 const DROP_TABLE = {
@@ -249,10 +261,10 @@ function playSfx(name) { if(sfxVol<=0)return; try{new Audio(`sounds/${name}.ogg`
 
 // ==================== SAVE/LOAD ====================
 function saveLocal() {
-  localStorage.setItem('zooventures_v15', JSON.stringify({coins,gems,inv,collected:[...collected],dailyStreak,dailyLastDate,dailyClaimed,usedCodes,musicVol,sfxVol}));
+  localStorage.setItem('zooventures_v2', JSON.stringify({coins,gems,inv,collected:[...collected],dailyStreak,dailyLastDate,dailyClaimed,usedCodes,musicVol,sfxVol}));
 }
 function loadLocal() {
-  const d = JSON.parse(localStorage.getItem('zooventures_v15')||'{}');
+  const d = JSON.parse(localStorage.getItem('zooventures_v2')||'{}');
   coins=d.coins??100; gems=d.gems??5; inv=d.inv??[]; collected=new Set(d.collected??[]);
   dailyStreak=d.dailyStreak??1; dailyLastDate=d.dailyLastDate??null; dailyClaimed=d.dailyClaimed??false;
   usedCodes=d.usedCodes??{}; musicVol=d.musicVol??70; sfxVol=d.sfxVol??80;
@@ -263,7 +275,7 @@ async function saveCloud() {
   if(!supabaseClient||!currentUser){saveLocal();return;}
   await supabaseClient.from('profiles').upsert({id:currentUser.id,coins,gems,daily_streak:dailyStreak,daily_last_date:dailyLastDate,daily_claimed_today:dailyClaimed,used_codes:usedCodes,collected_animals:[...collected]});
   await supabaseClient.from('user_inventory').delete().eq('user_id',currentUser.id);
-  const rows = inv.map(i=>({user_id:currentUser.id,animal_name:i.n,rarity:i.r,quantity:i.q}));
+  const rows = inv.map(i=>({user_id:currentUser.id,animal_name:i.n,rarity:i.r,quantity:i.q,base_rarity:i.baseRarity||null}));
   if(rows.length) await supabaseClient.from('user_inventory').insert(rows);
   saveLocal();
 }
@@ -273,7 +285,7 @@ async function loadCloud() {
   if(p){coins=p.coins;gems=p.gems;dailyStreak=p.daily_streak;dailyLastDate=p.daily_last_date;dailyClaimed=p.daily_claimed_today;usedCodes=p.used_codes||{};collected=new Set(p.collected_animals||[]);}
   else await supabaseClient.from('profiles').insert({id:currentUser.id});
   const {data:invData} = await supabaseClient.from('user_inventory').select('*').eq('user_id',currentUser.id);
-  inv = invData.map(i=>({n:i.animal_name,e:getEmoji(i.animal_name),r:i.rarity,q:i.quantity}));
+  inv = invData.map(i=>({n:i.animal_name,e:getEmoji(i.animal_name,i.base_rarity),r:i.rarity,q:i.quantity,baseRarity:i.base_rarity}));
   refreshViews(); updateUI();
 }
 
@@ -316,7 +328,17 @@ function showBanScreen(reason, expiresAt) {
 // ==================== UI ====================
 function updateUI(){ document.getElementById('coinsDisplay').textContent=coins; document.getElementById('gemsDisplay').textContent=gems; }
 function toast(msg,bg='#222'){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; t.style.background=bg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
-function getEmoji(name){ for(const arr of Object.values(ANIMALS)){ const f=arr.find(a=>a.n===name); if(f)return f.e; } return '🐾'; }
+function getEmoji(name, baseRarity){
+  if(name.startsWith('Hyper ')) {
+    const baseName = name.substring(6);
+    for(const arr of Object.values(ANIMALS)){
+      const f = arr.find(a=>a.n===baseName);
+      if(f) return f.e;
+    }
+  }
+  for(const arr of Object.values(ANIMALS)){ const f=arr.find(a=>a.n===name); if(f)return f.e; }
+  return '🐾';
+}
 
 // ==================== RENDER ====================
 function refreshViews(){ renderInventory(); renderCollection(); renderSell(); renderTrade(); }
@@ -326,9 +348,12 @@ function renderInventory(){
   if(inv.length===0){ grid.innerHTML='<p style="color:#666;text-align:center;grid-column:1/-1;">Brak kart.</p>'; return; }
   inv.forEach(i=>{
     const card = document.createElement('div'); card.className = 'card';
-    const isPack = i.n==='Podstawowa Paczka'||i.n==='Wiosenne Pudło'||i.n==='Ogniowa Paczka';
-    const rarityClass = isPack ? 'specjalny' : i.r.toLowerCase().replace(' ','-');
-    card.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-${rarityClass}">${i.r}</div><div style="color:#ccc;">x${i.q}</div>${isPack?'<button class="btn open-pack-btn">Otwórz</button>':`<div style="color:#f0c060;font-size:0.7rem;">🪙${RARITY[i.r]?.price??0}</div><button class="btn sell-btn">Sprzedaj 1</button>`}`;
+    const isPack = i.n==='Podstawowa Paczka'||i.n==='Wiosenne Pudło'||i.n==='Ogniowa Paczka'||i.n==='Hyper Paczka';
+    const isHyper = i.r === 'Hyper';
+    const rarityClass = isPack ? 'specjalny' : (isHyper ? 'hyper' : i.r.toLowerCase().replace(' ','-'));
+    const price = isHyper ? (2 * RARITY[i.baseRarity]?.price) : (RARITY[i.r]?.price??0);
+    card.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-${rarityClass}">${i.r}</div><div style="color:#ccc;">x${i.q}</div>
+      ${isPack ? '<button class="btn open-pack-btn">Otwórz</button>' : `<div style="color:#f0c060;font-size:0.7rem;">🪙${price}</div><button class="btn sell-btn">Sprzedaj 1</button>`}`;
     if(isPack) card.querySelector('.open-pack-btn').addEventListener('click',()=>openPackFromInventory(i));
     else card.querySelector('.sell-btn').addEventListener('click',()=>sellOne(i.n,i.r));
     grid.appendChild(card);
@@ -345,11 +370,13 @@ function renderCollection(){
 }
 function renderSell(){
   const cont = document.getElementById('sellContainer'); if(!cont)return; cont.innerHTML='';
-  const sellable = inv.filter(i=>i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka');
+  const sellable = inv.filter(i=>i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka'&&i.n!=='Hyper Paczka');
   if(sellable.length===0){ cont.innerHTML='<p style="color:#666;text-align:center;">Nic do sprzedania.</p>'; return; }
   sellable.forEach(i=>{
+    const isHyper = i.r === 'Hyper';
+    const price = isHyper ? (2 * RARITY[i.baseRarity]?.price) : (RARITY[i.r]?.price??0);
     const row = document.createElement('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #2a2a40;';
-    row.innerHTML=`<span>${i.e} <b>${i.n}</b> [${i.r}] x${i.q}</span><span><button class="btn sell-btn sell-one">1</button><button class="btn sell-btn sell-all">Wszystkie</button></span>`;
+    row.innerHTML=`<span>${i.e} <b>${i.n}</b> [${i.r}] x${i.q}</span><span>🪙${price} / szt.</span><span><button class="btn sell-btn sell-one">1</button><button class="btn sell-btn sell-all">Wszystkie</button></span>`;
     row.querySelector('.sell-one').addEventListener('click',()=>sellOne(i.n,i.r));
     row.querySelector('.sell-all').addEventListener('click',()=>sellAll(i.n,i.r));
     cont.appendChild(row);
@@ -360,9 +387,9 @@ function renderTrade(){
   const gemInput = document.getElementById('tradeGemAmount'); if(gemInput) gemInput.max=gems;
   const container = document.getElementById('tradeCardsContainer'); if(!container)return;
   container.innerHTML='';
-  const sellable = inv.filter(i=>i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka');
-  if(sellable.length===0){ container.innerHTML='<p style="color:#666;">Nie masz kart do wysłania.</p>'; return; }
-  sellable.forEach(i=>{
+  const tradable = inv.filter(i=>i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka'&&i.n!=='Hyper Paczka');
+  if(tradable.length===0){ container.innerHTML='<p style="color:#666;">Nie masz kart do wysłania.</p>'; return; }
+  tradable.forEach(i=>{
     const box = document.createElement('div'); box.className='trade-card-box'; box.style.cssText='background:var(--panel);border-radius:12px;padding:15px;margin:5px 0;display:flex;align-items:center;justify-content:space-between;';
     box.innerHTML=`<span>${i.e} <b>${i.n}</b> (${i.r}) – dostępne: ${i.q}</span><div style="display:flex;align-items:center;"><input type="number" class="trade-card-input" placeholder="0" min="0" max="${i.q}" value="0" data-name="${i.n}" data-rarity="${i.r}" style="width:60px;"><button class="btn send-card-btn" style="margin-left:5px;">📤</button></div>`;
     const input = box.querySelector('.trade-card-input');
@@ -387,14 +414,19 @@ function renderTrade(){
 function sellOne(name,rarity){
   const entry = inv.find(i=>i.n===name&&i.r===rarity);
   if(!entry||entry.q<1)return;
-  entry.q--; if(entry.q<=0) inv=inv.filter(i=>!(i.n===name&&i.r===rarity));
-  coins+=RARITY[rarity].price; updateUI(); saveCloud(); refreshViews();
-  playSfx('money'); toast(`Sprzedano ${name} za ${RARITY[rarity].price}🪙`);
+  const isHyper = entry.r === 'Hyper';
+  const price = isHyper ? (2 * RARITY[entry.baseRarity]?.price) : (RARITY[rarity]?.price??0);
+  entry.q--;
+  if(entry.q<=0) inv=inv.filter(i=>!(i.n===name&&i.r===rarity));
+  coins+=price; updateUI(); saveCloud(); refreshViews();
+  playSfx('money'); toast(`Sprzedano ${name} za ${price}🪙`);
 }
 function sellAll(name,rarity){
   const entry = inv.find(i=>i.n===name&&i.r===rarity);
   if(!entry)return;
-  const cnt=entry.q, total=RARITY[rarity].price*cnt;
+  const isHyper = entry.r === 'Hyper';
+  const price = isHyper ? (2 * RARITY[entry.baseRarity]?.price) : (RARITY[rarity]?.price??0);
+  const cnt=entry.q, total=price*cnt;
   inv=inv.filter(i=>!(i.n===name&&i.r===rarity));
   coins+=total; updateUI(); saveCloud(); refreshViews();
   playSfx('money'); toast(`Sprzedano ${cnt}x ${name} za ${total}🪙`);
@@ -426,15 +458,16 @@ function redeemCode(){
 
 // ==================== PACZKI ====================
 function buyAndOpen(pack){
-  const prices = { basic:10, spring:250, fire:200 };
+  const prices = { basic:10, spring:250, fire:200, hyper:1000 };
   if(coins<prices[pack]){ toast('Za mało monet!'); return; }
   coins-=prices[pack]; updateUI(); saveCloud();
-  packType=pack; startOpening();
+  packType=pack;
+  if(pack==='hyper') openHyperPack(); else startOpening();
 }
 function buyToInventory(pack){
-  const prices = { basic:10, spring:250, fire:200 };
-  const names = { basic:'Podstawowa Paczka', spring:'Wiosenne Pudło', fire:'Ogniowa Paczka' };
-  const emojis = { basic:'📦', spring:'🌸', fire:'🔥' };
+  const prices = { basic:10, spring:250, fire:200, hyper:1000 };
+  const names = { basic:'Podstawowa Paczka', spring:'Wiosenne Pudło', fire:'Ogniowa Paczka', hyper:'Hyper Paczka' };
+  const emojis = { basic:'📦', spring:'🌸', fire:'🔥', hyper:'📦' };
   if(coins<prices[pack]){ toast('Za mało monet!'); return; }
   coins-=prices[pack];
   let existing = inv.find(i=>i.n===names[pack]);
@@ -490,7 +523,25 @@ function openNow(){
   const btn = document.createElement('button'); btn.className='reveal-close'; btn.textContent='✔ Zamknij'; btn.onclick=()=>area.remove();
   setTimeout(()=>area.appendChild(btn),cards.length*200+400); document.body.appendChild(area);
 }
+function openHyperPack(){
+  const allAnimals = [];
+  for(const arr of Object.values(ANIMALS)) allAnimals.push(...arr);
+  const animal = allAnimals[Math.floor(Math.random()*allAnimals.length)];
+  const hyperName = 'Hyper ' + animal.n;
+  let existing = inv.find(i=>i.n===hyperName && i.r==='Hyper');
+  if(existing) existing.q++;
+  else inv.push({n:hyperName, e:animal.e, r:'Hyper', q:1, baseRarity: Object.keys(ANIMALS).find(key=>ANIMALS[key].some(a=>a.n===animal.n))});
+  collected.add(animal.n);
+  saveCloud(); refreshViews(); updateUI();
+  toast(`Otrzymujesz ${hyperName}!`);
+}
 function openPackFromInventory(item){
+  if(item.n==='Hyper Paczka'){
+    item.q--; if(item.q<=0) inv=inv.filter(i=>i!==item);
+    saveCloud(); refreshViews();
+    openHyperPack();
+    return;
+  }
   const typeMap = {'Podstawowa Paczka':'basic','Wiosenne Pudło':'spring','Ogniowa Paczka':'fire'};
   const type = typeMap[item.n]||'basic';
   packType = type;
