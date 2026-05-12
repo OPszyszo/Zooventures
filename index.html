@@ -1,114 +1,114 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Zooventures 🐾</title>
-  <link rel="icon" href="icon.png">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --bg: #0a0a14; --panel: #151525; --text: #e0e0e0; --gold: #f0c060; --gem: #ff80c0;
-      --border: #2a2a40; --btn: #1e1e32; --rzadki: #22c55e; --bardzo: #3b82f6;
-      --epicki: #a855f7; --mityczny: #ef4444; --legendarny: #eab308; --chroma: #ff6bff;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif;
-      min-height: 100vh; padding-bottom: 30px; user-select: none; -webkit-tap-highlight-color: transparent;
-    }
-    .top-bar { display:flex; align-items:center; justify-content:space-between; padding:10px 18px; background:rgba(18,18,32,0.9); backdrop-filter:blur(20px); border-bottom:2px solid var(--border); position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:8px; }
-    .logo { font-weight:800; font-size:1.2rem; letter-spacing:1px; color:#fff; }
-    .currency { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .coin, .gem { display:flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-weight:700; font-size:0.9rem; border:2px solid #3a3020; background:#1a1a28; }
-    .coin { color:var(--gold); border-color:#4a3e20; } .gem { color:var(--gem); border-color:#4a2040; }
-    .nav-tabs { display:flex; gap:4px; flex-wrap:wrap; }
-    .nav-tab { padding:6px 14px; border-radius:20px; border:2px solid var(--border); background:var(--btn); color:#aaa; cursor:pointer; font-weight:600; font-size:0.8rem; white-space:nowrap; transition:all 0.2s; }
-    .nav-tab:hover { background:#282845; color:#fff; } .nav-tab.active { background:#2a2040; color:#fff; border-color:#8b5cf6; }
-    .container { max-width:1000px; margin:20px auto; padding:0 15px; }
-    .view { display:none; animation:fadeIn 0.3s ease; } .view.active { display:block; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
-    h2 { margin:15px 0 10px; font-size:1.3rem; border-bottom:2px solid var(--border); padding-bottom:5px; }
-    .shop-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:15px; margin:15px 0; }
-    .shop-card { background:var(--panel); border:2px solid var(--border); border-radius:18px; padding:20px; text-align:center; transition:all 0.3s; }
-    .shop-card:hover { transform:translateY(-3px); border-color:#555; }
-    .pack-icon { font-size:3.5rem; margin-bottom:8px; }
-    .btn { display:inline-block; padding:10px 22px; border-radius:25px; border:none; background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-weight:700; cursor:pointer; font-size:0.9rem; margin:4px; transition:all 0.2s; }
-    .btn:hover { transform:scale(1.03); box-shadow:0 6px 20px rgba(139,92,246,0.4); } .btn:active { transform:scale(0.97); }
-    .btn.sell-btn { background:#ff5e5e; font-size:0.75rem; padding:5px 12px; }
-    .btn.discord-btn { background:linear-gradient(135deg,#5865F2,#404EED); display:flex; align-items:center; gap:6px; justify-content:center; }
-    .btn.github-btn { background:linear-gradient(135deg,#333,#555); display:flex; align-items:center; gap:6px; justify-content:center; }
-    .card-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap:12px; margin-top:10px; }
-    .card { background:#1a1a2e; border:2px solid #282845; border-radius:14px; padding:12px; text-align:center; }
-    .card .emoji { font-size:2.2rem; } .card .name { font-weight:700; font-size:0.85rem; margin:4px 0; }
-    .badge { display:inline-block; font-size:0.6rem; text-transform:uppercase; font-weight:800; padding:2px 8px; border-radius:10px; margin-top:2px; }
-    .badge-rzadki { background:#22c55e; color:#000; } .badge-bardzo-rzadki { background:#3b82f6; color:#fff; }
-    .badge-epicki { background:#a855f7; color:#fff; } .badge-mityczny { background:#ef4444; color:#fff; }
-    .badge-legendarny { background:#eab308; color:#000; } .badge-chromatyczny { background:linear-gradient(135deg,#ff6bff,#ffb347); color:#000; }
-    .badge-specjalny { background:#888; color:#fff; }
-    .collection-card { opacity:0.5; filter:grayscale(0.6); } .collection-card.owned { opacity:1; filter:none; border-color:#4ade80; }
-    .modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:200; display:none; align-items:center; justify-content:center; }
-    .modal.active { display:flex; }
-    .modal-content { background:#16162a; border:2px solid #3a3a55; border-radius:20px; padding:25px; max-width:400px; width:90%; text-align:center; }
-    .modal-content h2 { border:none; margin-bottom:10px; }
-    input, select { background:#1a1a2e; border:2px solid var(--border); border-radius:15px; padding:8px 12px; color:#fff; width:100%; margin:5px 0; font-size:0.9rem; }
-    .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#222; color:#fff; padding:10px 20px; border-radius:20px; z-index:300; font-weight:600; animation:toastAnim 2.5s forwards; }
-    @keyframes toastAnim { 0%{opacity:0;transform:translateX(-50%) translateY(-20px);} 15%{opacity:1;transform:translateX(-50%) translateY(0);} 85%{opacity:1;} 100%{opacity:0;transform:translateX(-50%) translateY(-20px);} }
-    .opening-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:150; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; }
-    .opening-box { width:140px; height:140px; background:linear-gradient(135deg,#3b2f5a,#1e1635); border:3px solid #8e7cc3; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:4rem; box-shadow:0 10px 30px rgba(0,0,0,0.6); transition:all 0.3s; }
-    .opening-box.shake { animation:shake 0.5s ease; }
-    @keyframes shake { 0%,100%{transform:rotate(0);} 25%{transform:rotate(-5deg);} 50%{transform:rotate(5deg);} 75%{transform:rotate(-3deg);} }
-    .rarity-text { font-size:2rem; font-weight:800; margin:15px 0; text-shadow:0 0 30px currentColor; }
-    .clicks-left { font-size:1rem; color:#ccc; margin:5px 0; }
-    .reveal-area { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:160; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:15px; padding:20px; }
-    .reveal-card { background:#1a1a30; border-radius:14px; padding:12px; width:110px; height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:3px solid #555; animation:cardJump 0.6s ease-out both; }
-    @keyframes cardJump { 0%{opacity:0;transform:translateY(50px) rotateY(90deg);} 50%{opacity:1;transform:translateY(-10px) rotateY(0);} 100%{transform:translateY(0);} }
-    .reveal-close { position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#fff; color:#000; padding:10px 28px; border-radius:25px; font-weight:700; z-index:170; cursor:pointer; border:none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Zooventures 🐾</title>
+    <link rel="icon" href="icon.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #0a0a14; --panel: #151525; --text: #e0e0e0; --gold: #f0c060; --gem: #ff80c0;
+            --border: #2a2a40; --btn: #1e1e32; --rzadki: #22c55e; --bardzo: #3b82f6;
+            --epicki: #a855f7; --mityczny: #ef4444; --legendarny: #eab308; --chroma: #ff6bff;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh; padding-bottom: 30px; user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .top-bar { display:flex; align-items:center; justify-content:space-between; padding:10px 18px; background:rgba(18,18,32,0.9); backdrop-filter:blur(20px); border-bottom:2px solid var(--border); position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:8px; }
+        .logo { font-weight:800; font-size:1.2rem; letter-spacing:1px; color:#fff; }
+        .currency { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+        .coin, .gem { display:flex; align-items:center; gap:5px; padding:5px 12px; border-radius:20px; font-weight:700; font-size:0.9rem; border:2px solid #3a3020; background:#1a1a28; }
+        .coin { color:var(--gold); border-color:#4a3e20; } .gem { color:var(--gem); border-color:#4a2040; }
+        .nav-tabs { display:flex; gap:4px; flex-wrap:wrap; }
+        .nav-tab { padding:6px 14px; border-radius:20px; border:2px solid var(--border); background:var(--btn); color:#aaa; cursor:pointer; font-weight:600; font-size:0.8rem; white-space:nowrap; transition:all 0.2s; }
+        .nav-tab:hover { background:#282845; color:#fff; } .nav-tab.active { background:#2a2040; color:#fff; border-color:#8b5cf6; }
+        .container { max-width:1000px; margin:20px auto; padding:0 15px; }
+        .view { display:none; animation:fadeIn 0.3s ease; } .view.active { display:block; }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+        h2 { margin:15px 0 10px; font-size:1.3rem; border-bottom:2px solid var(--border); padding-bottom:5px; }
+        .shop-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:15px; margin:15px 0; }
+        .shop-card { background:var(--panel); border:2px solid var(--border); border-radius:18px; padding:20px; text-align:center; transition:all 0.3s; }
+        .shop-card:hover { transform:translateY(-3px); border-color:#555; }
+        .pack-icon { font-size:3.5rem; margin-bottom:8px; }
+        .btn { display:inline-block; padding:10px 22px; border-radius:25px; border:none; background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-weight:700; cursor:pointer; font-size:0.9rem; margin:4px; transition:all 0.2s; }
+        .btn:hover { transform:scale(1.03); box-shadow:0 6px 20px rgba(139,92,246,0.4); } .btn:active { transform:scale(0.97); }
+        .btn.sell-btn { background:#ff5e5e; font-size:0.75rem; padding:5px 12px; }
+        .btn.discord-btn { background:linear-gradient(135deg,#5865F2,#404EED); display:flex; align-items:center; gap:6px; justify-content:center; }
+        .btn.github-btn { background:linear-gradient(135deg,#333,#555); display:flex; align-items:center; gap:6px; justify-content:center; }
+        .card-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap:12px; margin-top:10px; }
+        .card { background:#1a1a2e; border:2px solid #282845; border-radius:14px; padding:12px; text-align:center; }
+        .card .emoji { font-size:2.2rem; } .card .name { font-weight:700; font-size:0.85rem; margin:4px 0; }
+        .badge { display:inline-block; font-size:0.6rem; text-transform:uppercase; font-weight:800; padding:2px 8px; border-radius:10px; margin-top:2px; }
+        .badge-rzadki { background:#22c55e; color:#000; } .badge-bardzo-rzadki { background:#3b82f6; color:#fff; }
+        .badge-epicki { background:#a855f7; color:#fff; } .badge-mityczny { background:#ef4444; color:#fff; }
+        .badge-legendarny { background:#eab308; color:#000; } .badge-chromatyczny { background:linear-gradient(135deg,#ff6bff,#ffb347); color:#000; }
+        .badge-specjalny { background:#888; color:#fff; }
+        .collection-card { opacity:0.5; filter:grayscale(0.6); } .collection-card.owned { opacity:1; filter:none; border-color:#4ade80; }
+        .modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:200; display:none; align-items:center; justify-content:center; }
+        .modal.active { display:flex; }
+        .modal-content { background:#16162a; border:2px solid #3a3a55; border-radius:20px; padding:25px; max-width:400px; width:90%; text-align:center; }
+        .modal-content h2 { border:none; margin-bottom:10px; }
+        input, select { background:#1a1a2e; border:2px solid var(--border); border-radius:15px; padding:8px 12px; color:#fff; width:100%; margin:5px 0; font-size:0.9rem; }
+        .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#222; color:#fff; padding:10px 20px; border-radius:20px; z-index:300; font-weight:600; animation:toastAnim 2.5s forwards; }
+        @keyframes toastAnim { 0%{opacity:0;transform:translateX(-50%) translateY(-20px);} 15%{opacity:1;transform:translateX(-50%) translateY(0);} 85%{opacity:1;} 100%{opacity:0;transform:translateX(-50%) translateY(-20px);} }
+        .opening-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:150; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; }
+        .opening-box { width:140px; height:140px; background:linear-gradient(135deg,#3b2f5a,#1e1635); border:3px solid #8e7cc3; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:4rem; box-shadow:0 10px 30px rgba(0,0,0,0.6); transition:all 0.3s; }
+        .opening-box.shake { animation:shake 0.5s ease; }
+        @keyframes shake { 0%,100%{transform:rotate(0);} 25%{transform:rotate(-5deg);} 50%{transform:rotate(5deg);} 75%{transform:rotate(-3deg);} }
+        .rarity-text { font-size:2rem; font-weight:800; margin:15px 0; text-shadow:0 0 30px currentColor; }
+        .clicks-left { font-size:1rem; color:#ccc; margin:5px 0; }
+        .reveal-area { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:160; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:15px; padding:20px; }
+        .reveal-card { background:#1a1a30; border-radius:14px; padding:12px; width:110px; height:140px; display:flex; flex-direction:column; align-items:center; justify-content:center; border:3px solid #555; animation:cardJump 0.6s ease-out both; }
+        @keyframes cardJump { 0%{opacity:0;transform:translateY(50px) rotateY(90deg);} 50%{opacity:1;transform:translateY(-10px) rotateY(0);} 100%{transform:translateY(0);} }
+        .reveal-close { position:fixed; bottom:25px; left:50%; transform:translateX(-50%); background:#fff; color:#000; padding:10px 28px; border-radius:25px; font-weight:700; z-index:170; cursor:pointer; border:none; }
+    </style>
 </head>
 <body>
 <div class="top-bar">
-  <div class="logo">🐾 ZOOVENTURES</div>
-  <div class="currency">
-    <div class="coin">🪙 <span id="coinsDisplay">100</span></div>
-    <div class="gem">💎 <span id="gemsDisplay">5</span></div>
-    <button class="btn" id="openCodeBtn" style="padding:6px 14px;font-size:0.8rem;">🎟️ Kody</button>
-  </div>
-  <div class="nav-tabs">
-    <div class="nav-tab active" data-view="shop">🏪 Sklep</div>
-    <div class="nav-tab" data-view="inventory">🎒 Ekwipunek</div>
-    <div class="nav-tab" data-view="collection">📚 Kolekcja</div>
-    <div class="nav-tab" data-view="sell">💰 Sprzedaż</div>
-    <div class="nav-tab" data-view="trade">🔄 Trady</div>
-    <div class="nav-tab" data-view="daily">🎁 Nagrody</div>
-    <div class="nav-tab" data-view="leaderboard">🏆 Top 10</div>
-    <div class="nav-tab" data-view="settings">⚙️ Ustawienia</div>
-  </div>
+    <div class="logo">🐾 ZOOVENTURES</div>
+    <div class="currency">
+        <div class="coin">🪙 <span id="coinsDisplay">100</span></div>
+        <div class="gem">💎 <span id="gemsDisplay">5</span></div>
+        <button class="btn" id="openCodeBtn" style="padding:6px 14px;font-size:0.8rem;">🎟️ Kody</button>
+    </div>
+    <div class="nav-tabs">
+        <div class="nav-tab active" data-view="shop">🏪 Sklep</div>
+        <div class="nav-tab" data-view="inventory">🎒 Ekwipunek</div>
+        <div class="nav-tab" data-view="collection">📚 Kolekcja</div>
+        <div class="nav-tab" data-view="sell">💰 Sprzedaż</div>
+        <div class="nav-tab" data-view="trade">🔄 Trady</div>
+        <div class="nav-tab" data-view="daily">🎁 Nagrody</div>
+        <div class="nav-tab" data-view="leaderboard">🏆 Top 10</div>
+        <div class="nav-tab" data-view="settings">⚙️ Ustawienia</div>
+    </div>
 </div>
 
 <div class="container">
-  <div class="view active" id="shopView">
-    <h2>🧪 Paczki Kart</h2>
-    <div class="shop-grid">
-      <div class="shop-card"><div class="pack-icon">📦</div><h3>Podstawowa Paczka</h3><p>Start: <b style="color:#22c55e;">Rzadki</b> · Kliknij 1-5 razy</p><p>🪙 10</p><button class="btn buy-now-btn" data-pack="basic">Kup</button><button class="btn buy-inv-btn" data-pack="basic" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button></div>
-      <div class="shop-card"><div class="pack-icon">🌸</div><h3>Wiosenne Pudło</h3><p><b>3x szczęście</b> · Start: <b style="color:#22c55e;">Rzadki</b></p><p>🪙 250</p><button class="btn buy-now-btn" data-pack="spring">Kup</button><button class="btn buy-inv-btn" data-pack="spring" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button></div>
-      <div class="shop-card"><div class="pack-icon">🔥</div><h3>Ogniowa Paczka</h3><p>Specjalne ogniste zwierzaki!</p><p>🪙 200</p><button class="btn buy-now-btn" data-pack="fire">Kup</button><button class="btn buy-inv-btn" data-pack="fire" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button></div>
-      <div class="shop-card"><div class="pack-icon">📦</div><h3>Hyper Paczka</h3><p>Hyper karty (2x wartość)</p><p>🪙 1000</p><button class="btn buy-now-btn" data-pack="hyper">Kup</button><button class="btn buy-inv-btn" data-pack="hyper" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button></div>
+    <div class="view active" id="shopView">
+        <h2>🧪 Paczki Kart</h2>
+        <div class="shop-grid">
+            <div class="shop-card"><div class="pack-icon">📦</div><h3>Podstawowa Paczka</h3><p>Start: <b style="color:#22c55e;">Rzadki</b> · Kliknij 1-5 razy</p><p>🪙 10</p><button class="btn buy-now-btn" data-pack="basic">Kup</button><button class="btn buy-inv-btn" data-pack="basic" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button></div>
+            <div class="shop-card"><div class="pack-icon">🌸</div><h3>Wiosenne Pudło</h3><p><b>3x szczęście</b> · Start: <b style="color:#22c55e;">Rzadki</b></p><p>🪙 250</p><button class="btn buy-now-btn" data-pack="spring">Kup</button><button class="btn buy-inv-btn" data-pack="spring" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button></div>
+            <div class="shop-card"><div class="pack-icon">🔥</div><h3>Ogniowa Paczka</h3><p>Specjalne ogniste zwierzaki!</p><p>🪙 200</p><button class="btn buy-now-btn" data-pack="fire">Kup</button><button class="btn buy-inv-btn" data-pack="fire" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button></div>
+            <div class="shop-card"><div class="pack-icon">📦</div><h3>Hyper Paczka</h3><p>Hyper karty (2x wartość)</p><p>🪙 1000</p><button class="btn buy-now-btn" data-pack="hyper">Kup</button><button class="btn buy-inv-btn" data-pack="hyper" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button></div>
+        </div>
+        <div style="background:var(--panel);border-radius:16px;padding:20px;margin-top:15px;text-align:center;">
+            <h3>💎 Wymiana Gemów na Monety</h3>
+            <button class="btn exchange-btn" data-amount="1">💎1 → 🪙80</button>
+            <button class="btn exchange-btn" data-amount="5">💎5 → 🪙400</button>
+            <button class="btn exchange-btn" data-amount="10">💎10 → 🪙800</button>
+        </div>
     </div>
-    <div style="background:var(--panel);border-radius:16px;padding:20px;margin-top:15px;text-align:center;">
-      <h3>💎 Wymiana Gemów na Monety</h3>
-      <button class="btn exchange-btn" data-amount="1">💎1 → 🪙80</button>
-      <button class="btn exchange-btn" data-amount="5">💎5 → 🪙400</button>
-      <button class="btn exchange-btn" data-amount="10">💎10 → 🪙800</button>
-    </div>
-  </div>
-  <div class="view" id="inventoryView"><h2>🎒 Ekwipunek</h2><div class="card-grid" id="inventoryGrid"></div></div>
-  <div class="view" id="collectionView"><h2>📚 Kolekcja</h2><div class="card-grid" id="collectionGrid"></div></div>
-  <div class="view" id="sellView"><h2>💰 Sprzedaż</h2><div id="sellContainer"></div></div>
-  <div class="view" id="tradeView"><h2>🔄 Wyślij przedmioty</h2><input type="email" id="tradeEmail" placeholder="Email odbiorcy" style="max-width:400px; margin:0 auto 10px auto;"><div style="background:var(--panel);border-radius:12px;padding:15px;margin:10px 0;"><strong>💎 Gemy</strong> (posiadasz: <span id="tradeGemsCount">0</span>)<div style="display:flex; align-items:center; gap:10px; margin-top:8px;"><input type="number" id="tradeGemAmount" placeholder="Ilość" min="0" value="0" style="width:80px;"><button class="btn" id="sendGemBtn">📤 Wyślij Gemy</button></div></div><h3 style="margin-top:20px;">🃏 Karty</h3><div id="tradeCardsContainer"></div></div>
-  <div class="view" id="dailyView" style="text-align:center;"><h2>🎁 Nagrody</h2><button class="btn" id="openDailyBtn">📅 Kalendarz</button></div>
-  <div class="view" id="leaderboardView"><h2>🏆 Top 10 graczy (monety)</h2><div id="leaderboardList" style="text-align:center;color:#aaa;">Zaloguj się, aby zobaczyć ranking.</div></div>
-  <div class="view" id="settingsView"><h2>⚙️ Ustawienia</h2><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><label>🔊 Muzyka: <span id="musicVal">70</span>%</label><input type="range" id="musicSlider" min="0" max="100" value="70" style="width:100%;"><label style="margin-top:10px;">🔔 SFX: <span id="sfxVal">80</span>%</label><input type="range" id="sfxSlider" min="0" max="100" value="80" style="width:100%;"></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>🔐 Konto</h3><div id="authSection"><button class="btn discord-btn" id="loginDiscordBtn">🎮 Discord</button><button class="btn github-btn" id="loginGithubBtn" style="margin-left:6px;">🐙 GitHub</button><div style="margin:12px 0;color:#aaa;">lub</div><input type="email" id="authEmail" placeholder="Email"><br><input type="password" id="authPassword" placeholder="Hasło"><br><button class="btn" id="signUpBtn">Zarejestruj</button><button class="btn" id="signInBtn">Zaloguj</button><p id="authError" style="color:red;margin-top:6px;"></p></div><div id="userInfoBlock" style="display:none;"><p>Zalogowany jako <strong id="userNameDisplay"></strong></p><button class="btn" id="signOutBtn" style="background:#ff6b6b;">Wyloguj</button></div></div><div style="background:var(--panel);border-radius:16px;padding:20px;color:#aaa;"><div><b>Zooventures</b> v2.0</div><div>Copyright © 2026 SzyszoTeam</div><div>Made with ❤️</div></div></div>
+    <div class="view" id="inventoryView"><h2>🎒 Ekwipunek</h2><div class="card-grid" id="inventoryGrid"></div></div>
+    <div class="view" id="collectionView"><h2>📚 Kolekcja</h2><div class="card-grid" id="collectionGrid"></div></div>
+    <div class="view" id="sellView"><h2>💰 Sprzedaż</h2><div id="sellContainer"></div></div>
+    <div class="view" id="tradeView"><h2>🔄 Wyślij przedmioty</h2><input type="email" id="tradeEmail" placeholder="Email odbiorcy" style="max-width:400px; margin:0 auto 10px auto;"><div style="background:var(--panel);border-radius:12px;padding:15px;margin:10px 0;"><strong>💎 Gemy</strong> (posiadasz: <span id="tradeGemsCount">0</span>)<div style="display:flex; align-items:center; gap:10px; margin-top:8px;"><input type="number" id="tradeGemAmount" placeholder="Ilość" min="0" value="0" style="width:80px;"><button class="btn" id="sendGemBtn">📤 Wyślij Gemy</button></div></div><h3 style="margin-top:20px;">🃏 Karty</h3><div id="tradeCardsContainer"></div></div>
+    <div class="view" id="dailyView" style="text-align:center;"><h2>🎁 Nagrody</h2><button class="btn" id="openDailyBtn">📅 Kalendarz</button></div>
+    <div class="view" id="leaderboardView"><h2>🏆 Top 10 graczy (monety)</h2><div id="leaderboardList" style="text-align:center;color:#aaa;">Zaloguj się, aby zobaczyć ranking.</div></div>
+    <div class="view" id="settingsView"><h2>⚙️ Ustawienia</h2><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><label>🔊 Muzyka: <span id="musicVal">70</span>%</label><input type="range" id="musicSlider" min="0" max="100" value="70" style="width:100%;"><label style="margin-top:10px;">🔔 SFX: <span id="sfxVal">80</span>%</label><input type="range" id="sfxSlider" min="0" max="100" value="80" style="width:100%;"></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>🔐 Konto</h3><div id="authSection"><button class="btn discord-btn" id="loginDiscordBtn">🎮 Discord</button><button class="btn github-btn" id="loginGithubBtn" style="margin-left:6px;">🐙 GitHub</button><div style="margin:12px 0;color:#aaa;">lub</div><input type="email" id="authEmail" placeholder="Email"><br><input type="password" id="authPassword" placeholder="Hasło"><br><button class="btn" id="signUpBtn">Zarejestruj</button><button class="btn" id="signInBtn">Zaloguj</button><p id="authError" style="color:red;margin-top:6px;"></p></div><div id="userInfoBlock" style="display:none;"><p>Zalogowany jako <strong id="userNameDisplay"></strong></p><button class="btn" id="signOutBtn" style="background:#ff6b6b;">Wyloguj</button></div></div><div style="background:var(--panel);border-radius:16px;padding:20px;color:#aaa;"><div><b>Zooventures</b> v2.0</div><div>Copyright © 2026 SzyszoTeam</div><div>Made with ❤️</div></div></div>
 </div>
 
 <div class="modal" id="dailyModal"><div class="modal-content"><h2>🎁 Codzienne Nagrody</h2><div id="dailyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:10px 0;"></div><p id="dailyStatus"></p><button class="btn" id="claimDailyBtn">Odbierz</button><br><button class="btn" id="closeDailyModalBtn" style="background:transparent;border:1px solid #555;margin-top:5px;">Zamknij</button></div></div>
@@ -122,14 +122,7 @@ let supabaseClient = null;
 try { supabaseClient = window.supabase?.createClient?.(SUPA_URL, SUPA_KEY) || null; } catch(e) {}
 
 // ==================== STAŁE GRY ====================
-const RARITY = {
-  "Rzadki": { up:0.20, col:"#22c55e", price:8 },
-  "Bardzo Rzadki": { up:0.15, col:"#3b82f6", price:20 },
-  "Epicki": { up:0.10, col:"#a855f7", price:55 },
-  "Mityczny": { up:0.05, col:"#ef4444", price:130 },
-  "Legendarny": { up:0.01, col:"#eab308", price:350 },
-  "Chromatyczny": { up:0, col:"#ff6bff", price:900 }
-};
+const RARITY = { "Rzadki": { up:0.20, col:"#22c55e", price:8 }, "Bardzo Rzadki": { up:0.15, col:"#3b82f6", price:20 }, "Epicki": { up:0.10, col:"#a855f7", price:55 }, "Mityczny": { up:0.05, col:"#ef4444", price:130 }, "Legendarny": { up:0.01, col:"#eab308", price:350 }, "Chromatyczny": { up:0, col:"#ff6bff", price:900 } };
 const RORDER = Object.keys(RARITY);
 const ANIMALS = {
   "Rzadki": [{n:"Lew",e:"🦁"},{n:"Wilk",e:"🐺"},{n:"Jeleń",e:"🦌"},{n:"Żółw",e:"🐢"}],
@@ -167,7 +160,7 @@ let currentUser = null;
 // ==================== AUDIO ====================
 function playSfx(name) { if(sfxVol<=0)return; try{new Audio(`sounds/${name}.ogg`).play().catch(()=>{})}catch(e){} }
 
-// ==================== STABILNY KLUCZ LOCALSTORAGE (NIE ZMIENIAĆ!) ====================
+// ==================== STABILNY KLUCZ LOCALSTORAGE ====================
 const STORAGE_KEY = 'zooventures_data'; // stały klucz – dane nigdy nie znikną po aktualizacji
 
 function saveLocal() {
@@ -185,7 +178,6 @@ function loadLocal() {
       const old = JSON.parse(localStorage.getItem(key) || '{}');
       if (old && Object.keys(old).length > 0) {
         d = old;
-        // Zapisz od razu pod nowym kluczem
         localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
         break;
       }
@@ -253,15 +245,9 @@ function toast(msg, bg='#222') {
 function getEmoji(name, baseRarity) {
   if (name.startsWith('Hyper ')) {
     const baseName = name.substring(6);
-    for (const arr of Object.values(ANIMALS)) {
-      const f = arr.find(a => a.n === baseName);
-      if (f) return f.e;
-    }
+    for (const arr of Object.values(ANIMALS)) { const f = arr.find(a => a.n === baseName); if (f) return f.e; }
   }
-  for (const arr of Object.values(ANIMALS)) {
-    const f = arr.find(a => a.n === name);
-    if (f) return f.e;
-  }
+  for (const arr of Object.values(ANIMALS)) { const f = arr.find(a => a.n === name); if (f) return f.e; }
   return '🐾';
 }
 
@@ -270,64 +256,37 @@ function refreshViews() { renderInventory(); renderCollection(); renderSell(); r
 function renderInventory() {
   const grid = document.getElementById('inventoryGrid'); if (!grid) return;
   grid.innerHTML = '';
-  if (inv.length === 0) {
-    grid.innerHTML = '<p style="color:#666;text-align:center;grid-column:1/-1;">Brak kart.</p>';
-    return;
-  }
+  if (inv.length === 0) { grid.innerHTML = '<p style="color:#666;text-align:center;grid-column:1/-1;">Brak kart.</p>'; return; }
   inv.forEach(i => {
     const card = document.createElement('div'); card.className = 'card';
     const isPack = i.n === 'Podstawowa Paczka' || i.n === 'Wiosenne Pudło' || i.n === 'Ogniowa Paczka' || i.n === 'Hyper Paczka';
     const isHyper = i.r === 'Hyper';
     const rarityClass = isPack ? 'specjalny' : (isHyper ? 'hyper' : i.r.toLowerCase().replace(' ', '-'));
     const price = isHyper ? (2 * RARITY[i.baseRarity]?.price) : (RARITY[i.r]?.price ?? 0);
-    card.innerHTML = `
-      <div class="emoji">${i.e}</div><div class="name">${i.n}</div>
-      <div class="badge badge-${rarityClass}">${i.r}</div><div style="color:#ccc;">x${i.q}</div>
-      ${isPack
-        ? '<button class="btn open-pack-btn">Otwórz</button>'
-        : `<div style="color:#f0c060;font-size:0.7rem;">🪙${price}</div><button class="btn sell-btn">Sprzedaj 1</button>`
-      }
-    `;
+    card.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-${rarityClass}">${i.r}</div><div style="color:#ccc;">x${i.q}</div>${isPack ? '<button class="btn open-pack-btn">Otwórz</button>' : `<div style="color:#f0c060;font-size:0.7rem;">🪙${price}</div><button class="btn sell-btn">Sprzedaj 1</button>`}`;
     if (isPack) card.querySelector('.open-pack-btn').addEventListener('click', () => openPackFromInventory(i));
     else card.querySelector('.sell-btn').addEventListener('click', () => sellOne(i.n, i.r));
     grid.appendChild(card);
   });
 }
 function renderCollection() {
-  const grid = document.getElementById('collectionGrid'); if (!grid) return;
-  grid.innerHTML = '';
-  for (const [rarity, animals] of Object.entries(ANIMALS)) {
-    animals.forEach(a => {
-      const owned = collected.has(a.n);
-      const card = document.createElement('div');
-      card.className = `card collection-card ${owned ? 'owned' : ''}`;
-      card.innerHTML = `
-        <div class="emoji">${a.e}</div><div class="name">${a.n}</div>
-        <div class="badge badge-${rarity.toLowerCase().replace(' ', '-')}">${rarity}</div>
-        <div style="font-size:0.7rem;color:${owned ? '#4ade80' : '#666'};">${owned ? '✓ Posiadana' : 'Niezdobyta'}</div>
-      `;
-      grid.appendChild(card);
-    });
-  }
+  const grid = document.getElementById('collectionGrid'); if (!grid) return; grid.innerHTML = '';
+  for (const [rarity, animals] of Object.entries(ANIMALS)) animals.forEach(a => {
+    const owned = collected.has(a.n);
+    const card = document.createElement('div'); card.className = `card collection-card ${owned ? 'owned' : ''}`;
+    card.innerHTML = `<div class="emoji">${a.e}</div><div class="name">${a.n}</div><div class="badge badge-${rarity.toLowerCase().replace(' ', '-')}">${rarity}</div><div style="font-size:0.7rem;color:${owned ? '#4ade80' : '#666'};">${owned ? '✓ Posiadana' : 'Niezdobyta'}</div>`;
+    grid.appendChild(card);
+  });
 }
 function renderSell() {
-  const cont = document.getElementById('sellContainer'); if (!cont) return;
-  cont.innerHTML = '';
+  const cont = document.getElementById('sellContainer'); if (!cont) return; cont.innerHTML = '';
   const sellable = inv.filter(i => i.n !== 'Podstawowa Paczka' && i.n !== 'Wiosenne Pudło' && i.n !== 'Ogniowa Paczka' && i.n !== 'Hyper Paczka');
-  if (sellable.length === 0) {
-    cont.innerHTML = '<p style="color:#666;text-align:center;">Nic do sprzedania.</p>';
-    return;
-  }
+  if (sellable.length === 0) { cont.innerHTML = '<p style="color:#666;text-align:center;">Nic do sprzedania.</p>'; return; }
   sellable.forEach(i => {
     const isHyper = i.r === 'Hyper';
     const price = isHyper ? (2 * RARITY[i.baseRarity]?.price) : (RARITY[i.r]?.price ?? 0);
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #2a2a40;';
-    row.innerHTML = `
-      <span>${i.e} <b>${i.n}</b> [${i.r}] x${i.q}</span>
-      <span>🪙${price} / szt.</span>
-      <span><button class="btn sell-btn sell-one">1</button><button class="btn sell-btn sell-all">Wszystkie</button></span>
-    `;
+    const row = document.createElement('div'); row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #2a2a40;';
+    row.innerHTML = `<span>${i.e} <b>${i.n}</b> [${i.r}] x${i.q}</span><span>🪙${price} / szt.</span><span><button class="btn sell-btn sell-one">1</button><button class="btn sell-btn sell-all">Wszystkie</button></span>`;
     row.querySelector('.sell-one').addEventListener('click', () => sellOne(i.n, i.r));
     row.querySelector('.sell-all').addEventListener('click', () => sellAll(i.n, i.r));
     cont.appendChild(row);
@@ -339,21 +298,10 @@ function renderTrade() {
   const container = document.getElementById('tradeCardsContainer'); if (!container) return;
   container.innerHTML = '';
   const tradable = inv.filter(i => i.n !== 'Podstawowa Paczka' && i.n !== 'Wiosenne Pudło' && i.n !== 'Ogniowa Paczka' && i.n !== 'Hyper Paczka');
-  if (tradable.length === 0) {
-    container.innerHTML = '<p style="color:#666;">Nie masz kart do wysłania.</p>';
-    return;
-  }
+  if (tradable.length === 0) { container.innerHTML = '<p style="color:#666;">Nie masz kart do wysłania.</p>'; return; }
   tradable.forEach(i => {
-    const box = document.createElement('div');
-    box.className = 'trade-card-box';
-    box.style.cssText = 'background:var(--panel);border-radius:12px;padding:15px;margin:5px 0;display:flex;align-items:center;justify-content:space-between;';
-    box.innerHTML = `
-      <span>${i.e} <b>${i.n}</b> (${i.r}) – dostępne: ${i.q}</span>
-      <div style="display:flex;align-items:center;">
-        <input type="number" class="trade-card-input" placeholder="0" min="0" max="${i.q}" value="0" data-name="${i.n}" data-rarity="${i.r}" style="width:60px;">
-        <button class="btn send-card-btn" style="margin-left:5px;">📤</button>
-      </div>
-    `;
+    const box = document.createElement('div'); box.className = 'trade-card-box'; box.style.cssText = 'background:var(--panel);border-radius:12px;padding:15px;margin:5px 0;display:flex;align-items:center;justify-content:space-between;';
+    box.innerHTML = `<span>${i.e} <b>${i.n}</b> (${i.r}) – dostępne: ${i.q}</span><div style="display:flex;align-items:center;"><input type="number" class="trade-card-input" placeholder="0" min="0" max="${i.q}" value="0" data-name="${i.n}" data-rarity="${i.r}" style="width:60px;"><button class="btn send-card-btn" style="margin-left:5px;">📤</button></div>`;
     const input = box.querySelector('.trade-card-input');
     const btnSend = box.querySelector('.send-card-btn');
     btnSend.addEventListener('click', () => {
@@ -395,260 +343,166 @@ function sellAll(name, rarity) {
 }
 
 // ==================== WYMIANA GEMÓW ====================
-function exchangeGems(amount) {
-  if (gems < amount) { toast('Za mało gemów!'); return; }
-  gems -= amount; coins += amount * 80;
-  updateUI(); saveCloud(); toast(`Wymieniono ${amount}💎 → ${amount * 80}🪙`);
-}
+function exchangeGems(amount) { if(gems<amount){toast('Za mało gemów!');return;} gems-=amount; coins+=amount*80; updateUI(); saveCloud(); toast(`Wymieniono ${amount}💎 → ${amount*80}🪙`); }
 
 // ==================== KODY ====================
-function openCodeModal() { document.getElementById('codeModal').classList.add('active'); }
-function closeCodeModal() { document.getElementById('codeModal').classList.remove('active'); }
+function openCodeModal(){ document.getElementById('codeModal').classList.add('active'); }
+function closeCodeModal(){ document.getElementById('codeModal').classList.remove('active'); }
 function redeemCode() {
-  const inp = document.getElementById('codeInput'); if (!inp) return;
-  const code = inp.value.trim();
-  if (!code) return;
-  if (code === 'CardZoo') {
-    if (usedCodes['CardZoo']) { toast('Kod już wykorzystany!'); return; }
-    gems += 50; usedCodes['CardZoo'] = true;
-    toast('Otrzymałeś 50 gemów! 💎', '#224422'); playSfx('code');
-  } else if (code === 'TrailerOfficial') {
-    if (usedCodes['TrailerOfficial']) { toast('Kod już wykorzystany!'); return; }
-    gems += 5; usedCodes['TrailerOfficial'] = true;
-    toast('Otrzymałeś 5 gemów! 💎', '#224422'); playSfx('code');
-  } else {
-    toast('Niepraw który kod!');
-    return;
-  }
-  inp.value = ''; updateUI(); saveCloud(); closeCodeModal();
+  const inp = document.getElementById('codeInput'); if(!inp)return;
+  const code = inp.value.trim(); if(!code)return;
+  if(code==='CardZoo'){ if(usedCodes['CardZoo']){toast('Kod już wykorzystany!');return;} gems+=50; usedCodes['CardZoo']=true; toast('Otrzymałeś 50 gemów! 💎','#224422'); playSfx('code'); }
+  else if(code==='TrailerOfficial'){ if(usedCodes['TrailerOfficial']){toast('Kod już wykorzystany!');return;} gems+=5; usedCodes['TrailerOfficial']=true; toast('Otrzymałeś 5 gemów! 💎','#224422'); playSfx('code'); }
+  else { toast('Nieprawidłowy kod!'); return; }
+  inp.value=''; updateUI(); saveCloud(); closeCodeModal();
 }
 
 // ==================== PACZKI ====================
-function buyAndOpen(pack) {
-  const prices = { basic:10, spring:250, fire:200, hyper:1000 };
-  if (coins < prices[pack]) { toast('Za mało monet!'); return; }
-  coins -= prices[pack]; updateUI(); saveCloud();
-  packType = pack;
-  if (pack === 'hyper') openHyperPack(); else startOpening();
-}
-function buyToInventory(pack) {
-  const prices = { basic:10, spring:250, fire:200, hyper:1000 };
-  const names = { basic:'Podstawowa Paczka', spring:'Wiosenne Pudło', fire:'Ogniowa Paczka', hyper:'Hyper Paczka' };
-  const emojis = { basic:'📦', spring:'🌸', fire:'🔥', hyper:'📦' };
-  if (coins < prices[pack]) { toast('Za mało monet!'); return; }
-  coins -= prices[pack];
-  let existing = inv.find(i => i.n === names[pack]);
-  if (existing) existing.q++; else inv.push({ n: names[pack], e: emojis[pack], r: 'Specjalny', q: 1 });
-  updateUI(); saveCloud(); refreshViews();
-  toast(`Dodano ${names[pack]} do ekwipunku!`);
-}
-function startOpening() { curRar = "Rzadki"; clicksLeft = maxClicks; showOpeningOverlay(); }
-function showOpeningOverlay() {
-  const old = document.getElementById('openingOverlay');
-  if (old) { document.removeEventListener('keydown', old._kh); old.remove(); }
-  const ov = document.createElement('div'); ov.id = 'openingOverlay'; ov.className = 'opening-overlay';
-  ov.innerHTML = `
-    <div class="opening-box" id="openingBox">❓</div>
-    <div class="rarity-text" id="rarityLabel" style="color:${RARITY[curRar].col}">${curRar}</div>
-    <div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div>
-    <p style="color:#aaa;margin-top:10px;">Kliknij gdziekolwiek, by ulepszyć</p>
-    <p style="color:#f0c060;">SPACJA = otwórz teraz</p>
-  `;
-  ov.addEventListener('click', onOverlayClick);
-  const kh = (e) => { if (e.code === 'Space') { e.preventDefault(); openNow(); } };
-  document.addEventListener('keydown', kh); ov._kh = kh;
+function buyAndOpen(pack){ const prices={basic:10,spring:250,fire:200,hyper:1000}; if(coins<prices[pack]){toast('Za mało monet!');return;} coins-=prices[pack]; updateUI(); saveCloud(); packType=pack; if(pack==='hyper') openHyperPack(); else startOpening(); }
+function buyToInventory(pack){ const prices={basic:10,spring:250,fire:200,hyper:1000}; const names={basic:'Podstawowa Paczka',spring:'Wiosenne Pudło',fire:'Ogniowa Paczka',hyper:'Hyper Paczka'}; const emojis={basic:'📦',spring:'🌸',fire:'🔥',hyper:'📦'}; if(coins<prices[pack]){toast('Za mało monet!');return;} coins-=prices[pack]; let existing=inv.find(i=>i.n===names[pack]); if(existing)existing.q++; else inv.push({n:names[pack],e:emojis[pack],r:'Specjalny',q:1}); updateUI(); saveCloud(); refreshViews(); toast(`Dodano ${names[pack]} do ekwipunku!`); }
+function startOpening(){ curRar="Rzadki"; clicksLeft=maxClicks; showOpeningOverlay(); }
+function showOpeningOverlay(){
+  const old=document.getElementById('openingOverlay'); if(old){document.removeEventListener('keydown',old._kh);old.remove();}
+  const ov=document.createElement('div'); ov.id='openingOverlay'; ov.className='opening-overlay';
+  ov.innerHTML=`<div class="opening-box" id="openingBox">❓</div><div class="rarity-text" id="rarityLabel" style="color:${RARITY[curRar].col}">${curRar}</div><div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div><p style="color:#aaa;margin-top:10px;">Kliknij gdziekolwiek, by ulepszyć</p><p style="color:#f0c060;">SPACJA = otwórz teraz</p>`;
+  ov.addEventListener('click',onOverlayClick);
+  const kh=(e)=>{if(e.code==='Space'){e.preventDefault();openNow();}};
+  document.addEventListener('keydown',kh); ov._kh=kh;
   document.body.appendChild(ov);
 }
-function onOverlayClick() { if (clicksLeft <= 0 || curRar === "Chromatyczny") openNow(); else attemptUpgrade(); }
-function attemptUpgrade() {
-  if (clicksLeft <= 0 || curRar === "Chromatyczny") return;
-  clicksLeft--;
-  const box = document.getElementById('openingBox');
-  if (box) { box.classList.add('shake'); setTimeout(() => box.classList.remove('shake'), 500); }
+function onOverlayClick(){ if(clicksLeft<=0||curRar==="Chromatyczny") openNow(); else attemptUpgrade(); }
+function attemptUpgrade(){
+  if(clicksLeft<=0||curRar==="Chromatyczny")return;
+  clicksLeft--; const box=document.getElementById('openingBox'); if(box){box.classList.add('shake');setTimeout(()=>box.classList.remove('shake'),500);}
   playSfx('open');
-  let eff = RARITY[curRar].up;
-  if (packType === 'spring') eff *= 3;
-  if (Math.random() < eff) {
-    let idx = RORDER.indexOf(curRar);
-    if (idx < RORDER.length - 1) curRar = RORDER[idx + 1];
-  }
-  const lb = document.getElementById('rarityLabel');
-  if (lb) { lb.textContent = curRar; lb.style.color = RARITY[curRar].col; }
-  document.getElementById('clicksCount').textContent = clicksLeft;
-  if (clicksLeft <= 0 || curRar === "Chromatyczny") {
-    setTimeout(() => { if (document.getElementById('openingOverlay')) openNow(); }, 600);
-  }
+  let eff=RARITY[curRar].up; if(packType==='spring')eff*=3;
+  if(Math.random()<eff){ let idx=RORDER.indexOf(curRar); if(idx<RORDER.length-1)curRar=RORDER[idx+1]; }
+  const lb=document.getElementById('rarityLabel'); if(lb){lb.textContent=curRar;lb.style.color=RARITY[curRar].col;}
+  document.getElementById('clicksCount').textContent=clicksLeft;
+  if(clicksLeft<=0||curRar==="Chromatyczny") setTimeout(()=>{if(document.getElementById('openingOverlay')) openNow();},600);
 }
-function generateCard(r) {
-  const table = packType === 'fire' ? FIRE_DROP : DROP_TABLE;
-  const t = table[r] || { "Rzadki": 1 };
-  const total = Object.values(t).reduce((a, b) => a + b, 0);
-  let rand = Math.random() * total;
-  for (const [rarity, weight] of Object.entries(t)) {
-    rand -= weight;
-    if (rand <= 0) {
-      const animals = ANIMALS[rarity];
-      if (!animals || !animals.length) continue;
-      const animal = animals[Math.floor(Math.random() * animals.length)];
-      return { n: animal.n, e: animal.e, rarity };
-    }
-  }
-  return { n: ANIMALS["Rzadki"][0].n, e: ANIMALS["Rzadki"][0].e, rarity: "Rzadki" };
+function generateCard(r){
+  const table=packType==='fire'?FIRE_DROP:DROP_TABLE;
+  const t=table[r]||{"Rzadki":1}; const total=Object.values(t).reduce((a,b)=>a+b,0); let rand=Math.random()*total;
+  for(const [rarity,weight] of Object.entries(t)){ rand-=weight; if(rand<=0){ const animals=ANIMALS[rarity]; if(!animals||!animals.length)continue; const animal=animals[Math.floor(Math.random()*animals.length)]; return {n:animal.n,e:animal.e,rarity}; } }
+  return {n:ANIMALS["Rzadki"][0].n,e:ANIMALS["Rzadki"][0].e,rarity:"Rzadki"};
 }
-function openNow() {
-  const ov = document.getElementById('openingOverlay');
-  if (ov) { document.removeEventListener('keydown', ov._kh); ov.remove(); }
+function openNow(){
+  const ov=document.getElementById('openingOverlay'); if(ov){document.removeEventListener('keydown',ov._kh);ov.remove();}
   playSfx('opened');
-  const pr = curRar;
-  const count = pr === "Chromatyczny" ? 5 : (pr === "Legendarny" ? 4 : (pr === "Mityczny" ? 3 : 2));
-  const cards = [];
-  for (let i = 0; i < count; i++) {
-    const { n, e, rarity } = generateCard(pr);
-    cards.push({ n, e, rarity });
-    let entry = inv.find(x => x.n === n && x.r === rarity);
-    if (entry) entry.q++; else inv.push({ n, e, r: rarity, q: 1 });
-    collected.add(n);
-  }
+  const pr=curRar; const count=pr==="Chromatyczny"?5:(pr==="Legendarny"?4:(pr==="Mityczny"?3:2)); const cards=[];
+  for(let i=0;i<count;i++){ const {n,e,rarity}=generateCard(pr); cards.push({n,e,rarity}); let entry=inv.find(x=>x.n===n&&x.r===rarity); if(entry)entry.q++; else inv.push({n,e,r:rarity,q:1}); collected.add(n); }
   saveCloud(); refreshViews(); updateUI();
-  const area = document.createElement('div'); area.className = 'reveal-area';
-  cards.forEach((c, i) => {
-    setTimeout(() => {
-      const el = document.createElement('div'); el.className = 'reveal-card';
-      el.innerHTML = `<div style="font-size:2.5rem;">${c.e}</div><div style="font-weight:700;">${c.n}</div><div class="badge badge-${c.rarity.toLowerCase().replace(' ', '-')}">${c.rarity}</div>`;
-      area.appendChild(el);
-    }, i * 200);
-  });
-  const btn = document.createElement('button'); btn.className = 'reveal-close'; btn.textContent = '✔ Zamknij';
-  btn.onclick = () => area.remove();
-  setTimeout(() => area.appendChild(btn), cards.length * 200 + 400);
-  document.body.appendChild(area);
+  const area=document.createElement('div'); area.className='reveal-area';
+  cards.forEach((c,i)=>{ setTimeout(()=>{ const el=document.createElement('div'); el.className='reveal-card'; el.innerHTML=`<div style="font-size:2.5rem;">${c.e}</div><div style="font-weight:700;">${c.n}</div><div class="badge badge-${c.rarity.toLowerCase().replace(' ','-')}">${c.rarity}</div>`; area.appendChild(el); },i*200); });
+  const btn=document.createElement('button'); btn.className='reveal-close'; btn.textContent='✔ Zamknij'; btn.onclick=()=>area.remove();
+  setTimeout(()=>area.appendChild(btn),cards.length*200+400); document.body.appendChild(area);
 }
-function openHyperPack() {
-  const allAnimals = [];
-  for (const arr of Object.values(ANIMALS)) allAnimals.push(...arr);
-  const animal = allAnimals[Math.floor(Math.random() * allAnimals.length)];
-  const hyperName = 'Hyper ' + animal.n;
-  const baseRarity = Object.keys(ANIMALS).find(key => ANIMALS[key].some(a => a.n === animal.n));
-  let existing = inv.find(i => i.n === hyperName && i.r === 'Hyper');
-  if (existing) existing.q++;
-  else inv.push({ n: hyperName, e: animal.e, r: 'Hyper', q: 1, baseRarity: baseRarity });
+function openHyperPack(){
+  const allAnimals=[]; for(const arr of Object.values(ANIMALS))allAnimals.push(...arr);
+  const animal=allAnimals[Math.floor(Math.random()*allAnimals.length)];
+  const hyperName='Hyper '+animal.n;
+  const baseRarity=Object.keys(ANIMALS).find(key=>ANIMALS[key].some(a=>a.n===animal.n));
+  let existing=inv.find(i=>i.n===hyperName&&i.r==='Hyper');
+  if(existing)existing.q++; else inv.push({n:hyperName,e:animal.e,r:'Hyper',q:1,baseRarity:baseRarity});
   collected.add(animal.n);
   saveCloud(); refreshViews(); updateUI();
-  const area = document.createElement('div'); area.className = 'reveal-area';
-  const el = document.createElement('div'); el.className = 'reveal-card';
-  el.innerHTML = `<div style="font-size:2.5rem;">${animal.e}</div><div style="font-weight:700;">${hyperName}</div><div class="badge badge-hyper">Hyper</div>`;
+  const area=document.createElement('div'); area.className='reveal-area';
+  const el=document.createElement('div'); el.className='reveal-card';
+  el.innerHTML=`<div style="font-size:2.5rem;">${animal.e}</div><div style="font-weight:700;">${hyperName}</div><div class="badge badge-hyper">Hyper</div>`;
   area.appendChild(el);
-  const btn = document.createElement('button'); btn.className = 'reveal-close'; btn.textContent = '✔ Zamknij';
-  btn.onclick = () => area.remove();
-  area.appendChild(btn);
-  document.body.appendChild(area);
+  const btn=document.createElement('button'); btn.className='reveal-close'; btn.textContent='✔ Zamknij'; btn.onclick=()=>area.remove();
+  area.appendChild(btn); document.body.appendChild(area);
   toast(`Otrzymujesz ${hyperName}!`);
 }
-function openPackFromInventory(item) {
-  if (item.n === 'Hyper Paczka') {
-    item.q--; if (item.q <= 0) inv = inv.filter(i => i !== item);
-    saveCloud(); refreshViews();
-    openHyperPack();
-    return;
-  }
-  const typeMap = { 'Podstawowa Paczka': 'basic', 'Wiosenne Pudło': 'spring', 'Ogniowa Paczka': 'fire' };
-  packType = typeMap[item.n] || 'basic';
-  item.q--; if (item.q <= 0) inv = inv.filter(i => i !== item);
-  saveCloud(); refreshViews();
-  startOpening();
+function openPackFromInventory(item){
+  if(item.n==='Hyper Paczka'){ item.q--; if(item.q<=0)inv=inv.filter(i=>i!==item); saveCloud(); refreshViews(); openHyperPack(); return; }
+  const typeMap={'Podstawowa Paczka':'basic','Wiosenne Pudło':'spring','Ogniowa Paczka':'fire'};
+  packType=typeMap[item.n]||'basic';
+  item.q--; if(item.q<=0)inv=inv.filter(i=>i!==item);
+  saveCloud(); refreshViews(); startOpening();
 }
 
 // ==================== NAGRODY ====================
-function checkDailyReset() {
-  const today = new Date().toISOString().split('T')[0];
-  if (dailyLastDate !== today) {
-    if (!dailyLastDate) dailyStreak = 1;
-    else {
-      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-      if (dailyLastDate !== yesterday) dailyStreak = 1;
-    }
-    dailyClaimed = false; dailyLastDate = today;
-  }
+function checkDailyReset(){
+  const today=new Date().toISOString().split('T')[0];
+  if(dailyLastDate!==today){ if(!dailyLastDate)dailyStreak=1; else{ const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0]; if(dailyLastDate!==yesterday)dailyStreak=1; } dailyClaimed=false; dailyLastDate=today; }
 }
 checkDailyReset();
-const DAILY_PRIZES = [
-  { d:1, desc:'100 monet', r:{c:100} }, { d:2, desc:'2 paczki', r:{p:2} },
-  { d:3, desc:'10 gemów', r:{g:10} }, { d:4, desc:'500 monet', r:{c:500} },
-  { d:5, desc:'5 paczek', r:{p:5} }, { d:6, desc:'5 gemów', r:{g:5} },
-  { d:7, desc:'10 gemów', r:{g:10} }
-];
-function openDailyModal() { document.getElementById('dailyModal').classList.add('active'); renderDailyGrid(); }
-function closeDailyModal() { document.getElementById('dailyModal').classList.remove('active'); }
-function renderDailyGrid() {
-  const grid = document.getElementById('dailyGrid'); if (!grid) return;
-  grid.innerHTML = '';
-  for (let i = 1; i <= 7; i++) {
-    const prize = DAILY_PRIZES[i - 1];
-    const dayDiv = document.createElement('div');
-    dayDiv.style.cssText = 'background:#1e1e32;border-radius:10px;padding:8px 4px;text-align:center;border:2px solid #2a2a40;font-size:0.65rem;';
-    if (i < dailyStreak) { dayDiv.style.borderColor = '#4ade80'; dayDiv.innerHTML = '<div>✓</div>'; }
-    else if (i === dailyStreak && !dailyClaimed) { dayDiv.style.borderColor = '#fbbf24'; dayDiv.style.boxShadow = '0 0 12px rgba(251,191,36,0.5)'; dayDiv.innerHTML = `<div><b>Dzień ${i}</b></div><div>${prize.desc}</div>`; }
-    else if (i === dailyStreak && dailyClaimed) { dayDiv.style.borderColor = '#4ade80'; dayDiv.innerHTML = '<div>✓</div>'; }
-    else { dayDiv.innerHTML = `<div>Dzień ${i}</div><div>${prize.desc}</div>`; }
+const DAILY_PRIZES=[{d:1,desc:'100 monet',r:{c:100}},{d:2,desc:'2 paczki',r:{p:2}},{d:3,desc:'10 gemów',r:{g:10}},{d:4,desc:'500 monet',r:{c:500}},{d:5,desc:'5 paczek',r:{p:5}},{d:6,desc:'5 gemów',r:{g:5}},{d:7,desc:'10 gemów',r:{g:10}}];
+function openDailyModal(){document.getElementById('dailyModal').classList.add('active');renderDailyGrid();}
+function closeDailyModal(){document.getElementById('dailyModal').classList.remove('active');}
+function renderDailyGrid(){
+  const grid=document.getElementById('dailyGrid'); if(!grid)return; grid.innerHTML='';
+  for(let i=1;i<=7;i++){
+    const prize=DAILY_PRIZES[i-1]; const dayDiv=document.createElement('div'); dayDiv.style.cssText='background:#1e1e32;border-radius:10px;padding:8px 4px;text-align:center;border:2px solid #2a2a40;font-size:0.65rem;';
+    if(i<dailyStreak){dayDiv.style.borderColor='#4ade80';dayDiv.innerHTML='<div>✓</div>';}
+    else if(i===dailyStreak&&!dailyClaimed){dayDiv.style.borderColor='#fbbf24';dayDiv.style.boxShadow='0 0 12px rgba(251,191,36,0.5)';dayDiv.innerHTML=`<div><b>Dzień ${i}</b></div><div>${prize.desc}</div>`;}
+    else if(i===dailyStreak&&dailyClaimed){dayDiv.style.borderColor='#4ade80';dayDiv.innerHTML='<div>✓</div>';}
+    else{dayDiv.innerHTML=`<div>Dzień ${i}</div><div>${prize.desc}</div>`;}
     grid.appendChild(dayDiv);
   }
-  document.getElementById('dailyStatus').textContent = dailyClaimed ? '✅ Odebrano.' : `🔥 Dzień ${dailyStreak} – odbierz!`;
-  document.getElementById('claimDailyBtn').disabled = dailyClaimed;
+  document.getElementById('dailyStatus').textContent=dailyClaimed?'✅ Odebrano.':`🔥 Dzień ${dailyStreak} – odbierz!`;
+  document.getElementById('claimDailyBtn').disabled=dailyClaimed;
 }
-function claimDailyReward() {
-  if (dailyClaimed) return;
-  const prize = DAILY_PRIZES[dailyStreak - 1];
-  if (prize.r.c) coins += prize.r.c;
-  if (prize.r.g) gems += prize.r.g;
-  if (prize.r.p) for (let i = 0; i < prize.r.p; i++) {
-    const animal = ANIMALS["Rzadki"][Math.floor(Math.random() * ANIMALS["Rzadki"].length)];
-    let entry = inv.find(x => x.n === animal.n && x.r === "Rzadki");
-    if (entry) entry.q++; else inv.push({ n: animal.n, e: animal.e, r: "Rzadki", q: 1 });
-    collected.add(animal.n);
-  }
-  dailyClaimed = true; dailyLastDate = new Date().toISOString().split('T')[0];
-  dailyStreak = dailyStreak < 7 ? dailyStreak + 1 : 1;
+function claimDailyReward(){
+  if(dailyClaimed)return; const prize=DAILY_PRIZES[dailyStreak-1];
+  if(prize.r.c)coins+=prize.r.c; if(prize.r.g)gems+=prize.r.g;
+  if(prize.r.p)for(let i=0;i<prize.r.p;i++){ const animal=ANIMALS["Rzadki"][Math.floor(Math.random()*ANIMALS["Rzadki"].length)]; let entry=inv.find(x=>x.n===animal.n&&x.r==="Rzadki"); if(entry)entry.q++; else inv.push({n:animal.n,e:animal.e,r:"Rzadki",q:1}); collected.add(animal.n); }
+  dailyClaimed=true; dailyLastDate=new Date().toISOString().split('T')[0];
+  dailyStreak=dailyStreak<7?dailyStreak+1:1;
   updateUI(); saveCloud(); refreshViews(); renderDailyGrid();
   toast(`Odebrano nagrodę dnia ${prize.d}!`);
 }
 
 // ==================== RANKING ====================
-async function loadLeaderboard() {
-  const list = document.getElementById('leaderboardList');
-  if (!supabaseClient) { list.innerHTML = 'Zaloguj się, aby zobaczyć ranking.'; return; }
-  const { data, error } = await supabaseClient.from('profiles').select('username, coins').order('coins', { ascending: false }).limit(10);
-  if (error) { list.innerHTML = 'Błąd ładowania.'; return; }
-  if (!data || data.length === 0) { list.innerHTML = 'Brak graczy.'; return; }
-  list.innerHTML = data.map((p, i) => `<div style="padding:5px;border-bottom:1px solid #2a2a40;">${i+1}. ${p.username || 'Anonim'} – 🪙 ${p.coins}</div>`).join('');
+async function loadLeaderboard(){
+  const list=document.getElementById('leaderboardList'); if(!supabaseClient){list.innerHTML='Zaloguj się, aby zobaczyć ranking.';return;}
+  const {data,error}=await supabaseClient.from('profiles').select('username,coins').order('coins',{ascending:false}).limit(10);
+  if(error){list.innerHTML='Błąd ładowania.';return;} if(!data||data.length===0){list.innerHTML='Brak graczy.';return;}
+  list.innerHTML=data.map((p,i)=>`<div style="padding:5px;border-bottom:1px solid #2a2a40;">${i+1}. ${p.username||'Anonim'} – 🪙 ${p.coins}</div>`).join('');
 }
 
-// ==================== AUTH ====================
+// ==================== AUTH (POPRAWIONE) ====================
+function getUserDisplayName(user) {
+  if (!user) return 'Gracz';
+  return user.user_metadata?.full_name || user.user_metadata?.user_name || user.email || 'Gracz';
+}
 async function updateAuthUI() {
-  if (!supabaseClient) { document.getElementById('authSection').style.display = 'none'; return; }
+  const authSection = document.getElementById('authSection');
+  const userBlock = document.getElementById('userInfoBlock');
+  if (!supabaseClient) {
+    if(authSection) authSection.style.display = 'none';
+    return;
+  }
   const { data: { user } } = await supabaseClient.auth.getUser();
   currentUser = user;
   if (currentUser) {
-    document.getElementById('authSection').style.display = 'none';
-    document.getElementById('userInfoBlock').style.display = 'block';
-    // Wyświetl nazwę: preferowane pełne imię, email, albo "Gracz"
-    const displayName = currentUser.user_metadata?.full_name || currentUser.email || 'Gracz';
-    document.getElementById('userNameDisplay').textContent = displayName;
+    if(authSection) authSection.style.display = 'none';
+    if(userBlock) userBlock.style.display = 'block';
+    document.getElementById('userNameDisplay').textContent = getUserDisplayName(currentUser);
   } else {
-    document.getElementById('authSection').style.display = 'block';
-    document.getElementById('userInfoBlock').style.display = 'none';
+    if(authSection) authSection.style.display = 'block';
+    if(userBlock) userBlock.style.display = 'none';
   }
 }
-async function signInWithDiscord() { if(!supabaseClient) return; await supabaseClient.auth.signInWithOAuth({provider:'discord'}); }
-async function signInWithGithub() { if(!supabaseClient) return; await supabaseClient.auth.signInWithOAuth({provider:'github'}); }
+async function signInWithDiscord() {
+  if (!supabaseClient) return toast('Supabase offline');
+  await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin } });
+}
+async function signInWithGithub() {
+  if (!supabaseClient) return toast('Supabase offline');
+  await supabaseClient.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: window.location.origin } });
+}
 async function signUp() {
-  if(!supabaseClient) return toast('Supabase offline');
+  if (!supabaseClient) return toast('Supabase offline');
   const email = document.getElementById('authEmail').value, pass = document.getElementById('authPassword').value;
   const { error } = await supabaseClient.auth.signUp({ email, password: pass });
   if (error) document.getElementById('authError').textContent = error.message;
   else toast('Zarejestrowano! Możesz się zalogować.');
 }
 async function signIn() {
-  if(!supabaseClient) return toast('Supabase offline');
+  if (!supabaseClient) return toast('Supabase offline');
   const email = document.getElementById('authEmail').value, pass = document.getElementById('authPassword').value;
   const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
   if (error) {
@@ -666,6 +520,21 @@ async function signOut() {
   await updateAuthUI();
   loadLocal(); updateUI(); refreshViews();
 }
+if (supabaseClient) {
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+      await updateAuthUI();
+      await loadCloud();
+    } else {
+      currentUser = null;
+      await updateAuthUI();
+    }
+  });
+  updateAuthUI();
+} else {
+  document.getElementById('authSection').style.display = 'none';
+}
 
 // ==================== EVENTY ====================
 document.addEventListener('DOMContentLoaded', () => {
@@ -677,8 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = document.getElementById('tradeEmail').value.trim(), amt = parseInt(document.getElementById('tradeGemAmount').value);
     if (!email) { toast('Wpisz email!'); return; }
     if (!amt || amt < 1 || amt > gems) { toast('Nieprawidłowa ilość!'); return; }
-    gems -= amt; updateUI(); saveCloud(); refreshViews();
-    toast(`Wysłano ${amt}💎 do ${email}`);
+    gems -= amt; updateUI(); saveCloud(); refreshViews(); toast(`Wysłano ${amt}💎 do ${email}`);
   });
   document.getElementById('openDailyBtn').addEventListener('click', openDailyModal);
   document.getElementById('closeDailyModalBtn').addEventListener('click', closeDailyModal);
@@ -686,12 +554,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('openCodeBtn').addEventListener('click', openCodeModal);
   document.getElementById('closeCodeModalBtn').addEventListener('click', closeCodeModal);
   document.getElementById('redeemCodeBtn').addEventListener('click', redeemCode);
-  document.getElementById('musicSlider').addEventListener('input', function() {
-    musicVol = parseInt(this.value); document.getElementById('musicVal').textContent = musicVol; saveLocal();
-  });
-  document.getElementById('sfxSlider').addEventListener('input', function() {
-    sfxVol = parseInt(this.value); document.getElementById('sfxVal').textContent = sfxVol; saveLocal(); playSfx('sfx');
-  });
+  document.getElementById('musicSlider').addEventListener('input', function() { musicVol = parseInt(this.value); document.getElementById('musicVal').textContent = musicVol; saveLocal(); });
+  document.getElementById('sfxSlider').addEventListener('input', function() { sfxVol = parseInt(this.value); document.getElementById('sfxVal').textContent = sfxVol; saveLocal(); playSfx('sfx'); });
   document.getElementById('musicSlider').value = musicVol; document.getElementById('sfxSlider').value = sfxVol;
   document.getElementById('musicVal').textContent = musicVol; document.getElementById('sfxVal').textContent = sfxVol;
   document.getElementById('loginDiscordBtn').addEventListener('click', signInWithDiscord);
@@ -699,26 +563,14 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('signUpBtn').addEventListener('click', signUp);
   document.getElementById('signInBtn').addEventListener('click', signIn);
   document.getElementById('signOutBtn').addEventListener('click', signOut);
-  if (supabaseClient) {
-    supabaseClient.auth.onAuthStateChange(async (e, s) => {
-      if (s?.user) { currentUser = s.user; await updateAuthUI(); await loadCloud(); }
-      else { currentUser = null; await updateAuthUI(); }
-    });
-    updateAuthUI();
-  } else {
-    document.getElementById('authSection').style.display = 'none';
-  }
-  updateUI();
-  refreshViews();
+  updateUI(); refreshViews();
 });
 
 function switchView(view) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  const target = document.getElementById(view + 'View');
-  if (target) target.classList.add('active');
+  const target = document.getElementById(view + 'View'); if (target) target.classList.add('active');
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  const tab = document.querySelector(`.nav-tab[data-view="${view}"]`);
-  if (tab) tab.classList.add('active');
+  const tab = document.querySelector(`.nav-tab[data-view="${view}"]`); if (tab) tab.classList.add('active');
   if (view === 'daily') openDailyModal();
   if (view === 'leaderboard') loadLeaderboard();
   refreshViews();
