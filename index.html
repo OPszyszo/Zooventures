@@ -132,6 +132,32 @@
 <div class="modal" id="codeModal"><div class="modal-content"><h2>🎟️ Wpisz kod</h2><input type="text" id="codeInput" placeholder="Wpisz kod..."><br><button class="btn" id="redeemCodeBtn">Zrealizuj</button><br><button class="btn" id="closeCodeModalBtn" style="background:transparent;border:1px solid #555;margin-top:5px;">Zamknij</button></div></div>
 <div class="warning-box" id="warningBox">⚠️ UWAGA! Nie używaj auto-clickera – grozi to banem!</div>
 
+<!-- NOWY POPUP Z LINKAMI -->
+<div id="linksPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:999; align-items:center; justify-content:center; backdrop-filter:blur(12px);">
+    <div style="background: linear-gradient(145deg, #12122a, #1a1a38); border: 2px solid #4a4a7a; border-radius: 28px; padding: 35px 30px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 60px rgba(139,92,246,0.3); animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🐾</div>
+        <h2 style="font-size: 1.6rem; font-weight: 800; color: #fff; margin-bottom: 10px;">Polecamy sprawdzić te linki</h2>
+        <div style="display: flex; flex-direction: column; gap: 12px; margin: 20px 0;">
+            <a href="https://dc.gg/zooventures" target="_blank" style="text-decoration:none;">
+                <button style="display:flex; align-items:center; gap:12px; width:100%; padding:14px 20px; border-radius:16px; border:none; background:linear-gradient(135deg,#5865F2,#404EED); color:#fff; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.3s; box-shadow:0 6px 20px rgba(88,101,242,0.4);">
+                    <span style="font-size:1.6rem;">🎮</span> Discord
+                </button>
+            </a>
+            <a href="https://github.com/opszyszo" target="_blank" style="text-decoration:none;">
+                <button style="display:flex; align-items:center; gap:12px; width:100%; padding:14px 20px; border-radius:16px; border:none; background:linear-gradient(135deg,#3ddc84,#00c853); color:#000; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.3s; box-shadow:0 6px 20px rgba(61,220,132,0.4);">
+                    <span style="font-size:1.6rem;">🤖</span> Android
+                </button>
+            </a>
+            <a href="https://github.com/opszyszo" target="_blank" style="text-decoration:none;">
+                <button style="display:flex; align-items:center; gap:12px; width:100%; padding:14px 20px; border-radius:16px; border:none; background:linear-gradient(135deg,#8b5cf6,#6d28d9); color:#fff; font-weight:700; font-size:1rem; cursor:pointer; transition:all 0.3s; box-shadow:0 6px 20px rgba(139,92,246,0.4);">
+                    <span style="font-size:1.6rem;">🖥️</span> Windows
+                </button>
+            </a>
+        </div>
+        <button onclick="closeLinksPopup()" style="background:transparent; border:1px solid #555; color:#aaa; padding:10px 24px; border-radius:20px; cursor:pointer; font-size:0.9rem;">✕ Zamknij</button>
+    </div>
+</div>
+
 <script>
 // ==================== SUPABASE ====================
 const SUPA_URL = 'https://wjbzishechoxiafyfypr.supabase.co';
@@ -150,12 +176,34 @@ const RARITY = {
 };
 const RORDER = Object.keys(RARITY);
 const ANIMALS = {
-    "Rzadki": [{n:"Lew",e:"🦁"},{n:"Wilk",e:"🐺"},{n:"Jeleń",e:"🦌"},{n:"Żółw",e:"🐢"}],
-    "Bardzo Rzadki": [{n:"Lis",e:"🦊"},{n:"Sowa",e:"🦉"},{n:"Papuga",e:"🦜"}],
-    "Epicki": [{n:"Tygrys",e:"🐯"},{n:"Orzeł",e:"🦅"},{n:"Wąż",e:"🐍"},{n:"Ryba",e:"🐟"},{n:"Krab",e:"🦀"},{n:"Świnka morska",e:"🐹"}],
-    "Mityczny": [{n:"Rekin",e:"🦈"},{n:"Panda",e:"🐼"},{n:"Kot",e:"🐈"},{n:"Pies",e:"🐕"},{n:"Krewetka",e:"🦐"}],
-    "Legendarny": [{n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"},{n:"Szynszyla",e:"🐿️"},{n:"Salamandra Ognista",e:"🦎"}],
-    "Chromatyczny": [{n:"Krokodyl",e:"🐊"},{n:"Smok Gór",e:"🐉"},{n:"Phoenix",e:"🐦‍🔥"}]
+    "Rzadki": [
+        {n:"Lew",e:"🦁"},{n:"Wilk",e:"🐺"},{n:"Jeleń",e:"🦌"},{n:"Żółw",e:"🐢"},
+        {n:"Żaba",e:"🐸"},{n:"Kura",e:"🐔"},{n:"Jeż",e:"🦔"}
+    ],
+    "Bardzo Rzadki": [
+        {n:"Lis",e:"🦊"},{n:"Sowa",e:"🦉"},{n:"Papuga",e:"🦜"},
+        {n:"Pingwin",e:"🐧"},{n:"Baran",e:"🐏"},{n:"Wiewiórka",e:"🐿️"},
+        {n:"Biedronka",e:"🐞"},{n:"Ślimak",e:"🐌"},{n:"Szop",e:"🦝"}
+    ],
+    "Epicki": [
+        {n:"Tygrys",e:"🐯"},{n:"Orzeł",e:"🦅"},{n:"Wąż",e:"🐍"},
+        {n:"Ryba",e:"🐟"},{n:"Krab",e:"🦀"},{n:"Świnka morska",e:"🐹"},
+        {n:"Motyl",e:"🦋"},{n:"Miś",e:"🐻"},{n:"Flamingo",e:"🦩"},
+        {n:"Kraken",e:"🦑"},{n:"Królik",e:"🐇"},{n:"Shadow Bat",e:"🦇"}
+    ],
+    "Mityczny": [
+        {n:"Rekin",e:"🦈"},{n:"Panda",e:"🐼"},{n:"Kot",e:"🐈"},
+        {n:"Pies",e:"🐕"},{n:"Krewetka",e:"🦐"},{n:"Delfin",e:"🐬"},
+        {n:"T-Rex",e:"🦖"},{n:"Tygrys",e:"🐅"},{n:"Łabędź",e:"🦢"}
+    ],
+    "Legendarny": [
+        {n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"},{n:"Szynszyla",e:"🐿️"},
+        {n:"Salamandra Ognista",e:"🦎"},{n:"Kot Void",e:"🐈‍⬛"}
+    ],
+    "Chromatyczny": [
+        {n:"Krokodyl",e:"🐊"},{n:"Smok Gór",e:"🐉"},{n:"Phoenix",e:"🐦‍🔥"},
+        {n:"Kosmiczna Ośmiornica",e:"🐙"},{n:"Crystal Hydra",e:"💎"}
+    ]
 };
 const DROP_TABLE = {
     "Rzadki":{"Rzadki":0.70,"Bardzo Rzadki":0.25,"Epicki":0.05},
@@ -353,232 +401,62 @@ function buyMultiple(pack, amount) {
     packType = pack;
     const allCards = [];
     for (let i = 0; i < amount; i++) {
-        curRar = "Rzadki";
-        clicksLeft = maxClicks;
-        // symulacja kliknięć
+        curRar = "Rzadki"; clicksLeft = maxClicks;
         for (let j = 0; j < maxClicks; j++) {
             if (curRar === "Chromatyczny") break;
             let eff = RARITY[curRar].up;
             if (pack === 'spring') eff *= 3;
-            if (Math.random() < eff) {
-                let idx = RORDER.indexOf(curRar);
-                if (idx < RORDER.length - 1) curRar = RORDER[idx + 1];
-            }
+            if (Math.random() < eff) { let idx = RORDER.indexOf(curRar); if (idx < RORDER.length - 1) curRar = RORDER[idx + 1]; }
         }
         const count = curRar === "Chromatyczny" ? 5 : (curRar === "Legendarny" ? 4 : (curRar === "Mityczny" ? 3 : 2));
-        for (let k = 0; k < count; k++) {
-            const { n, e, rarity } = generateCard(curRar);
-            allCards.push({ n, e, rarity });
-            let entry = inv.find(x => x.n === n && x.r === rarity);
-            if (entry) entry.q++; else inv.push({ n, e, r: rarity, q: 1 });
-            collected.add(n);
-        }
+        for (let k = 0; k < count; k++) { const { n, e, rarity } = generateCard(curRar); allCards.push({ n, e, rarity }); let entry = inv.find(x => x.n === n && x.r === rarity); if (entry) entry.q++; else inv.push({ n, e, r: rarity, q: 1 }); collected.add(n); }
     }
     saveCloud(); refreshViews(); updateUI();
     showReveal(allCards);
 }
-function buyToInventory(pack){
-    const prices={basic:10,spring:250,hyper:1000};
-    const names={basic:'Podstawowa Paczka',spring:'Wiosenne Pudło',hyper:'Hyper Paczka'};
-    const emojis={basic:'📦',spring:'🌸',hyper:'📦'};
-    if(coins<prices[pack]){toast('Za mało monet!');return;}
-    coins-=prices[pack]; let existing=inv.find(i=>i.n===names[pack]);
-    if(existing)existing.q++; else inv.push({n:names[pack],e:emojis[pack],r:'Specjalny',q:1});
-    updateUI(); saveCloud(); refreshViews(); toast(`Dodano ${names[pack]} do ekwipunku!`);
-}
+function buyToInventory(pack){ const prices={basic:10,spring:250,hyper:1000}; const names={basic:'Podstawowa Paczka',spring:'Wiosenne Pudło',hyper:'Hyper Paczka'}; const emojis={basic:'📦',spring:'🌸',hyper:'📦'}; if(coins<prices[pack]){toast('Za mało monet!');return;} coins-=prices[pack]; let existing=inv.find(i=>i.n===names[pack]); if(existing)existing.q++; else inv.push({n:names[pack],e:emojis[pack],r:'Specjalny',q:1}); updateUI(); saveCloud(); refreshViews(); toast(`Dodano ${names[pack]} do ekwipunku!`); }
 function startOpening(){ curRar="Rzadki"; clicksLeft=maxClicks; showOpeningOverlay(); }
-function showOpeningOverlay(){
-    const old=document.getElementById('openingOverlay'); if(old){document.removeEventListener('keydown',old._kh);old.remove();}
-    const ov=document.createElement('div'); ov.id='openingOverlay'; ov.className='opening-overlay';
-    ov.innerHTML=`<div class="opening-box" id="openingBox">❓</div><div class="rarity-text" id="rarityLabel" style="color:${RARITY[curRar].col}">${curRar}</div><div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div><p style="color:#aaa;margin-top:10px;">Kliknij gdziekolwiek, by ulepszyć</p><p style="color:#f0c060;">SPACJA = otwórz teraz</p>`;
-    ov.addEventListener('click', onOverlayClick);
-    const kh=(e)=>{if(e.code==='Space'){e.preventDefault(); openNow();}};
-    document.addEventListener('keydown',kh); ov._kh=kh;
-    document.body.appendChild(ov);
-}
-function onOverlayClick(e){
-    if(isBlocked) return;
-    const now = Date.now();
-    clickTimestamps = clickTimestamps.filter(t => now - t < 1000);
-    clickTimestamps.push(now);
-    if (clickTimestamps.length >= 50) {
-        isBlocked = true;
-        document.getElementById('warningBox').style.display = 'block';
-        setTimeout(() => {
-            document.getElementById('warningBox').style.display = 'none';
-            isBlocked = false;
-        }, 2000);
-        return;
-    }
-    if(clicksLeft<=0||curRar==="Chromatyczny") openNow(); else attemptUpgrade();
-}
-function attemptUpgrade(){
-    if(clicksLeft<=0||curRar==="Chromatyczny")return;
-    clicksLeft--; const box=document.getElementById('openingBox'); if(box){box.classList.add('shake');setTimeout(()=>box.classList.remove('shake'),500);}
-    playSfx('open');
-    let eff=RARITY[curRar].up; if(packType==='spring')eff*=3;
-    if(Math.random()<eff){ let idx=RORDER.indexOf(curRar); if(idx<RORDER.length-1)curRar=RORDER[idx+1]; }
-    const lb=document.getElementById('rarityLabel'); if(lb){lb.textContent=curRar;lb.style.color=RARITY[curRar].col;}
-    document.getElementById('clicksCount').textContent=clicksLeft;
-    if(clicksLeft<=0||curRar==="Chromatyczny") setTimeout(()=>{if(document.getElementById('openingOverlay')) openNow();},600);
-}
-function generateCard(r){
-    const table=DROP_TABLE; const t=table[r]||{"Rzadki":1}; const total=Object.values(t).reduce((a,b)=>a+b,0); let rand=Math.random()*total;
-    for(const [rarity,weight] of Object.entries(t)){ rand-=weight; if(rand<=0){ const animals=ANIMALS[rarity]; if(!animals||!animals.length)continue; const animal=animals[Math.floor(Math.random()*animals.length)]; return {n:animal.n,e:animal.e,rarity}; } }
-    return {n:ANIMALS["Rzadki"][0].n,e:ANIMALS["Rzadki"][0].e,rarity:"Rzadki"};
-}
-function openNow(){
-    const ov=document.getElementById('openingOverlay'); if(ov){document.removeEventListener('keydown',ov._kh);ov.remove();}
-    playSfx('opened');
-    const pr=curRar; const count=pr==="Chromatyczny"?5:(pr==="Legendarny"?4:(pr==="Mityczny"?3:2)); const cards=[];
-    for(let i=0;i<count;i++){ const {n,e,rarity}=generateCard(pr); cards.push({n,e,rarity}); let entry=inv.find(x=>x.n===n&&x.r===rarity); if(entry)entry.q++; else inv.push({n,e,r:rarity,q:1}); collected.add(n); }
-    saveCloud(); refreshViews(); updateUI();
-    showReveal(cards);
-}
-function openHyperPack(){
-    const allAnimals=[]; for(const arr of Object.values(ANIMALS))allAnimals.push(...arr);
-    const animal=allAnimals[Math.floor(Math.random()*allAnimals.length)];
-    const hyperName='Hyper '+animal.n;
-    const baseRarity=Object.keys(ANIMALS).find(key=>ANIMALS[key].some(a=>a.n===animal.n));
-    let existing=inv.find(i=>i.n===hyperName&&i.r==='Hyper');
-    if(existing)existing.q++; else inv.push({n:hyperName,e:animal.e,r:'Hyper',q:1,baseRarity:baseRarity});
-    collected.add(animal.n);
-    saveCloud(); refreshViews(); updateUI();
-    const area=document.createElement('div'); area.className='reveal-area';
-    const el=document.createElement('div'); el.className='reveal-card';
-    el.innerHTML=`<div style="font-size:2.5rem;">${animal.e}</div><div style="font-weight:700;">${hyperName}</div><div class="badge badge-hyper">Hyper</div>`;
-    area.appendChild(el);
-    area.addEventListener('click', () => area.remove());
-    document.body.appendChild(area);
-    toast(`Otrzymujesz ${hyperName}!`);
-}
-function showReveal(cards) {
-    const area = document.createElement('div'); area.className = 'reveal-area';
-    cards.forEach((c, i) => {
-        setTimeout(() => {
-            const el = document.createElement('div'); el.className = 'reveal-card';
-            el.innerHTML = `<div style="font-size:2.5rem;">${c.e}</div><div style="font-weight:700;">${c.n}</div><div class="badge badge-${c.rarity.toLowerCase().replace(' ','-')}">${c.rarity}</div>`;
-            area.appendChild(el);
-        }, i * 150);
-    });
-    area.addEventListener('click', () => area.remove());
-    document.body.appendChild(area);
-}
-function openPackFromInventory(item){
-    if(item.n==='Hyper Paczka'){ item.q--; if(item.q<=0)inv=inv.filter(i=>i!==item); saveCloud(); refreshViews(); openHyperPack(); return; }
-    const typeMap={'Podstawowa Paczka':'basic','Wiosenne Pudło':'spring'};
-    packType=typeMap[item.n]||'basic';
-    item.q--; if(item.q<=0)inv=inv.filter(i=>i!==item);
-    saveCloud(); refreshViews(); startOpening();
-}
+function showOpeningOverlay(){ const old=document.getElementById('openingOverlay'); if(old){document.removeEventListener('keydown',old._kh);old.remove();} const ov=document.createElement('div'); ov.id='openingOverlay'; ov.className='opening-overlay'; ov.innerHTML=`<div class="opening-box" id="openingBox">❓</div><div class="rarity-text" id="rarityLabel" style="color:${RARITY[curRar].col}">${curRar}</div><div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div><p style="color:#aaa;margin-top:10px;">Kliknij gdziekolwiek, by ulepszyć</p><p style="color:#f0c060;">SPACJA = otwórz teraz</p>`; ov.addEventListener('click', onOverlayClick); const kh=(e)=>{if(e.code==='Space'){e.preventDefault(); openNow();}}; document.addEventListener('keydown',kh); ov._kh=kh; document.body.appendChild(ov); }
+function onOverlayClick(e){ if(isBlocked) return; const now = Date.now(); clickTimestamps = clickTimestamps.filter(t => now - t < 1000); clickTimestamps.push(now); if (clickTimestamps.length >= 50) { isBlocked = true; document.getElementById('warningBox').style.display = 'block'; setTimeout(() => { document.getElementById('warningBox').style.display = 'none'; isBlocked = false; }, 2000); return; } if(clicksLeft<=0||curRar==="Chromatyczny") openNow(); else attemptUpgrade(); }
+function attemptUpgrade(){ if(clicksLeft<=0||curRar==="Chromatyczny")return; clicksLeft--; const box=document.getElementById('openingBox'); if(box){box.classList.add('shake');setTimeout(()=>box.classList.remove('shake'),500);} playSfx('open'); let eff=RARITY[curRar].up; if(packType==='spring')eff*=3; if(Math.random()<eff){ let idx=RORDER.indexOf(curRar); if(idx<RORDER.length-1)curRar=RORDER[idx+1]; } const lb=document.getElementById('rarityLabel'); if(lb){lb.textContent=curRar;lb.style.color=RARITY[curRar].col;} document.getElementById('clicksCount').textContent=clicksLeft; if(clicksLeft<=0||curRar==="Chromatyczny") setTimeout(()=>{if(document.getElementById('openingOverlay')) openNow();},600); }
+function generateCard(r){ const table=DROP_TABLE; const t=table[r]||{"Rzadki":1}; const total=Object.values(t).reduce((a,b)=>a+b,0); let rand=Math.random()*total; for(const [rarity,weight] of Object.entries(t)){ rand-=weight; if(rand<=0){ const animals=ANIMALS[rarity]; if(!animals||!animals.length)continue; const animal=animals[Math.floor(Math.random()*animals.length)]; return {n:animal.n,e:animal.e,rarity}; } } return {n:ANIMALS["Rzadki"][0].n,e:ANIMALS["Rzadki"][0].e,rarity:"Rzadki"}; }
+function openNow(){ const ov=document.getElementById('openingOverlay'); if(ov){document.removeEventListener('keydown',ov._kh);ov.remove();} playSfx('opened'); const pr=curRar; const count=pr==="Chromatyczny"?5:(pr==="Legendarny"?4:(pr==="Mityczny"?3:2)); const cards=[]; for(let i=0;i<count;i++){ const {n,e,rarity}=generateCard(pr); cards.push({n,e,rarity}); let entry=inv.find(x=>x.n===n&&x.r===rarity); if(entry)entry.q++; else inv.push({n,e,r:rarity,q:1}); collected.add(n); } saveCloud(); refreshViews(); updateUI(); showReveal(cards); }
+function openHyperPack(){ const allAnimals=[]; for(const arr of Object.values(ANIMALS))allAnimals.push(...arr); const animal=allAnimals[Math.floor(Math.random()*allAnimals.length)]; const hyperName='Hyper '+animal.n; const baseRarity=Object.keys(ANIMALS).find(key=>ANIMALS[key].some(a=>a.n===animal.n)); let existing=inv.find(i=>i.n===hyperName&&i.r==='Hyper'); if(existing)existing.q++; else inv.push({n:hyperName,e:animal.e,r:'Hyper',q:1,baseRarity:baseRarity}); collected.add(animal.n); saveCloud(); refreshViews(); updateUI(); const area=document.createElement('div'); area.className='reveal-area'; const el=document.createElement('div'); el.className='reveal-card'; el.innerHTML=`<div style="font-size:2.5rem;">${animal.e}</div><div style="font-weight:700;">${hyperName}</div><div class="badge badge-hyper">Hyper</div>`; area.appendChild(el); area.addEventListener('click', () => area.remove()); document.body.appendChild(area); toast(`Otrzymujesz ${hyperName}!`); }
+function showReveal(cards) { const area = document.createElement('div'); area.className = 'reveal-area'; cards.forEach((c, i) => { setTimeout(() => { const el = document.createElement('div'); el.className = 'reveal-card'; el.innerHTML = `<div style="font-size:2.5rem;">${c.e}</div><div style="font-weight:700;">${c.n}</div><div class="badge badge-${c.rarity.toLowerCase().replace(' ','-')}">${c.rarity}</div>`; area.appendChild(el); }, i * 150); }); area.addEventListener('click', () => area.remove()); document.body.appendChild(area); }
+function openPackFromInventory(item){ if(item.n==='Hyper Paczka'){ item.q--; if(item.q<=0)inv=inv.filter(i=>i!==item); saveCloud(); refreshViews(); openHyperPack(); return; } const typeMap={'Podstawowa Paczka':'basic','Wiosenne Pudło':'spring'}; packType=typeMap[item.n]||'basic'; item.q--; if(item.q<=0)inv=inv.filter(i=>i!==item); saveCloud(); refreshViews(); startOpening(); }
 
 // ==================== NAGRODY ====================
-function checkDailyReset(){
-    const today=new Date().toISOString().split('T')[0];
-    if(dailyLastDate!==today){ if(!dailyLastDate)dailyStreak=1; else{ const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0]; if(dailyLastDate!==yesterday)dailyStreak=1; } dailyClaimed=false; dailyLastDate=today; }
-}
-checkDailyReset();
+function checkDailyReset(){ const today=new Date().toISOString().split('T')[0]; if(dailyLastDate!==today){ if(!dailyLastDate)dailyStreak=1; else{ const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0]; if(dailyLastDate!==yesterday)dailyStreak=1; } dailyClaimed=false; dailyLastDate=today; } } checkDailyReset();
 const DAILY_PRIZES=[{d:1,desc:'100 monet',r:{c:100}},{d:2,desc:'2 paczki',r:{p:2}},{d:3,desc:'10 gemów',r:{g:10}},{d:4,desc:'500 monet',r:{c:500}},{d:5,desc:'5 paczek',r:{p:5}},{d:6,desc:'5 gemów',r:{g:5}},{d:7,desc:'10 gemów',r:{g:10}}];
 function openDailyModal(){document.getElementById('dailyModal').classList.add('active');renderDailyGrid();}
 function closeDailyModal(){document.getElementById('dailyModal').classList.remove('active');}
-function renderDailyGrid(){
-    const grid=document.getElementById('dailyGrid'); if(!grid)return; grid.innerHTML='';
-    for(let i=1;i<=7;i++){
-        const prize=DAILY_PRIZES[i-1]; const dayDiv=document.createElement('div'); dayDiv.style.cssText='background:#1e1e32;border-radius:10px;padding:8px 4px;text-align:center;border:2px solid #2a2a40;font-size:0.65rem;';
-        if(i<dailyStreak){dayDiv.style.borderColor='#4ade80';dayDiv.innerHTML='<div>✓</div>';}
-        else if(i===dailyStreak&&!dailyClaimed){dayDiv.style.borderColor='#fbbf24';dayDiv.style.boxShadow='0 0 12px rgba(251,191,36,0.5)';dayDiv.innerHTML=`<div><b>Dzień ${i}</b></div><div>${prize.desc}</div>`;}
-        else if(i===dailyStreak&&dailyClaimed){dayDiv.style.borderColor='#4ade80';dayDiv.innerHTML='<div>✓</div>';}
-        else{dayDiv.innerHTML=`<div>Dzień ${i}</div><div>${prize.desc}</div>`;}
-        grid.appendChild(dayDiv);
-    }
-    document.getElementById('dailyStatus').textContent=dailyClaimed?'✅ Odebrano.':`🔥 Dzień ${dailyStreak} – odbierz!`;
-    document.getElementById('claimDailyBtn').disabled=dailyClaimed;
-}
-function claimDailyReward(){
-    if(dailyClaimed)return; const prize=DAILY_PRIZES[dailyStreak-1];
-    if(prize.r.c)coins+=prize.r.c; if(prize.r.g)gems+=prize.r.g;
-    if(prize.r.p)for(let i=0;i<prize.r.p;i++){ const animal=ANIMALS["Rzadki"][Math.floor(Math.random()*ANIMALS["Rzadki"].length)]; let entry=inv.find(x=>x.n===animal.n&&x.r==="Rzadki"); if(entry)entry.q++; else inv.push({n:animal.n,e:animal.e,r:"Rzadki",q:1}); collected.add(animal.n); }
-    dailyClaimed=true; dailyLastDate=new Date().toISOString().split('T')[0];
-    dailyStreak=dailyStreak<7?dailyStreak+1:1;
-    updateUI(); saveCloud(); refreshViews(); renderDailyGrid();
-    toast(`Odebrano nagrodę dnia ${prize.d}!`);
-}
+function renderDailyGrid(){ const grid=document.getElementById('dailyGrid'); if(!grid)return; grid.innerHTML=''; for(let i=1;i<=7;i++){ const prize=DAILY_PRIZES[i-1]; const dayDiv=document.createElement('div'); dayDiv.style.cssText='background:#1e1e32;border-radius:10px;padding:8px 4px;text-align:center;border:2px solid #2a2a40;font-size:0.65rem;'; if(i<dailyStreak){dayDiv.style.borderColor='#4ade80';dayDiv.innerHTML='<div>✓</div>';} else if(i===dailyStreak&&!dailyClaimed){dayDiv.style.borderColor='#fbbf24';dayDiv.style.boxShadow='0 0 12px rgba(251,191,36,0.5)';dayDiv.innerHTML=`<div><b>Dzień ${i}</b></div><div>${prize.desc}</div>`;} else if(i===dailyStreak&&dailyClaimed){dayDiv.style.borderColor='#4ade80';dayDiv.innerHTML='<div>✓</div>';} else{dayDiv.innerHTML=`<div>Dzień ${i}</div><div>${prize.desc}</div>`;} grid.appendChild(dayDiv); } document.getElementById('dailyStatus').textContent=dailyClaimed?'✅ Odebrano.':`🔥 Dzień ${dailyStreak} – odbierz!`; document.getElementById('claimDailyBtn').disabled=dailyClaimed; }
+function claimDailyReward(){ if(dailyClaimed)return; const prize=DAILY_PRIZES[dailyStreak-1]; if(prize.r.c)coins+=prize.r.c; if(prize.r.g)gems+=prize.r.g; if(prize.r.p)for(let i=0;i<prize.r.p;i++){ const animal=ANIMALS["Rzadki"][Math.floor(Math.random()*ANIMALS["Rzadki"].length)]; let entry=inv.find(x=>x.n===animal.n&&x.r==="Rzadki"); if(entry)entry.q++; else inv.push({n:animal.n,e:animal.e,r:"Rzadki",q:1}); collected.add(animal.n); } dailyClaimed=true; dailyLastDate=new Date().toISOString().split('T')[0]; dailyStreak=dailyStreak<7?dailyStreak+1:1; updateUI(); saveCloud(); refreshViews(); renderDailyGrid(); toast(`Odebrano nagrodę dnia ${prize.d}!`); }
 
 // ==================== RANKING ====================
-async function loadLeaderboard(){
-    const list=document.getElementById('leaderboardList');
-    if(!supabaseClient){list.innerHTML='Zaloguj się, aby zobaczyć ranking.';return;}
-    const {data,error}=await supabaseClient.from('profiles').select('username,coins').order('coins',{ascending:false}).limit(10);
-    if(error){list.innerHTML='Błąd ładowania.';return;}
-    if(!data||data.length===0){list.innerHTML='Brak graczy.';return;}
-    list.innerHTML = data.map((p,i) => `<div style="padding:5px;border-bottom:1px solid #2a2a40;">${i+1}. ${p.username || 'Anonim'} – 🪙 ${p.coins}</div>`).join('');
-}
+async function loadLeaderboard(){ const list=document.getElementById('leaderboardList'); if(!supabaseClient){list.innerHTML='Zaloguj się, aby zobaczyć ranking.';return;} const {data,error}=await supabaseClient.from('profiles').select('username,coins').order('coins',{ascending:false}).limit(10); if(error){list.innerHTML='Błąd ładowania.';return;} if(!data||data.length===0){list.innerHTML='Brak graczy.';return;} list.innerHTML = data.map((p,i) => `<div style="padding:5px;border-bottom:1px solid #2a2a40;">${i+1}. ${p.username || 'Anonim'} – 🪙 ${p.coins}</div>`).join(''); }
 
 // ==================== AUTH ====================
-function getUserDisplayName(user) {
-    if (!user) return 'Gracz';
-    return user.user_metadata?.full_name || user.user_metadata?.user_name || user.email || 'Gracz';
-}
-async function updateAuthUI() {
-    const authSection = document.getElementById('authSection');
-    const userBlock = document.getElementById('userInfoBlock');
-    if (!supabaseClient) { if(authSection) authSection.style.display = 'none'; return; }
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    currentUser = user;
-    if (currentUser) {
-        if(authSection) authSection.style.display = 'none';
-        if(userBlock) userBlock.style.display = 'block';
-        document.getElementById('userNameDisplay').textContent = getUserDisplayName(currentUser);
-    } else {
-        if(authSection) authSection.style.display = 'block';
-        if(userBlock) userBlock.style.display = 'none';
-    }
-}
+function getUserDisplayName(user) { if (!user) return 'Gracz'; return user.user_metadata?.full_name || user.user_metadata?.user_name || user.email || 'Gracz'; }
+async function updateAuthUI() { const authSection = document.getElementById('authSection'); const userBlock = document.getElementById('userInfoBlock'); if (!supabaseClient) { if(authSection) authSection.style.display = 'none'; return; } const { data: { user } } = await supabaseClient.auth.getUser(); currentUser = user; if (currentUser) { if(authSection) authSection.style.display = 'none'; if(userBlock) userBlock.style.display = 'block'; document.getElementById('userNameDisplay').textContent = getUserDisplayName(currentUser); } else { if(authSection) authSection.style.display = 'block'; if(userBlock) userBlock.style.display = 'none'; } }
 async function signInWithDiscord() { if (!supabaseClient) return toast('Supabase offline'); await supabaseClient.auth.signInWithOAuth({ provider: 'discord', options: { redirectTo: window.location.origin } }); }
 async function signInWithGithub() { if (!supabaseClient) return toast('Supabase offline'); await supabaseClient.auth.signInWithOAuth({ provider: 'github', options: { redirectTo: window.location.origin } }); }
-async function signUp() {
-    if (!supabaseClient) return toast('Supabase offline');
-    const email = document.getElementById('authEmail').value, pass = document.getElementById('authPassword').value;
-    const { error } = await supabaseClient.auth.signUp({ email, password: pass });
-    if (error) document.getElementById('authError').textContent = error.message;
-    else toast('Zarejestrowano! Możesz się zalogować.');
-}
-async function signIn() {
-    if (!supabaseClient) return toast('Supabase offline');
-    const email = document.getElementById('authEmail').value, pass = document.getElementById('authPassword').value;
-    const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-    if (error) { document.getElementById('authError').textContent = error.message; console.error('SignIn error:', error); }
-    else { toast('Zalogowano!'); await updateAuthUI(); await loadCloud(); }
-}
-async function signOut() {
-    if (supabaseClient) await supabaseClient.auth.signOut();
-    currentUser = null; await updateAuthUI();
-    loadLocal(); updateUI(); refreshViews();
-}
-if (supabaseClient) {
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-        if (session?.user) { currentUser = session.user; await updateAuthUI(); await loadCloud(); }
-        else { currentUser = null; await updateAuthUI(); }
-    });
-    updateAuthUI();
-} else { document.getElementById('authSection').style.display = 'none'; }
+async function signUp() { if (!supabaseClient) return toast('Supabase offline'); const email = document.getElementById('authEmail').value, pass = document.getElementById('authPassword').value; const { error } = await supabaseClient.auth.signUp({ email, password: pass }); if (error) document.getElementById('authError').textContent = error.message; else toast('Zarejestrowano! Możesz się zalogować.'); }
+async function signIn() { if (!supabaseClient) return toast('Supabase offline'); const email = document.getElementById('authEmail').value, pass = document.getElementById('authPassword').value; const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass }); if (error) { document.getElementById('authError').textContent = error.message; } else { toast('Zalogowano!'); await updateAuthUI(); await loadCloud(); } }
+async function signOut() { if (supabaseClient) await supabaseClient.auth.signOut(); currentUser = null; await updateAuthUI(); loadLocal(); updateUI(); refreshViews(); }
+if (supabaseClient) { supabaseClient.auth.onAuthStateChange(async (event, session) => { if (session?.user) { currentUser = session.user; await updateAuthUI(); await loadCloud(); } else { currentUser = null; await updateAuthUI(); } }); updateAuthUI(); } else { document.getElementById('authSection').style.display = 'none'; }
 
 // ==================== SPRING TIMER ====================
-function updateSpringTimer() {
-    const target = new Date('2026-05-22T16:00:00').getTime();
-    const now = Date.now();
-    const diff = target - now;
-    const el = document.getElementById('springTimer');
-    if (!el) return;
-    if (diff <= 0) { el.textContent = '⏰ Wydarzenie zakończone!'; return; }
-    const d = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    el.textContent = `⏳ Kończy się za: ${d}d ${h}g ${m}m ${s}s`;
-}
-setInterval(updateSpringTimer, 1000);
-updateSpringTimer();
+function updateSpringTimer() { const target = new Date('2026-05-22T16:00:00').getTime(); const now = Date.now(); const diff = target - now; const el = document.getElementById('springTimer'); if (!el) return; if (diff <= 0) { el.textContent = '⏰ Wydarzenie zakończone!'; return; } const d = Math.floor(diff / 86400000); const h = Math.floor((diff % 86400000) / 3600000); const m = Math.floor((diff % 3600000) / 60000); const s = Math.floor((diff % 60000) / 1000); el.textContent = `⏳ Kończy się za: ${d}d ${h}g ${m}m ${s}s`; }
+setInterval(updateSpringTimer, 1000); updateSpringTimer();
+
+// ==================== POPUP Z LINKAMI ====================
+function closeLinksPopup() { document.getElementById('linksPopup').style.display = 'none'; localStorage.setItem('linksPopupClosed', 'true'); }
+window.addEventListener('load', () => {
+    if (localStorage.getItem('linksPopupClosed') !== 'true') {
+        setTimeout(() => { const popup = document.getElementById('linksPopup'); if (popup) popup.style.display = 'flex'; }, 600);
+    }
+});
 
 // ==================== EVENTY ====================
 document.addEventListener('DOMContentLoaded', () => {
@@ -586,12 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.buy-now-btn').forEach(b => b.addEventListener('click', () => buyPackInteractive(b.dataset.pack)));
     document.querySelectorAll('.buy-inv-btn').forEach(b => b.addEventListener('click', () => buyToInventory(b.dataset.pack)));
     document.querySelectorAll('.exchange-btn').forEach(b => b.addEventListener('click', () => exchangeGems(parseInt(b.dataset.amount))));
-    document.getElementById('sendGemBtn').addEventListener('click', () => {
-        const email = document.getElementById('tradeEmail').value.trim(), amt = parseInt(document.getElementById('tradeGemAmount').value);
-        if (!email) { toast('Wpisz email!'); return; }
-        if (!amt || amt < 1 || amt > gems) { toast('Nieprawidłowa ilość!'); return; }
-        gems -= amt; updateUI(); saveCloud(); refreshViews(); toast(`Wysłano ${amt}💎 do ${email}`);
-    });
+    document.getElementById('sendGemBtn').addEventListener('click', () => { const email = document.getElementById('tradeEmail').value.trim(), amt = parseInt(document.getElementById('tradeGemAmount').value); if (!email) { toast('Wpisz email!'); return; } if (!amt || amt < 1 || amt > gems) { toast('Nieprawidłowa ilość!'); return; } gems -= amt; updateUI(); saveCloud(); refreshViews(); toast(`Wysłano ${amt}💎 do ${email}`); });
     document.getElementById('openDailyBtn').addEventListener('click', openDailyModal);
     document.getElementById('closeDailyModalBtn').addEventListener('click', closeDailyModal);
     document.getElementById('claimDailyBtn').addEventListener('click', claimDailyReward);
