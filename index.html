@@ -45,6 +45,7 @@
     .badge-rzadki { background:#22c55e; color:#000; } .badge-bardzo-rzadki { background:#3b82f6; color:#fff; }
     .badge-epicki { background:#a855f7; color:#fff; } .badge-mityczny { background:#ef4444; color:#fff; }
     .badge-legendarny { background:#eab308; color:#000; } .badge-chromatyczny { background:linear-gradient(135deg,#ff6bff,#ffb347); color:#000; }
+    .badge-hyper { background:#c084fc; color:#000; }
     .badge-specjalny { background:#888; color:#fff; }
     .collection-card { opacity:0.5; filter:grayscale(0.6); } .collection-card.owned { opacity:1; filter:none; border-color:#4ade80; }
     .modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:200; display:none; align-items:center; justify-content:center; }
@@ -105,19 +106,7 @@
   <div class="view" id="inventoryView"><h2>🎒 Ekwipunek</h2><div class="card-grid" id="inventoryGrid"></div></div>
   <div class="view" id="collectionView"><h2>📚 Kolekcja</h2><div class="card-grid" id="collectionGrid"></div></div>
   <div class="view" id="sellView"><h2>💰 Sprzedaż</h2><div id="sellContainer"></div></div>
-  <div class="view" id="tradeView">
-    <h2>🔄 Wyślij przedmioty</h2>
-    <input type="email" id="tradeEmail" placeholder="Email odbiorcy" style="max-width:400px; margin:0 auto 10px auto;">
-    <div style="background:var(--panel);border-radius:12px;padding:15px;margin:10px 0;">
-      <strong>💎 Gemy</strong> (posiadasz: <span id="tradeGemsCount">0</span>)
-      <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
-        <input type="number" id="tradeGemAmount" placeholder="Ilość" min="0" value="0" style="width:80px;">
-        <button class="btn" id="sendGemBtn">📤 Wyślij Gemy</button>
-      </div>
-    </div>
-    <h3 style="margin-top:20px;">🃏 Karty</h3>
-    <div id="tradeCardsContainer"></div>
-  </div>
+  <div class="view" id="tradeView"><h2>🔄 Wyślij przedmioty</h2><input type="email" id="tradeEmail" placeholder="Email odbiorcy" style="max-width:400px; margin:0 auto 10px auto;"><div style="background:var(--panel);border-radius:12px;padding:15px;margin:10px 0;"><strong>💎 Gemy</strong> (posiadasz: <span id="tradeGemsCount">0</span>)<div style="display:flex; align-items:center; gap:10px; margin-top:8px;"><input type="number" id="tradeGemAmount" placeholder="Ilość" min="0" value="0" style="width:80px;"><button class="btn" id="sendGemBtn">📤 Wyślij Gemy</button></div></div><h3 style="margin-top:20px;">🃏 Karty</h3><div id="tradeCardsContainer"></div></div>
   <div class="view" id="dailyView" style="text-align:center;"><h2>🎁 Nagrody</h2><button class="btn" id="openDailyBtn">📅 Kalendarz</button></div>
   <div class="view" id="leaderboardView"><h2>🏆 Top 10 graczy (monety)</h2><div id="leaderboardList" style="text-align:center;color:#aaa;">Zaloguj się, aby zobaczyć ranking.</div></div>
   <div class="view" id="settingsView"><h2>⚙️ Ustawienia</h2><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><label>🔊 Muzyka: <span id="musicVal">70</span>%</label><input type="range" id="musicSlider" min="0" max="100" value="70" style="width:100%;"><label style="margin-top:10px;">🔔 SFX: <span id="sfxVal">80</span>%</label><input type="range" id="sfxSlider" min="0" max="100" value="80" style="width:100%;"></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>🔐 Konto</h3><div id="authSection"><button class="btn discord-btn" id="loginDiscordBtn">🎮 Discord</button><button class="btn github-btn" id="loginGithubBtn" style="margin-left:6px;">🐙 GitHub</button><div style="margin:12px 0;color:#aaa;">lub</div><input type="email" id="authEmail" placeholder="Email"><br><input type="password" id="authPassword" placeholder="Hasło"><br><button class="btn" id="signUpBtn">Zarejestruj</button><button class="btn" id="signInBtn">Zaloguj</button><p id="authError" style="color:red;margin-top:6px;"></p></div><div id="userInfoBlock" style="display:none;"><p>Zalogowany jako <strong id="userNameDisplay"></strong></p><button class="btn" id="signOutBtn" style="background:#ff6b6b;">Wyloguj</button></div></div><div style="background:var(--panel);border-radius:16px;padding:20px;color:#aaa;"><div><b>Zooventures</b> v2.0</div><div>Copyright © 2026 SzyszoTeam</div><div>Made with ❤️</div></div></div>
@@ -173,7 +162,7 @@ let currentUser = null;
 function playSfx(name) { if(sfxVol<=0)return; try{new Audio(`sounds/${name}.ogg`).play().catch(()=>{})}catch(e){} }
 
 // ==================== STABILNY KLUCZ LOCALSTORAGE ====================
-const STORAGE_KEY = 'zooventures_data'; // stały klucz – dane nigdy nie znikną po aktualizacji
+const STORAGE_KEY = 'zooventures_data';
 
 function saveLocal() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -183,7 +172,6 @@ function saveLocal() {
 }
 function loadLocal() {
   let d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-  // Jeśli brak danych, szukaj w starych kluczach (migracja)
   if (!d || Object.keys(d).length === 0) {
     const oldKeys = ['zooventures_final', 'zooventures_v15', 'zooventures_v2', 'zoo', 'zoo2', 'zoo3'];
     for (const key of oldKeys) {
@@ -415,8 +403,9 @@ function openHyperPack(){
   const animal=allAnimals[Math.floor(Math.random()*allAnimals.length)];
   const hyperName='Hyper '+animal.n;
   const baseRarity=Object.keys(ANIMALS).find(key=>ANIMALS[key].some(a=>a.n===animal.n));
-  let existing=inv.find(i=>i.n===hyperName&&i.r==='Hyper');
-  if(existing)existing.q++; else inv.push({n:hyperName,e:animal.e,r:'Hyper',q:1,baseRarity:baseRarity});
+  let existing=inv.find(i=>i.n===hyperName && i.r==='Hyper');
+  if(existing) existing.q++;
+  else inv.push({n:hyperName, e:animal.e, r:'Hyper', q:1, baseRarity:baseRarity});
   collected.add(animal.n);
   saveCloud(); refreshViews(); updateUI();
   const area=document.createElement('div'); area.className='reveal-area';
@@ -475,7 +464,7 @@ async function loadLeaderboard(){
   list.innerHTML=data.map((p,i)=>`<div style="padding:5px;border-bottom:1px solid #2a2a40;">${i+1}. ${p.username||'Anonim'} – 🪙 ${p.coins}</div>`).join('');
 }
 
-// ==================== AUTH (POPRAWIONE) ====================
+// ==================== AUTH ====================
 function getUserDisplayName(user) {
   if (!user) return 'Gracz';
   return user.user_metadata?.full_name || user.user_metadata?.user_name || user.email || 'Gracz';
@@ -483,10 +472,7 @@ function getUserDisplayName(user) {
 async function updateAuthUI() {
   const authSection = document.getElementById('authSection');
   const userBlock = document.getElementById('userInfoBlock');
-  if (!supabaseClient) {
-    if(authSection) authSection.style.display = 'none';
-    return;
-  }
+  if (!supabaseClient) { if(authSection) authSection.style.display = 'none'; return; }
   const { data: { user } } = await supabaseClient.auth.getUser();
   currentUser = user;
   if (currentUser) {
@@ -558,8 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = document.getElementById('tradeEmail').value.trim(), amt = parseInt(document.getElementById('tradeGemAmount').value);
     if (!email) { toast('Wpisz email!'); return; }
     if (!amt || amt < 1 || amt > gems) { toast('Nieprawidłowa ilość!'); return; }
-    gems -= amt; updateUI(); saveCloud(); refreshViews();
-    toast(`Wysłano ${amt}💎 do ${email}`);
+    gems -= amt; updateUI(); saveCloud(); refreshViews(); toast(`Wysłano ${amt}💎 do ${email}`);
   });
   document.getElementById('openDailyBtn').addEventListener('click', openDailyModal);
   document.getElementById('closeDailyModalBtn').addEventListener('click', closeDailyModal);
