@@ -67,7 +67,6 @@
   </style>
 </head>
 <body>
-
 <div class="top-bar">
   <div class="logo">🐾 ZOOVENTURES</div>
   <div class="currency">
@@ -92,9 +91,38 @@
   <div class="view active" id="shopView">
     <h2>🧪 Paczki Kart</h2>
     <div class="shop-grid">
-      <div class="shop-card"><div class="pack-icon">📦</div><h3>Podstawowa Paczka</h3><p>Start: <b style="color:#22c55e;">Rzadki</b> · Kliknij 1-5 razy</p><p>🪙 10</p><button class="btn" id="buyBasicBtn">Kup</button></div>
-      <div class="shop-card"><div class="pack-icon">🌸</div><h3>Wiosenne Pudło</h3><p><b>3x szczęście</b> · Start: <b style="color:#22c55e;">Rzadki</b></p><p>🪙 250</p><button class="btn" id="buySpringBtn">Kup</button></div>
-      <div class="shop-card"><div class="pack-icon">💎</div><h3>Paczka Gemów</h3><p>Losowa ilość gemów (1-10)</p><p>🪙 100</p><button class="btn" id="buyGemPackBtn">Kup</button></div>
+      <div class="shop-card">
+        <div class="pack-icon">📦</div>
+        <h3>Podstawowa Paczka</h3>
+        <p>Start: <b style="color:#22c55e;">Rzadki</b> · Kliknij 1-5 razy</p>
+        <p>🪙 10</p>
+        <button class="btn buy-now-btn" data-pack="basic">Kup</button>
+        <button class="btn buy-inv-btn" data-pack="basic" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button>
+      </div>
+      <div class="shop-card">
+        <div class="pack-icon">🌸</div>
+        <h3>Wiosenne Pudło</h3>
+        <p><b>3x szczęście</b> · Start: <b style="color:#22c55e;">Rzadki</b></p>
+        <p>🪙 250</p>
+        <button class="btn buy-now-btn" data-pack="spring">Kup</button>
+        <button class="btn buy-inv-btn" data-pack="spring" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button>
+      </div>
+      <div class="shop-card">
+        <div class="pack-icon">🔥</div>
+        <h3>Ogniowa Paczka</h3>
+        <p>Specjalne ogniste zwierzaki!</p>
+        <p>🪙 200</p>
+        <button class="btn buy-now-btn" data-pack="fire">Kup</button>
+        <button class="btn buy-inv-btn" data-pack="fire" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button>
+      </div>
+      <div class="shop-card">
+        <div class="pack-icon">💎</div>
+        <h3>Paczka Gemów</h3>
+        <p>Losowa ilość gemów (1-10)</p>
+        <p>🪙 100</p>
+        <button class="btn buy-now-btn" data-pack="gem">Kup</button>
+        <button class="btn buy-inv-btn" data-pack="gem" style="background:linear-gradient(135deg,#666,#444);">Kup do Inv</button>
+      </div>
     </div>
     <div style="background:var(--panel);border-radius:16px;padding:20px;margin-top:15px;text-align:center;">
       <h3>💎 Wymiana Gemów na Monety</h3>
@@ -107,14 +135,14 @@
   <!-- EKWIPUNEK -->
   <div class="view" id="inventoryView"><h2>🎒 Ekwipunek</h2><div class="card-grid" id="inventoryGrid"></div></div>
   <!-- KOLEKCJA -->
-  <div class="view" id="collectionView"><h2>📚 Kolekcja Zwierząt</h2><div class="card-grid" id="collectionGrid"></div></div>
+  <div class="view" id="collectionView"><h2>📚 Kolekcja</h2><div class="card-grid" id="collectionGrid"></div></div>
   <!-- SPRZEDAŻ -->
   <div class="view" id="sellView"><h2>💰 Sprzedaż</h2><div id="sellContainer"></div></div>
   <!-- TRADY -->
   <div class="view" id="tradeView">
     <h2>🔄 Wyślij przedmioty</h2>
     <input type="email" id="tradeEmail" placeholder="Email odbiorcy" style="max-width:400px; margin:0 auto 10px auto;">
-    <div class="trade-gem-box" style="background:var(--panel); border-radius:12px; padding:15px; margin:10px 0;">
+    <div class="trade-gem-box" style="background:var(--panel);border-radius:12px;padding:15px;margin:10px 0;">
       <strong>💎 Gemy</strong> (posiadasz: <span id="tradeGemsCount">0</span>)
       <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
         <input type="number" id="tradeGemAmount" placeholder="Ilość" min="0" value="0" style="width:80px;">
@@ -125,12 +153,9 @@
     <div id="tradeCardsContainer"></div>
   </div>
   <!-- NAGRODY -->
-  <div class="view" id="dailyView" style="text-align:center;"><h2>🎁 Codzienne Nagrody</h2><button class="btn" id="openDailyBtn">📅 Otwórz Kalendarz</button></div>
+  <div class="view" id="dailyView" style="text-align:center;"><h2>🎁 Nagrody</h2><button class="btn" id="openDailyBtn">📅 Kalendarz</button></div>
   <!-- TOP 10 -->
-  <div class="view" id="leaderboardView">
-    <h2>🏆 Top 10 graczy (monety)</h2>
-    <div id="leaderboardList" style="text-align:center; color:#aaa;">Zaloguj się, aby zobaczyć ranking.</div>
-  </div>
+  <div class="view" id="leaderboardView"><h2>🏆 Top 10 graczy (monety)</h2><div id="leaderboardList" style="text-align:center;color:#aaa;">Zaloguj się, aby zobaczyć ranking.</div></div>
   <!-- USTAWIENIA -->
   <div class="view" id="settingsView">
     <h2>⚙️ Ustawienia</h2>
@@ -158,7 +183,7 @@
       </div>
     </div>
     <div style="background:var(--panel);border-radius:16px;padding:20px;color:#aaa;">
-      <div><b>Zooventures</b> v1.0.5</div>
+      <div><b>Zooventures</b> v1.5</div>
       <div>Copyright © 2026 SzyszoTeam</div>
       <div>Made with ❤️</div>
     </div>
@@ -194,12 +219,12 @@ try { supabaseClient = window.supabase?.createClient?.(SUPA_URL, SUPA_KEY) || nu
 
 // ==================== STAN GRY ====================
 const RARITY = {
-  "Rzadki": { up: 0.20, col: "#22c55e", price: 8 },
-  "Bardzo Rzadki": { up: 0.15, col: "#3b82f6", price: 20 },
-  "Epicki": { up: 0.10, col: "#a855f7", price: 55 },
-  "Mityczny": { up: 0.05, col: "#ef4444", price: 130 },
-  "Legendarny": { up: 0.01, col: "#eab308", price: 350 },
-  "Chromatyczny": { up: 0.00, col: "#ff6bff", price: 900 }
+  "Rzadki": { up:0.20, col:"#22c55e", price:8 },
+  "Bardzo Rzadki": { up:0.15, col:"#3b82f6", price:20 },
+  "Epicki": { up:0.10, col:"#a855f7", price:55 },
+  "Mityczny": { up:0.05, col:"#ef4444", price:130 },
+  "Legendarny": { up:0.01, col:"#eab308", price:350 },
+  "Chromatyczny": { up:0, col:"#ff6bff", price:900 }
 };
 const RORDER = Object.keys(RARITY);
 const ANIMALS = {
@@ -207,8 +232,8 @@ const ANIMALS = {
   "Bardzo Rzadki": [{n:"Lis",e:"🦊"},{n:"Sowa",e:"🦉"},{n:"Papuga",e:"🦜"}],
   "Epicki": [{n:"Tygrys",e:"🐯"},{n:"Orzeł",e:"🦅"},{n:"Wąż",e:"🐍"}],
   "Mityczny": [{n:"Rekin",e:"🦈"},{n:"Panda",e:"🐼"}],
-  "Legendarny": [{n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"},{n:"Szynszyla",e:"🐹"}],
-  "Chromatyczny": [{n:"Krokodyl",e:"🐊"},{n:"Smok Gór",e:"🐉"}]
+  "Legendarny": [{n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"},{n:"Szynszyla",e:"🐹"},{n:"Salamandra Ognista",e:"🐉"}],
+  "Chromatyczny": [{n:"Krokodyl",e:"🐊"},{n:"Smok Gór",e:"🐉"},{n:"Phoenix",e:"🐦‍🔥"}]
 };
 const DROP_TABLE = {
   "Rzadki":{"Rzadki":0.70,"Bardzo Rzadki":0.25,"Epicki":0.05},
@@ -218,521 +243,397 @@ const DROP_TABLE = {
   "Legendarny":{"Epicki":0.10,"Mityczny":0.20,"Legendarny":0.40,"Chromatyczny":0.30},
   "Chromatyczny":{"Mityczny":0.05,"Legendarny":0.15,"Chromatyczny":0.80}
 };
+const FIRE_DROP = {
+  "Rzadki":{"Rzadki":0.60,"Bardzo Rzadki":0.30,"Epicki":0.10},
+  "Bardzo Rzadki":{"Rzadki":0.10,"Bardzo Rzadki":0.50,"Epicki":0.30,"Mityczny":0.10},
+  "Epicki":{"Rzadki":0.05,"Bardzo Rzadki":0.10,"Epicki":0.40,"Mityczny":0.30,"Legendarny":0.15},
+  "Mityczny":{"Bardzo Rzadki":0.05,"Epicki":0.10,"Mityczny":0.35,"Legendarny":0.35,"Chromatyczny":0.15},
+  "Legendarny":{"Epicki":0.05,"Mityczny":0.15,"Legendarny":0.40,"Chromatyczny":0.40},
+  "Chromatyczny":{"Mityczny":0.05,"Legendarny":0.15,"Chromatyczny":0.80}
+};
 
 let coins = 100, gems = 5, inv = [], collected = new Set();
-let curRar = "Rzadki", clicksLeft = 5, maxClicks = 5, springMode = false;
+let curRar = "Rzadki", clicksLeft = maxClicks = 5, packType = 'basic';
 let dailyStreak = 1, dailyLastDate = null, dailyClaimed = false;
 let usedCodes = {};
 let musicVol = 70, sfxVol = 80;
 let currentUser = null;
 
 // ==================== AUDIO ====================
-function playSfx(name) {
-    if (sfxVol <= 0) return;
-    try { new Audio(`sounds/${name}.ogg`).play().catch(()=>{}); } catch(e) {}
-}
+function playSfx(name) { if(sfxVol<=0)return; try{new Audio(`sounds/${name}.ogg`).play().catch(()=>{})}catch(e){} }
 
-// ==================== SAVE / LOAD ====================
+// ==================== SAVE/LOAD ====================
 function saveLocal() {
-    localStorage.setItem('zooventures_final', JSON.stringify({
-        coins, gems, inv, collected: [...collected],
-        dailyStreak, dailyLastDate, dailyClaimed, usedCodes, musicVol, sfxVol
-    }));
+  localStorage.setItem('zooventures_v15', JSON.stringify({coins,gems,inv,collected:[...collected],dailyStreak,dailyLastDate,dailyClaimed,usedCodes,musicVol,sfxVol}));
 }
 function loadLocal() {
-    const d = JSON.parse(localStorage.getItem('zooventures_final') || '{}');
-    coins = d.coins ?? 100; gems = d.gems ?? 5;
-    inv = d.inv ?? []; collected = new Set(d.collected ?? []);
-    dailyStreak = d.dailyStreak ?? 1; dailyLastDate = d.dailyLastDate ?? null;
-    dailyClaimed = d.dailyClaimed ?? false; usedCodes = d.usedCodes ?? {};
-    musicVol = d.musicVol ?? 70; sfxVol = d.sfxVol ?? 80;
+  const d = JSON.parse(localStorage.getItem('zooventures_v15')||'{}');
+  coins=d.coins??100; gems=d.gems??5; inv=d.inv??[]; collected=new Set(d.collected??[]);
+  dailyStreak=d.dailyStreak??1; dailyLastDate=d.dailyLastDate??null; dailyClaimed=d.dailyClaimed??false;
+  usedCodes=d.usedCodes??{}; musicVol=d.musicVol??70; sfxVol=d.sfxVol??80;
 }
 loadLocal();
 
 async function saveCloud() {
-    if (!supabaseClient || !currentUser) { saveLocal(); return; }
-    await supabaseClient.from('profiles').upsert({
-        id: currentUser.id, coins, gems,
-        daily_streak: dailyStreak, daily_last_date: dailyLastDate,
-        daily_claimed_today: dailyClaimed, used_codes: usedCodes,
-        collected_animals: [...collected]
-    });
-    await supabaseClient.from('user_inventory').delete().eq('user_id', currentUser.id);
-    const rows = inv.map(i => ({
-        user_id: currentUser.id, animal_name: i.n, rarity: i.r, quantity: i.q
-    }));
-    if (rows.length) await supabaseClient.from('user_inventory').insert(rows);
-    saveLocal();
+  if(!supabaseClient||!currentUser){saveLocal();return;}
+  await supabaseClient.from('profiles').upsert({id:currentUser.id,coins,gems,daily_streak:dailyStreak,daily_last_date:dailyLastDate,daily_claimed_today:dailyClaimed,used_codes:usedCodes,collected_animals:[...collected]});
+  await supabaseClient.from('user_inventory').delete().eq('user_id',currentUser.id);
+  const rows = inv.map(i=>({user_id:currentUser.id,animal_name:i.n,rarity:i.r,quantity:i.q}));
+  if(rows.length) await supabaseClient.from('user_inventory').insert(rows);
+  saveLocal();
 }
 async function loadCloud() {
-    if (!supabaseClient || !currentUser) return;
-    const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
-    if (profile) {
-        coins = profile.coins; gems = profile.gems;
-        dailyStreak = profile.daily_streak; dailyLastDate = profile.daily_last_date;
-        dailyClaimed = profile.daily_claimed_today; usedCodes = profile.used_codes || {};
-        collected = new Set(profile.collected_animals || []);
-    } else {
-        await supabaseClient.from('profiles').insert({ id: currentUser.id });
-    }
-    const { data: invData } = await supabaseClient.from('user_inventory').select('*').eq('user_id', currentUser.id);
-    inv = invData.map(i => ({ n: i.animal_name, e: getEmoji(i.animal_name), r: i.rarity, q: i.quantity }));
-    refreshViews(); updateUI();
+  if(!supabaseClient||!currentUser)return;
+  const {data:p} = await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).single();
+  if(p){coins=p.coins;gems=p.gems;dailyStreak=p.daily_streak;dailyLastDate=p.daily_last_date;dailyClaimed=p.daily_claimed_today;usedCodes=p.used_codes||{};collected=new Set(p.collected_animals||[]);}
+  else await supabaseClient.from('profiles').insert({id:currentUser.id});
+  const {data:invData} = await supabaseClient.from('user_inventory').select('*').eq('user_id',currentUser.id);
+  inv = invData.map(i=>({n:i.animal_name,e:getEmoji(i.animal_name),r:i.rarity,q:i.quantity}));
+  refreshViews(); updateUI();
 }
 
 // ==================== UI ====================
-function updateUI() {
-    document.getElementById('coinsDisplay').textContent = coins;
-    document.getElementById('gemsDisplay').textContent = gems;
-}
-function toast(msg, bg = '#222') {
-    const t = document.createElement('div'); t.className = 'toast';
-    t.textContent = msg; t.style.background = bg;
-    document.body.appendChild(t); setTimeout(() => t.remove(), 2500);
-}
-function getEmoji(name) {
-    if (name === 'Paczka Gemów') return '🎁';
-    for (const arr of Object.values(ANIMALS)) {
-        const found = arr.find(a => a.n === name);
-        if (found) return found.e;
-    }
-    return '🐾';
-}
+function updateUI(){ document.getElementById('coinsDisplay').textContent=coins; document.getElementById('gemsDisplay').textContent=gems; }
+function toast(msg,bg='#222'){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; t.style.background=bg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
+function getEmoji(name){ if(name==='Paczka Gemów') return '🎁'; for(const arr of Object.values(ANIMALS)){ const f=arr.find(a=>a.n===name); if(f)return f.e; } return '🐾'; }
 
 // ==================== RENDER ====================
-function refreshViews() {
-    renderInventory(); renderCollection(); renderSell(); renderTrade();
+function refreshViews(){ renderInventory(); renderCollection(); renderSell(); renderTrade(); }
+function renderInventory(){
+  const grid = document.getElementById('inventoryGrid'); if(!grid) return;
+  grid.innerHTML = '';
+  if(inv.length===0){ grid.innerHTML='<p style="color:#666;text-align:center;grid-column:1/-1;">Brak kart.</p>'; return; }
+  inv.forEach(i=>{
+    const card = document.createElement('div'); card.className = 'card';
+    const isPack = i.n==='Paczka Gemów'||i.n==='Podstawowa Paczka'||i.n==='Wiosenne Pudło'||i.n==='Ogniowa Paczka';
+    const rarityClass = isPack ? 'specjalny' : i.r.toLowerCase().replace(' ','-');
+    card.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-${rarityClass}">${i.r}</div><div style="color:#ccc;">x${i.q}</div>${isPack?'<button class="btn open-pack-btn">Otwórz</button>':`<div style="color:#f0c060;font-size:0.7rem;">🪙${RARITY[i.r]?.price??0}</div><button class="btn sell-btn">Sprzedaj 1</button>`}`;
+    if(isPack) card.querySelector('.open-pack-btn').addEventListener('click',()=>openPackFromInventory(i));
+    else card.querySelector('.sell-btn').addEventListener('click',()=>sellOne(i.n,i.r));
+    grid.appendChild(card);
+  });
 }
-function renderInventory() {
-    const grid = document.getElementById('inventoryGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    if (inv.length === 0) {
-        grid.innerHTML = '<p style="color:#666;text-align:center;grid-column:1/-1;">Brak kart.</p>';
-        return;
-    }
-    inv.forEach(i => {
-        const card = document.createElement('div'); card.className = 'card';
-        const isPack = i.n === 'Paczka Gemów';
-        const rarityClass = isPack ? 'specjalny' : i.r.toLowerCase().replace(' ','-');
-        card.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div>
-          <div class="badge badge-${rarityClass}">${i.r}</div>
-          <div style="color:#ccc;">x${i.q}</div>
-          ${isPack
-            ? '<button class="btn open-pack-btn">Otwórz</button>'
-            : `<div style="color:#f0c060;font-size:0.7rem;">🪙${RARITY[i.r]?.price ?? 0}</div><button class="btn sell-btn">Sprzedaj 1</button>`
-          }`;
-        if (isPack) {
-            card.querySelector('.open-pack-btn').addEventListener('click', () => openGemPack(i));
-        } else {
-            card.querySelector('.sell-btn').addEventListener('click', () => sellOne(i.n, i.r));
-        }
-        grid.appendChild(card);
+function renderCollection(){
+  const grid = document.getElementById('collectionGrid'); if(!grid)return;
+  grid.innerHTML='';
+  for(const [rarity,animals] of Object.entries(ANIMALS)){
+    animals.forEach(a=>{
+      const owned = collected.has(a.n);
+      const card = document.createElement('div'); card.className=`card collection-card ${owned?'owned':''}`;
+      card.innerHTML=`<div class="emoji">${a.e}</div><div class="name">${a.n}</div><div class="badge badge-${rarity.toLowerCase().replace(' ','-')}">${rarity}</div><div style="font-size:0.7rem;color:${owned?'#4ade80':'#666'};">${owned?'✓ Posiadana':'Niezdobyta'}</div>`;
+      grid.appendChild(card);
     });
+  }
 }
-function renderCollection() {
-    const grid = document.getElementById('collectionGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    for (const [rarity, animals] of Object.entries(ANIMALS)) {
-        animals.forEach(a => {
-            const owned = collected.has(a.n);
-            const card = document.createElement('div');
-            card.className = `card collection-card ${owned ? 'owned' : ''}`;
-            card.innerHTML = `<div class="emoji">${a.e}</div><div class="name">${a.n}</div>
-            <div class="badge badge-${rarity.toLowerCase().replace(' ','-')}">${rarity}</div>
-            <div style="font-size:0.7rem;color:${owned ? '#4ade80' : '#666'};">${owned ? '✓ Posiadana' : 'Niezdobyta'}</div>`;
-            grid.appendChild(card);
-        });
-    }
+function renderSell(){
+  const cont = document.getElementById('sellContainer'); if(!cont)return;
+  cont.innerHTML='';
+  const sellable = inv.filter(i=>i.n!=='Paczka Gemów'&&i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka');
+  if(sellable.length===0){ cont.innerHTML='<p style="color:#666;text-align:center;">Nic do sprzedania.</p>'; return; }
+  sellable.forEach(i=>{
+    const row = document.createElement('div'); row.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #2a2a40;';
+    row.innerHTML=`<span>${i.e} <b>${i.n}</b> [${i.r}] x${i.q}</span><span><button class="btn sell-btn sell-one">1</button><button class="btn sell-btn sell-all">Wszystkie</button></span>`;
+    row.querySelector('.sell-one').addEventListener('click',()=>sellOne(i.n,i.r));
+    row.querySelector('.sell-all').addEventListener('click',()=>sellAll(i.n,i.r));
+    cont.appendChild(row);
+  });
 }
-function renderSell() {
-    const cont = document.getElementById('sellContainer');
-    if (!cont) return;
-    cont.innerHTML = '';
-    const sellable = inv.filter(i => i.n !== 'Paczka Gemów');
-    if (sellable.length === 0) {
-        cont.innerHTML = '<p style="color:#666;text-align:center;">Nic do sprzedania.</p>';
-        return;
-    }
-    sellable.forEach(i => {
-        const row = document.createElement('div');
-        row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #2a2a40;';
-        row.innerHTML = `<span>${i.e} <b>${i.n}</b> [${i.r}] x${i.q}</span>
-          <span><button class="btn sell-btn sell-one">1</button><button class="btn sell-btn sell-all">Wszystkie</button></span>`;
-        row.querySelector('.sell-one').addEventListener('click', () => sellOne(i.n, i.r));
-        row.querySelector('.sell-all').addEventListener('click', () => sellAll(i.n, i.r));
-        cont.appendChild(row);
+function renderTrade(){
+  const gemCount = document.getElementById('tradeGemsCount'); if(gemCount) gemCount.textContent=gems;
+  const gemInput = document.getElementById('tradeGemAmount'); if(gemInput) gemInput.max=gems;
+  const container = document.getElementById('tradeCardsContainer'); if(!container)return;
+  container.innerHTML='';
+  const sellable = inv.filter(i=>i.n!=='Paczka Gemów'&&i.n!=='Podstawowa Paczka'&&i.n!=='Wiosenne Pudło'&&i.n!=='Ogniowa Paczka');
+  if(sellable.length===0){ container.innerHTML='<p style="color:#666;">Nie masz kart do wysłania.</p>'; return; }
+  sellable.forEach(i=>{
+    const box = document.createElement('div'); box.className='trade-card-box'; box.style.cssText='background:var(--panel);border-radius:12px;padding:15px;margin:5px 0;display:flex;align-items:center;justify-content:space-between;';
+    box.innerHTML=`<span>${i.e} <b>${i.n}</b> (${i.r}) – dostępne: ${i.q}</span><div style="display:flex;align-items:center;"><input type="number" class="trade-card-input" placeholder="0" min="0" max="${i.q}" value="0" data-name="${i.n}" data-rarity="${i.r}" style="width:60px;"><button class="btn send-card-btn" style="margin-left:5px;">📤</button></div>`;
+    const input = box.querySelector('.trade-card-input');
+    const btnSend = box.querySelector('.send-card-btn');
+    btnSend.addEventListener('click',()=>{
+      const amount = parseInt(input.value);
+      const email = document.getElementById('tradeEmail').value.trim();
+      if(!email){ toast('Wpisz email odbiorcy!'); return; }
+      if(!amount||amount<1){ toast('Podaj ilość!'); return; }
+      const entry = inv.find(i=>i.n===input.dataset.name&&i.r===input.dataset.rarity);
+      if(!entry||entry.q<amount){ toast('Nie masz tylu kart!'); return; }
+      entry.q -= amount;
+      if(entry.q<=0) inv = inv.filter(i=>!(i.n===input.dataset.name&&i.r===input.dataset.rarity));
+      updateUI(); saveCloud(); refreshViews();
+      toast(`Wysłano ${amount}x ${input.dataset.name} do ${email}`);
     });
-}
-
-// ==================== GEM PACK ====================
-function buyGemPack() {
-    if (coins < 100) { toast('Za mało monet! (100🪙)'); return; }
-    coins -= 100;
-    let existing = inv.find(i => i.n === 'Paczka Gemów');
-    if (existing) existing.q++;
-    else inv.push({ n: 'Paczka Gemów', e: '🎁', r: 'Specjalny', q: 1 });
-    updateUI(); saveCloud(); refreshViews();
-    toast('Kupiono Paczkę Gemów!');
-}
-function openGemPack(item) {
-    // Usuń jeden egzemplarz paczki
-    item.q--;
-    if (item.q <= 0) inv = inv.filter(i => i !== item);
-    
-    const rand = Math.random() * 100;
-    let gemAmount = 1;
-    if (rand < 60) gemAmount = 1;
-    else if (rand < 85) gemAmount = 2;
-    else if (rand < 95) gemAmount = 3;
-    else if (rand < 99) gemAmount = 5;
-    else gemAmount = 10;
-    
-    gems += gemAmount;
-    updateUI(); saveCloud(); refreshViews();
-    toast(`Otworzono paczkę! +${gemAmount} 💎`);
+    container.appendChild(box);
+  });
 }
 
 // ==================== SPRZEDAŻ ====================
-function sellOne(name, rarity) {
-    const entry = inv.find(i => i.n === name && i.r === rarity);
-    if (!entry || entry.q < 1) return;
-    entry.q--;
-    if (entry.q <= 0) inv = inv.filter(i => !(i.n === name && i.r === rarity));
-    coins += RARITY[rarity].price;
-    updateUI(); saveCloud(); refreshViews();
-    playSfx('money'); toast(`Sprzedano ${name} za ${RARITY[rarity].price}🪙`);
+function sellOne(name,rarity){
+  const entry = inv.find(i=>i.n===name&&i.r===rarity);
+  if(!entry||entry.q<1)return;
+  entry.q--; if(entry.q<=0) inv=inv.filter(i=>!(i.n===name&&i.r===rarity));
+  coins+=RARITY[rarity].price; updateUI(); saveCloud(); refreshViews();
+  playSfx('money'); toast(`Sprzedano ${name} za ${RARITY[rarity].price}🪙`);
 }
-function sellAll(name, rarity) {
-    const entry = inv.find(i => i.n === name && i.r === rarity);
-    if (!entry) return;
-    const cnt = entry.q, total = RARITY[rarity].price * cnt;
-    inv = inv.filter(i => !(i.n === name && i.r === rarity));
-    coins += total;
-    updateUI(); saveCloud(); refreshViews();
-    playSfx('money'); toast(`Sprzedano ${cnt}x ${name} za ${total}🪙`);
+function sellAll(name,rarity){
+  const entry = inv.find(i=>i.n===name&&i.r===rarity);
+  if(!entry)return;
+  const cnt=entry.q, total=RARITY[rarity].price*cnt;
+  inv=inv.filter(i=>!(i.n===name&&i.r===rarity));
+  coins+=total; updateUI(); saveCloud(); refreshViews();
+  playSfx('money'); toast(`Sprzedano ${cnt}x ${name} za ${total}🪙`);
 }
 
 // ==================== WYMIANA GEMÓW ====================
-function exchangeGems(amount) {
-    if (gems < amount) { toast('Za mało gemów!'); return; }
-    gems -= amount; coins += amount * 80;
-    updateUI(); saveCloud(); toast(`Wymieniono ${amount}💎 → ${amount * 80}🪙`);
+function exchangeGems(amount){
+  if(gems<amount){ toast('Za mało gemów!'); return; }
+  gems-=amount; coins+=amount*80;
+  updateUI(); saveCloud(); toast(`Wymieniono ${amount}💎 → ${amount*80}🪙`);
 }
 
 // ==================== KODY ====================
-function openCodeModal() { document.getElementById('codeModal').classList.add('active'); }
-function closeCodeModal() { document.getElementById('codeModal').classList.remove('active'); }
-function redeemCode() {
-    const inp = document.getElementById('codeInput');
-    if (!inp) return;
-    const code = inp.value.trim();
-    if (!code) return;
-
-    if (code === 'CardZoo') {
-        if (usedCodes['CardZoo']) { toast('Kod już wykorzystany!'); return; }
-        gems += 50; usedCodes['CardZoo'] = true;
-        toast('Otrzymałeś 50 gemów! 💎', '#224422');
-        playSfx('code');
-    } else if (code === 'TrailerOfficial') {
-        if (usedCodes['TrailerOfficial']) { toast('Kod już wykorzystany!'); return; }
-        gems += 5; usedCodes['TrailerOfficial'] = true;
-        toast('Otrzymałeś 5 gemów! 💎', '#224422');
-        playSfx('code');
-    } else {
-        toast('Nieprawidłowy kod!');
-        return;
-    }
-    inp.value = ''; updateUI(); saveCloud(); closeCodeModal();
+function openCodeModal(){ document.getElementById('codeModal').classList.add('active'); }
+function closeCodeModal(){ document.getElementById('codeModal').classList.remove('active'); }
+function redeemCode(){
+  const inp = document.getElementById('codeInput'); if(!inp)return;
+  const code = inp.value.trim();
+  if(!code)return;
+  if(code==='CardZoo'){
+    if(usedCodes['CardZoo']){ toast('Kod już wykorzystany!'); return; }
+    gems+=50; usedCodes['CardZoo']=true; toast('Otrzymałeś 50 gemów! 💎','#224422'); playSfx('code');
+  } else if(code==='TrailerOfficial'){
+    if(usedCodes['TrailerOfficial']){ toast('Kod już wykorzystany!'); return; }
+    gems+=5; usedCodes['TrailerOfficial']=true; toast('Otrzymałeś 5 gemów! 💎','#224422'); playSfx('code');
+  } else { toast('Nieprawidłowy kod!'); return; }
+  inp.value=''; updateUI(); saveCloud(); closeCodeModal();
 }
 
-// ==================== PACZKI ZWIERZĄT ====================
-function buyPack(type) {
-    const price = type === 'spring' ? 250 : 10;
-    if (coins < price) { toast('Za mało monet!'); return; }
-    coins -= price; updateUI(); saveCloud();
-    springMode = (type === 'spring'); startOpening();
+// ==================== PACZKI ====================
+function buyAndOpen(pack){
+  if(pack==='gem'){
+    if(coins<100){ toast('Za mało monet!'); return; }
+    coins-=100;
+    const rand = Math.random()*100;
+    let amt=1;
+    if(rand<60) amt=1; else if(rand<85) amt=2; else if(rand<95) amt=3; else if(rand<99) amt=5; else amt=10;
+    gems+=amt; updateUI(); saveCloud(); refreshViews();
+    toast(`Kupiono paczkę gemów! +${amt} 💎`);
+  } else {
+    const prices = { basic:10, spring:250, fire:200 };
+    if(coins<prices[pack]){ toast('Za mało monet!'); return; }
+    coins-=prices[pack]; updateUI(); saveCloud();
+    packType=pack; startOpening();
+  }
 }
-function startOpening() { curRar = "Rzadki"; clicksLeft = maxClicks; showOpeningOverlay(); }
-function showOpeningOverlay() {
-    const old = document.getElementById('openingOverlay');
-    if (old) { document.removeEventListener('keydown', old._kh); old.remove(); }
-    const ov = document.createElement('div'); ov.id = 'openingOverlay'; ov.className = 'opening-overlay';
-    ov.innerHTML = `<div class="opening-box" id="openingBox">❓</div>
-      <div class="rarity-text" id="rarityLabel" style="color:${RARITY[curRar].col}">${curRar}</div>
-      <div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div>
-      <p style="color:#aaa;margin-top:10px;">Kliknij gdziekolwiek, by ulepszyć</p>
-      <p style="color:#f0c060;">SPACJA = otwórz teraz</p>`;
-    ov.addEventListener('click', onOverlayClick);
-    const kh = (e) => { if (e.code === 'Space') { e.preventDefault(); openNow(); } };
-    document.addEventListener('keydown', kh); ov._kh = kh;
-    document.body.appendChild(ov);
+function buyToInventory(pack){
+  const prices = { basic:10, spring:250, fire:200, gem:100 };
+  const names = { basic:'Podstawowa Paczka', spring:'Wiosenne Pudło', fire:'Ogniowa Paczka', gem:'Paczka Gemów' };
+  const emojis = { basic:'📦', spring:'🌸', fire:'🔥', gem:'🎁' };
+  if(coins<prices[pack]){ toast('Za mało monet!'); return; }
+  coins-=prices[pack];
+  let existing = inv.find(i=>i.n===names[pack]);
+  if(existing) existing.q++; else inv.push({n:names[pack],e:emojis[pack],r:'Specjalny',q:1});
+  updateUI(); saveCloud(); refreshViews();
+  toast(`Dodano ${names[pack]} do ekwipunku!`);
 }
-function onOverlayClick() { if (clicksLeft <= 0 || curRar === "Chromatyczny") openNow(); else attemptUpgrade(); }
-function attemptUpgrade() {
-    if (clicksLeft <= 0 || curRar === "Chromatyczny") return;
-    clicksLeft--;
-    const box = document.getElementById('openingBox'); if (box) { box.classList.add('shake'); setTimeout(() => box.classList.remove('shake'), 500); }
-    playSfx('open');
-    let eff = RARITY[curRar].up; if (springMode) eff *= 3;
-    if (Math.random() < eff) {
-        let idx = RORDER.indexOf(curRar);
-        if (idx < RORDER.length - 1) curRar = RORDER[idx + 1];
-    }
-    const lb = document.getElementById('rarityLabel'); if (lb) { lb.textContent = curRar; lb.style.color = RARITY[curRar].col; }
-    document.getElementById('clicksCount').textContent = clicksLeft;
-    if (clicksLeft <= 0 || curRar === "Chromatyczny") setTimeout(() => { if (document.getElementById('openingOverlay')) openNow(); }, 600);
+function startOpening(){
+  curRar="Rzadki"; clicksLeft=maxClicks;
+  showOpeningOverlay();
 }
-function generateCard(packRarity) {
-    const table = DROP_TABLE[packRarity] || { "Rzadki": 1 };
-    const total = Object.values(table).reduce((a, b) => a + b, 0);
-    let rand = Math.random() * total;
-    for (const [rarity, weight] of Object.entries(table)) {
-        rand -= weight;
-        if (rand <= 0) {
-            const animals = ANIMALS[rarity];
-            if (!animals || !animals.length) continue;
-            const animal = animals[Math.floor(Math.random() * animals.length)];
-            return { n: animal.n, e: animal.e, rarity: rarity };
-        }
-    }
-    return { n: ANIMALS["Rzadki"][0].n, e: ANIMALS["Rzadki"][0].e, rarity: "Rzadki" };
+function showOpeningOverlay(){
+  const old = document.getElementById('openingOverlay'); if(old){ document.removeEventListener('keydown',old._kh); old.remove(); }
+  const ov = document.createElement('div'); ov.id='openingOverlay'; ov.className='opening-overlay';
+  ov.innerHTML=`<div class="opening-box" id="openingBox">❓</div><div class="rarity-text" id="rarityLabel" style="color:${RARITY[curRar].col}">${curRar}</div><div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div><p style="color:#aaa;margin-top:10px;">Kliknij gdziekolwiek, by ulepszyć</p><p style="color:#f0c060;">SPACJA = otwórz teraz</p>`;
+  ov.addEventListener('click',onOverlayClick);
+  const kh = (e)=>{ if(e.code==='Space'){ e.preventDefault(); openNow(); } };
+  document.addEventListener('keydown',kh); ov._kh=kh;
+  document.body.appendChild(ov);
 }
-function openNow() {
-    const ov = document.getElementById('openingOverlay'); if (ov) { document.removeEventListener('keydown', ov._kh); ov.remove(); }
-    playSfx('opened');
-    const packRarity = curRar;
-    const count = packRarity === "Chromatyczny" ? 5 : (packRarity === "Legendarny" ? 4 : (packRarity === "Mityczny" ? 3 : 2));
-    const cards = [];
-    for (let i = 0; i < count; i++) {
-        const { n, e, rarity } = generateCard(packRarity);
-        cards.push({ n, e, rarity });
-        let entry = inv.find(i => i.n === n && i.r === rarity);
-        if (entry) entry.q++; else inv.push({ n, e, r: rarity, q: 1 });
-        collected.add(n);
-    }
-    saveCloud(); refreshViews(); updateUI();
-    const area = document.createElement('div'); area.className = 'reveal-area';
-    cards.forEach((c, i) => {
-        setTimeout(() => {
-            const el = document.createElement('div'); el.className = 'reveal-card';
-            el.innerHTML = `<div style="font-size:2.5rem;">${c.e}</div><div style="font-weight:700;">${c.n}</div><div class="badge badge-${c.rarity.toLowerCase().replace(' ','-')}">${c.rarity}</div>`;
-            area.appendChild(el);
-        }, i * 200);
-    });
-    const btn = document.createElement('button'); btn.className = 'reveal-close'; btn.textContent = '✔ Zamknij';
-    btn.onclick = () => area.remove();
-    setTimeout(() => area.appendChild(btn), cards.length * 200 + 400);
-    document.body.appendChild(area);
+function onOverlayClick(){ if(clicksLeft<=0||curRar==="Chromatyczny") openNow(); else attemptUpgrade(); }
+function attemptUpgrade(){
+  if(clicksLeft<=0||curRar==="Chromatyczny")return;
+  clicksLeft--;
+  const box = document.getElementById('openingBox'); if(box){ box.classList.add('shake'); setTimeout(()=>box.classList.remove('shake'),500); }
+  playSfx('open');
+  let eff = RARITY[curRar].up;
+  if(packType==='spring') eff*=3;
+  if(Math.random()<eff){
+    let idx = RORDER.indexOf(curRar);
+    if(idx<RORDER.length-1) curRar=RORDER[idx+1];
+  }
+  const lb = document.getElementById('rarityLabel'); if(lb){ lb.textContent=curRar; lb.style.color=RARITY[curRar].col; }
+  document.getElementById('clicksCount').textContent=clicksLeft;
+  if(clicksLeft<=0||curRar==="Chromatyczny") setTimeout(()=>{ if(document.getElementById('openingOverlay')) openNow(); },600);
+}
+function generateCard(r){
+  const table = packType==='fire'? FIRE_DROP : DROP_TABLE;
+  const t = table[r]||{"Rzadki":1};
+  const total = Object.values(t).reduce((a,b)=>a+b,0);
+  let rand = Math.random()*total;
+  for(const [rarity,weight] of Object.entries(t)){ rand-=weight; if(rand<=0){ const animals=ANIMALS[rarity]; if(!animals||!animals.length)continue; const animal=animals[Math.floor(Math.random()*animals.length)]; return {n:animal.n,e:animal.e,rarity}; } }
+  return {n:ANIMALS["Rzadki"][0].n,e:ANIMALS["Rzadki"][0].e,rarity:"Rzadki"};
+}
+function openNow(){
+  const ov = document.getElementById('openingOverlay'); if(ov){ document.removeEventListener('keydown',ov._kh); ov.remove(); }
+  playSfx('opened');
+  const pr = curRar; const count = pr==="Chromatyczny"?5:(pr==="Legendarny"?4:(pr==="Mityczny"?3:2)); const cards=[];
+  for(let i=0;i<count;i++){ const {n,e,rarity}=generateCard(pr); cards.push({n,e,rarity}); let entry=inv.find(x=>x.n===n&&x.r===rarity); if(entry) entry.q++; else inv.push({n,e,r:rarity,q:1}); collected.add(n); }
+  saveCloud(); refreshViews(); updateUI();
+  const area = document.createElement('div'); area.className='reveal-area';
+  cards.forEach((c,i)=>{ setTimeout(()=>{ const el=document.createElement('div'); el.className='reveal-card'; el.innerHTML=`<div style="font-size:2.5rem;">${c.e}</div><div style="font-weight:700;">${c.n}</div><div class="badge badge-${c.rarity.toLowerCase().replace(' ','-')}">${c.rarity}</div>`; area.appendChild(el); },i*200); });
+  const btn = document.createElement('button'); btn.className='reveal-close'; btn.textContent='✔ Zamknij'; btn.onclick=()=>area.remove();
+  setTimeout(()=>area.appendChild(btn),cards.length*200+400); document.body.appendChild(area);
+}
+function openPackFromInventory(item){
+  if(item.n==='Paczka Gemów'){
+    item.q--; if(item.q<=0) inv=inv.filter(i=>i!==item);
+    const rand = Math.random()*100;
+    let amt=1;
+    if(rand<60) amt=1; else if(rand<85) amt=2; else if(rand<95) amt=3; else if(rand<99) amt=5; else amt=10;
+    gems+=amt; updateUI(); saveCloud(); refreshViews();
+    toast(`Otworzono paczkę! +${amt} 💎`);
+  } else {
+    const typeMap = {'Podstawowa Paczka':'basic','Wiosenne Pudło':'spring','Ogniowa Paczka':'fire'};
+    const type = typeMap[item.n]||'basic';
+    packType = type;
+    item.q--; if(item.q<=0) inv=inv.filter(i=>i!==item);
+    saveCloud(); refreshViews();
+    startOpening();
+  }
 }
 
 // ==================== NAGRODY ====================
-function checkDailyReset() {
-    const today = new Date().toISOString().split('T')[0];
-    if (dailyLastDate !== today) {
-        if (!dailyLastDate) dailyStreak = 1;
-        else {
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            dailyStreak = (dailyLastDate === yesterday) ? dailyStreak : 1;
-        }
-        dailyClaimed = false;
-        dailyLastDate = today;
+function checkDailyReset(){
+  const today = new Date().toISOString().split('T')[0];
+  if(dailyLastDate!==today){
+    if(!dailyLastDate) dailyStreak=1;
+    else{
+      const yesterday = new Date(Date.now()-86400000).toISOString().split('T')[0];
+      if(dailyLastDate!==yesterday) dailyStreak=1;
     }
+    dailyClaimed=false; dailyLastDate=today;
+  }
 }
 checkDailyReset();
 const DAILY_PRIZES = [
-    { d: 1, desc: '100 monet', r: { c: 100 } }, { d: 2, desc: '2 paczki', r: { p: 2 } },
-    { d: 3, desc: '10 gemów', r: { g: 10 } }, { d: 4, desc: '500 monet', r: { c: 500 } },
-    { d: 5, desc: '5 paczek', r: { p: 5 } }, { d: 6, desc: '5 gemów', r: { g: 5 } },
-    { d: 7, desc: '10 gemów', r: { g: 10 } }
+  {d:1,desc:'100 monet',r:{c:100}},{d:2,desc:'2 paczki',r:{p:2}},{d:3,desc:'10 gemów',r:{g:10}},
+  {d:4,desc:'500 monet',r:{c:500}},{d:5,desc:'5 paczek',r:{p:5}},{d:6,desc:'5 gemów',r:{g:5}},{d:7,desc:'10 gemów',r:{g:10}}
 ];
-function openDailyModal() { document.getElementById('dailyModal').classList.add('active'); renderDailyGrid(); }
-function closeDailyModal() { document.getElementById('dailyModal').classList.remove('active'); }
-function renderDailyGrid() {
-    const grid = document.getElementById('dailyGrid'); if (!grid) return;
-    grid.innerHTML = '';
-    for (let i = 1; i <= 7; i++) {
-        const prize = DAILY_PRIZES[i - 1];
-        const dayDiv = document.createElement('div');
-        dayDiv.style.cssText = 'background:#1e1e32;border-radius:10px;padding:8px 4px;text-align:center;border:2px solid #2a2a40;font-size:0.65rem;';
-        if (i < dailyStreak) { dayDiv.style.borderColor = '#4ade80'; dayDiv.innerHTML = '<div>✓</div>'; }
-        else if (i === dailyStreak && !dailyClaimed) { dayDiv.style.borderColor = '#fbbf24'; dayDiv.style.boxShadow = '0 0 12px rgba(251,191,36,0.5)'; dayDiv.innerHTML = `<div><b>Dzień ${i}</b></div><div>${prize.desc}</div>`; }
-        else if (i === dailyStreak && dailyClaimed) { dayDiv.style.borderColor = '#4ade80'; dayDiv.innerHTML = '<div>✓</div>'; }
-        else { dayDiv.innerHTML = `<div>Dzień ${i}</div><div>${prize.desc}</div>`; }
-        grid.appendChild(dayDiv);
-    }
-    document.getElementById('dailyStatus').textContent = dailyClaimed ? '✅ Odebrano dzisiaj.' : `🔥 Dzień ${dailyStreak} – odbierz!`;
-    document.getElementById('claimDailyBtn').disabled = dailyClaimed;
+function openDailyModal(){ document.getElementById('dailyModal').classList.add('active'); renderDailyGrid(); }
+function closeDailyModal(){ document.getElementById('dailyModal').classList.remove('active'); }
+function renderDailyGrid(){
+  const grid = document.getElementById('dailyGrid'); if(!grid)return;
+  grid.innerHTML='';
+  for(let i=1;i<=7;i++){
+    const prize = DAILY_PRIZES[i-1];
+    const dayDiv = document.createElement('div'); dayDiv.style.cssText='background:#1e1e32;border-radius:10px;padding:8px 4px;text-align:center;border:2px solid #2a2a40;font-size:0.65rem;';
+    if(i<dailyStreak){ dayDiv.style.borderColor='#4ade80'; dayDiv.innerHTML='<div>✓</div>'; }
+    else if(i===dailyStreak&&!dailyClaimed){ dayDiv.style.borderColor='#fbbf24'; dayDiv.style.boxShadow='0 0 12px rgba(251,191,36,0.5)'; dayDiv.innerHTML=`<div><b>Dzień ${i}</b></div><div>${prize.desc}</div>`; }
+    else if(i===dailyStreak&&dailyClaimed){ dayDiv.style.borderColor='#4ade80'; dayDiv.innerHTML='<div>✓</div>'; }
+    else { dayDiv.innerHTML=`<div>Dzień ${i}</div><div>${prize.desc}</div>`; }
+    grid.appendChild(dayDiv);
+  }
+  document.getElementById('dailyStatus').textContent = dailyClaimed?'✅ Odebrano.':`🔥 Dzień ${dailyStreak} – odbierz!`;
+  document.getElementById('claimDailyBtn').disabled = dailyClaimed;
 }
-function claimDailyReward() {
-    if (dailyClaimed) return;
-    const prize = DAILY_PRIZES[dailyStreak - 1];
-    if (prize.r.c) coins += prize.r.c;
-    if (prize.r.g) gems += prize.r.g;
-    if (prize.r.p) for (let i = 0; i < prize.r.p; i++) {
-        const animal = ANIMALS["Rzadki"][Math.floor(Math.random() * ANIMALS["Rzadki"].length)];
-        let entry = inv.find(x => x.n === animal.n && x.r === "Rzadki");
-        if (entry) entry.q++; else inv.push({ n: animal.n, e: animal.e, r: "Rzadki", q: 1 });
-        collected.add(animal.n);
-    }
-    dailyClaimed = true;
-    dailyLastDate = new Date().toISOString().split('T')[0];
-    dailyStreak = dailyStreak < 7 ? dailyStreak + 1 : 1;
-    updateUI(); saveCloud(); refreshViews(); renderDailyGrid();
-    toast(`Odebrano nagrodę dnia ${prize.d}!`);
+function claimDailyReward(){
+  if(dailyClaimed)return;
+  const prize = DAILY_PRIZES[dailyStreak-1];
+  if(prize.r.c) coins+=prize.r.c;
+  if(prize.r.g) gems+=prize.r.g;
+  if(prize.r.p) for(let i=0;i<prize.r.p;i++){ const animal=ANIMALS["Rzadki"][Math.floor(Math.random()*ANIMALS["Rzadki"].length)]; let entry=inv.find(x=>x.n===animal.n&&x.r==="Rzadki"); if(entry) entry.q++; else inv.push({n:animal.n,e:animal.e,r:"Rzadki",q:1}); collected.add(animal.n); }
+  dailyClaimed=true; dailyLastDate=new Date().toISOString().split('T')[0];
+  dailyStreak = dailyStreak<7 ? dailyStreak+1 : 1;
+  updateUI(); saveCloud(); refreshViews(); renderDailyGrid();
+  toast(`Odebrano nagrodę dnia ${prize.d}!`);
 }
 
 // ==================== RANKING ====================
-async function loadLeaderboard() {
-    const list = document.getElementById('leaderboardList');
-    if (!supabaseClient) { list.innerHTML = 'Zaloguj się, aby zobaczyć ranking.'; return; }
-    const { data, error } = await supabaseClient.from('profiles').select('username, coins').order('coins', { ascending: false }).limit(10);
-    if (error) { list.innerHTML = 'Błąd ładowania rankingu.'; return; }
-    if (!data || data.length === 0) { list.innerHTML = 'Brak graczy w rankingu.'; return; }
-    list.innerHTML = data.map((p, i) => `<div style="padding:5px; border-bottom:1px solid #2a2a40;">${i+1}. ${p.username || 'Anonim'} – 🪙 ${p.coins}</div>`).join('');
+async function loadLeaderboard(){
+  const list = document.getElementById('leaderboardList');
+  if(!supabaseClient){ list.innerHTML='Zaloguj się, aby zobaczyć ranking.'; return; }
+  const {data,error} = await supabaseClient.from('profiles').select('username,coins').order('coins',{ascending:false}).limit(10);
+  if(error){ list.innerHTML='Błąd ładowania.'; return; }
+  if(!data||data.length===0){ list.innerHTML='Brak graczy.'; return; }
+  list.innerHTML = data.map((p,i)=>`<div style="padding:5px;border-bottom:1px solid #2a2a40;">${i+1}. ${p.username||'Anonim'} – 🪙 ${p.coins}</div>`).join('');
 }
 
 // ==================== AUTH ====================
-async function updateAuthUI() {
-    if (!supabaseClient) { document.getElementById('authSection').style.display = 'none'; return; }
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    currentUser = user;
-    if (currentUser) {
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('userInfoBlock').style.display = 'block';
-        document.getElementById('userNameDisplay').textContent = currentUser.user_metadata?.full_name || currentUser.email;
-    } else {
-        document.getElementById('authSection').style.display = 'block';
-        document.getElementById('userInfoBlock').style.display = 'none';
-    }
+async function updateAuthUI(){
+  if(!supabaseClient){ document.getElementById('authSection').style.display='none'; return; }
+  const {data:{user}} = await supabaseClient.auth.getUser();
+  currentUser = user;
+  if(currentUser){
+    document.getElementById('authSection').style.display='none';
+    document.getElementById('userInfoBlock').style.display='block';
+    document.getElementById('userNameDisplay').textContent = currentUser.user_metadata?.full_name||currentUser.email;
+  } else {
+    document.getElementById('authSection').style.display='block';
+    document.getElementById('userInfoBlock').style.display='none';
+  }
 }
-async function signInWithDiscord() { if(!supabaseClient) return; await supabaseClient.auth.signInWithOAuth({provider:'discord'}); }
-async function signInWithGithub() { if(!supabaseClient) return; await supabaseClient.auth.signInWithOAuth({provider:'github'}); }
-async function signUp() {
-    if (!supabaseClient) return toast('Supabase offline');
-    const email = document.getElementById('authEmail').value, pass = document.getElementById('authPassword').value;
-    const { error } = await supabaseClient.auth.signUp({ email, password: pass });
-    if (error) document.getElementById('authError').textContent = error.message;
-    else toast('Zarejestrowano! Możesz się zalogować.');
+async function signInWithDiscord(){ if(!supabaseClient)return; await supabaseClient.auth.signInWithOAuth({provider:'discord'}); }
+async function signInWithGithub(){ if(!supabaseClient)return; await supabaseClient.auth.signInWithOAuth({provider:'github'}); }
+async function signUp(){
+  if(!supabaseClient)return toast('Supabase offline');
+  const email=document.getElementById('authEmail').value, pass=document.getElementById('authPassword').value;
+  const {error} = await supabaseClient.auth.signUp({email,password:pass});
+  if(error) document.getElementById('authError').textContent=error.message;
+  else toast('Zarejestrowano! Możesz się zalogować.');
 }
-async function signIn() {
-    if (!supabaseClient) return toast('Supabase offline');
-    const email = document.getElementById('authEmail').value, pass = document.getElementById('authPassword').value;
-    const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-    if (error) document.getElementById('authError').textContent = error.message;
-    else { toast('Zalogowano!'); await updateAuthUI(); await loadCloud(); }
+async function signIn(){
+  if(!supabaseClient)return toast('Supabase offline');
+  const email=document.getElementById('authEmail').value, pass=document.getElementById('authPassword').value;
+  const {error} = await supabaseClient.auth.signInWithPassword({email,password:pass});
+  if(error) document.getElementById('authError').textContent=error.message;
+  else { toast('Zalogowano!'); await updateAuthUI(); await loadCloud(); }
 }
-async function signOut() {
-    if (supabaseClient) await supabaseClient.auth.signOut();
-    currentUser = null; await updateAuthUI(); loadLocal(); updateUI(); refreshViews();
+async function signOut(){
+  if(supabaseClient) await supabaseClient.auth.signOut();
+  currentUser=null; await updateAuthUI(); loadLocal(); updateUI(); refreshViews();
 }
-
-// ==================== TRADY ====================
-function renderTrade() {
-    const gemCount = document.getElementById('tradeGemsCount');
-    const gemInput = document.getElementById('tradeGemAmount');
-    if (gemCount) gemCount.textContent = gems;
-    if (gemInput) gemInput.max = gems;
-    
-    const container = document.getElementById('tradeCardsContainer');
-    if (!container) return;
-    container.innerHTML = '';
-    const sellable = inv.filter(i => i.n !== 'Paczka Gemów');
-    if (sellable.length === 0) {
-        container.innerHTML = '<p style="color:#666;">Nie masz kart do wysłania.</p>';
-        return;
-    }
-    sellable.forEach(i => {
-        const box = document.createElement('div');
-        box.className = 'trade-card-box';
-        box.style.cssText = 'background:var(--panel); border-radius:12px; padding:15px; margin:5px 0; display:flex; align-items:center; justify-content:space-between;';
-        box.innerHTML = `
-            <span>${i.e} <b>${i.n}</b> (${i.r}) – dostępne: ${i.q}</span>
-            <div style="display:flex; align-items:center;">
-                <input type="number" class="trade-card-input" placeholder="0" min="0" max="${i.q}" value="0" data-name="${i.n}" data-rarity="${i.r}" style="width:60px;">
-                <button class="btn send-card-btn" style="margin-left:5px;">📤</button>
-            </div>
-        `;
-        const input = box.querySelector('.trade-card-input');
-        const btnSend = box.querySelector('.send-card-btn');
-        btnSend.addEventListener('click', () => {
-            const amount = parseInt(input.value);
-            const name = input.dataset.name;
-            const rarity = input.dataset.rarity;
-            const email = document.getElementById('tradeEmail').value.trim();
-            if (!email) { toast('Wpisz email odbiorcy!'); return; }
-            if (!amount || amount < 1) { toast('Podaj ilość!'); return; }
-            const entry = inv.find(i => i.n === name && i.r === rarity);
-            if (!entry || entry.q < amount) { toast('Nie masz tylu kart!'); return; }
-            entry.q -= amount;
-            if (entry.q <= 0) inv = inv.filter(i => !(i.n === name && i.r === rarity));
-            updateUI(); saveCloud(); refreshViews();
-            toast(`Wysłano ${amount}x ${name} (${rarity}) do ${email}`);
-        });
-        container.appendChild(box);
-    });
-}
-document.getElementById('sendGemBtn').addEventListener('click', () => {
-    const email = document.getElementById('tradeEmail').value.trim();
-    const amount = parseInt(document.getElementById('tradeGemAmount').value);
-    if (!email) { toast('Wpisz email odbiorcy!'); return; }
-    if (!amount || amount < 1) { toast('Podaj ilość gemów!'); return; }
-    if (gems < amount) { toast('Nie masz tylu gemów!'); return; }
-    gems -= amount;
-    updateUI(); saveCloud(); refreshViews();
-    toast(`Wysłano ${amount}💎 do ${email}`);
-});
 
 // ==================== EVENTY ====================
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.nav-tab').forEach(tab => tab.addEventListener('click', () => switchView(tab.dataset.view)));
-    document.getElementById('buyBasicBtn').addEventListener('click', () => buyPack('basic'));
-    document.getElementById('buySpringBtn').addEventListener('click', () => buyPack('spring'));
-    document.getElementById('buyGemPackBtn').addEventListener('click', buyGemPack);
-    document.querySelectorAll('.exchange-btn').forEach(btn => btn.addEventListener('click', () => exchangeGems(parseInt(btn.dataset.amount))));
-    document.getElementById('openDailyBtn').addEventListener('click', openDailyModal);
-    document.getElementById('closeDailyModalBtn').addEventListener('click', closeDailyModal);
-    document.getElementById('claimDailyBtn').addEventListener('click', claimDailyReward);
-    document.getElementById('openCodeBtn').addEventListener('click', openCodeModal);
-    document.getElementById('closeCodeModalBtn').addEventListener('click', closeCodeModal);
-    document.getElementById('redeemCodeBtn').addEventListener('click', redeemCode);
-    document.getElementById('musicSlider').addEventListener('input', function() {
-        musicVol = parseInt(this.value); document.getElementById('musicVal').textContent = musicVol; saveLocal();
-    });
-    document.getElementById('sfxSlider').addEventListener('input', function() {
-        sfxVol = parseInt(this.value); document.getElementById('sfxVal').textContent = sfxVol; saveLocal(); playSfx('sfx');
-    });
-    document.getElementById('musicSlider').value = musicVol; document.getElementById('sfxSlider').value = sfxVol;
-    document.getElementById('musicVal').textContent = musicVol; document.getElementById('sfxVal').textContent = sfxVol;
-    document.getElementById('loginDiscordBtn').addEventListener('click', signInWithDiscord);
-    document.getElementById('loginGithubBtn').addEventListener('click', signInWithGithub);
-    document.getElementById('signUpBtn').addEventListener('click', signUp);
-    document.getElementById('signInBtn').addEventListener('click', signIn);
-    document.getElementById('signOutBtn').addEventListener('click', signOut);
-    if (supabaseClient) {
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            if (session?.user) { currentUser = session.user; await updateAuthUI(); await loadCloud(); }
-            else { currentUser = null; await updateAuthUI(); }
-        });
-        updateAuthUI();
-    } else {
-        document.getElementById('authSection').style.display = 'none';
-    }
-    updateUI();
-    refreshViews();
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.nav-tab').forEach(t=>t.addEventListener('click',()=>switchView(t.dataset.view)));
+  document.querySelectorAll('.buy-now-btn').forEach(b=>b.addEventListener('click',()=>buyAndOpen(b.dataset.pack)));
+  document.querySelectorAll('.buy-inv-btn').forEach(b=>b.addEventListener('click',()=>buyToInventory(b.dataset.pack)));
+  document.querySelectorAll('.exchange-btn').forEach(b=>b.addEventListener('click',()=>exchangeGems(parseInt(b.dataset.amount))));
+  document.getElementById('sendGemBtn').addEventListener('click',()=>{
+    const email=document.getElementById('tradeEmail').value.trim(), amt=parseInt(document.getElementById('tradeGemAmount').value);
+    if(!email){ toast('Wpisz email!'); return; }
+    if(!amt||amt<1||amt>gems){ toast('Nieprawidłowa ilość!'); return; }
+    gems-=amt; updateUI(); saveCloud(); refreshViews(); toast(`Wysłano ${amt}💎 do ${email}`);
+  });
+  document.getElementById('openDailyBtn').addEventListener('click',openDailyModal);
+  document.getElementById('closeDailyModalBtn').addEventListener('click',closeDailyModal);
+  document.getElementById('claimDailyBtn').addEventListener('click',claimDailyReward);
+  document.getElementById('openCodeBtn').addEventListener('click',openCodeModal);
+  document.getElementById('closeCodeModalBtn').addEventListener('click',closeCodeModal);
+  document.getElementById('redeemCodeBtn').addEventListener('click',redeemCode);
+  document.getElementById('musicSlider').addEventListener('input',function(){ musicVol=parseInt(this.value); document.getElementById('musicVal').textContent=musicVol; saveLocal(); });
+  document.getElementById('sfxSlider').addEventListener('input',function(){ sfxVol=parseInt(this.value); document.getElementById('sfxVal').textContent=sfxVol; saveLocal(); playSfx('sfx'); });
+  document.getElementById('musicSlider').value=musicVol; document.getElementById('sfxSlider').value=sfxVol;
+  document.getElementById('musicVal').textContent=musicVol; document.getElementById('sfxVal').textContent=sfxVol;
+  document.getElementById('loginDiscordBtn').addEventListener('click',signInWithDiscord);
+  document.getElementById('loginGithubBtn').addEventListener('click',signInWithGithub);
+  document.getElementById('signUpBtn').addEventListener('click',signUp);
+  document.getElementById('signInBtn').addEventListener('click',signIn);
+  document.getElementById('signOutBtn').addEventListener('click',signOut);
+  if(supabaseClient){
+    supabaseClient.auth.onAuthStateChange(async(e,s)=>{ if(s?.user){ currentUser=s.user; await updateAuthUI(); await loadCloud(); } else { currentUser=null; await updateAuthUI(); } });
+    updateAuthUI();
+  } else document.getElementById('authSection').style.display='none';
+  updateUI(); refreshViews();
 });
 
-function switchView(view) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    const target = document.getElementById(view + 'View');
-    if (target) target.classList.add('active');
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    const tab = document.querySelector(`.nav-tab[data-view="${view}"]`);
-    if (tab) tab.classList.add('active');
-    if (view === 'daily') openDailyModal();
-    if (view === 'leaderboard') loadLeaderboard();
-    refreshViews();
+function switchView(view){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const target = document.getElementById(view+'View'); if(target) target.classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const tab = document.querySelector(`.nav-tab[data-view="${view}"]`); if(tab) tab.classList.add('active');
+  if(view==='daily') openDailyModal();
+  if(view==='leaderboard') loadLeaderboard();
+  refreshViews();
 }
 </script>
 </body>
