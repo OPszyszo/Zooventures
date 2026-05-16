@@ -67,3 +67,7 @@ Zooventures regularnie dodaje:
 Twoim zadaniem jest zdobycie jak najrzadszych zwierzaków, rozwijanie kolekcji oraz zostanie jednym z najlepszych graczy w rankingu.
 
 Czy uda Ci się zdobyć wszystkie Chromatyczne zwierzaki? 👀
+
+## Game Testing
+
+https://github.com/user-attachments/assets/3837e69c-39d8-48d6-9e0c-1ce99efff683
