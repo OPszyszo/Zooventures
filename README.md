@@ -2,6 +2,22 @@
   <img src="https://i.imgur.com/sMDDrvx.png alt="Zooventures" width="300"/>
 </p>
 
+# 🐾 Zooventures
+
+<p align="center">
+  <a href="https://opszyszo.github.io/Zooventures/">
+    <img src="https://i.imgur.com/r8YSwd3.png" width="180" alt="Play Zooventures">
+  </a>
+
+  <a href="https://github.com/OPszyszo/Zooventures/releases/download/1.1.0/Zooventures_launcher_110.apk">
+    <img src="https://i.imgur.com/bo0xxMk.png" width="180" alt="Download Android APK">
+  </a>
+
+  <a href="https://github.com/OPszyszo/Zooventures/releases/download/1.1.0/Zooventures-1.1.0.exe">
+    <img src="https://i.imgur.com/E1cksjH.png" width="180" alt="Download Windows EXE">
+  </a>
+</p>
+
 Zooventures to wciągająca gra kolekcjonerska, w której otwierasz paczki pełne niezwykłych zwierzaków i budujesz swoją własną, unikalną kolekcję. Każda paczka kryje losowe stworzenia o różnych poziomach rzadkości — od zwykłych rzadkich zwierzaków aż po potężne Chromatyczne, Golden i Rainbow Pety.
 
 ## 🎮 Co możesz robić w grze?
