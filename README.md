@@ -2,7 +2,7 @@
   <img src="https://i.imgur.com/sMDDrvx.png alt="Zooventures" width="300"/>
 </p>
 
-# 🐾 Zooventures
+# 
 
 <p align="center">
   <a href="https://opszyszo.github.io/Zooventures/">
