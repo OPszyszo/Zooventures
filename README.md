@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://opszyszo.github.io/Zooventures/">
-    <img src="https://i.imgur.com/r8YSwd3.png" width="180" alt="Play Zooventures">
+    <img src="https://i.imgur.com/hOEOSQl.png" width="180" alt="Play Zooventures">
   </a>
 
   <a href="https://github.com/OPszyszo/Zooventures/releases/download/1.1.0/Zooventures_launcher_110.apk">
@@ -14,7 +14,7 @@
   </a>
 
   <a href="https://github.com/OPszyszo/Zooventures/releases/download/1.1.0/Zooventures-1.1.0.exe">
-    <img src="https://i.imgur.com/E1cksjH.png" width="180" alt="Download Windows EXE">
+    <img src="https://i.imgur.com/toeP1lp.png" width="180" alt="Download Windows EXE">
   </a>
 </p>
 
