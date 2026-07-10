@@ -2,974 +2,684 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Zooventures 🐾</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zooventures - Ładowanie</title>
     <style>
         :root {
-            --bg: #0a0a14;
-            --panel: #151525;
-            --text: #e0e0e0;
-            --gold: #f0c060;
-            --gem: #ff80c0;
-            --diamond: #80ffff;
-            --border: #2a2a40;
-            --btn: #1e1e32;
+            --orange-bg: #f97316;
+            --orange-dark: #c2410c;
+            --orange-light: #fb923c;
+            --white: #fff;
+            --dark: #1a1a1a;
+            --dialog-bg: #1e1e2e;
+            --dialog-border: #3a3a5c;
+            --red-accent: #ef4444;
+            --text-light: #e0e0e0;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: 30px; }
-        .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; background: rgba(18,18,32,0.9); backdrop-filter: blur(20px); border-bottom: 2px solid var(--border); flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 100; }
-        .logo { font-weight: 800; font-size: 1.2rem; }
-        .currency { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .coin, .gem, .diamond { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-weight: 700; background: #1a1a28; border: 2px solid #3a3020; }
-        .coin { color: var(--gold); }
-        .gem { color: var(--gem); }
-        .diamond { color: var(--diamond); }
-        .nav-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
-        .nav-tab { padding: 6px 14px; border-radius: 20px; border: 2px solid var(--border); background: var(--btn); color: #aaa; cursor: pointer; font-weight: 600; font-size: 0.8rem; transition: 0.2s; }
-        .nav-tab:hover { background: #282845; color: #fff; }
-        .nav-tab.active { background: #2a2040; color: #fff; border-color: #8b5cf6; }
-        .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
-        .view { display: none; }
-        .view.active { display: block; }
-        h2 { margin: 15px 0 10px; border-bottom: 2px solid var(--border); padding-bottom: 5px; }
-        .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0; }
-        .shop-card { background: var(--panel); border: 2px solid var(--border); border-radius: 18px; padding: 20px; text-align: center; transition: 0.3s; }
-        .btn { display: inline-block; padding: 8px 18px; border-radius: 25px; background: linear-gradient(135deg,#8b5cf6,#6d28d9); color: #fff; font-weight: 700; cursor: pointer; font-size: 0.85rem; margin: 4px; border: none; transition: 0.2s; }
-        .btn:hover { transform: scale(1.02); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
-        .sell-btn { background: #ff5e5e; font-size: 0.75rem; padding: 4px 10px; }
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; margin-top: 10px; }
-        .card { background: #1a1a2e; border: 2px solid #282845; border-radius: 14px; padding: 10px; text-align: center; }
-        .card .emoji { font-size: 2rem; }
-        .badge { display: inline-block; font-size: 0.6rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; }
-        .badge-rzadki { background: #22c55e; color:#000; }
-        .badge-bardzo { background: #3b82f6; color:#fff; }
-        .badge-epicki { background: #a855f7; color:#fff; }
-        .badge-mityczny { background: #ef4444; color:#fff; }
-        .badge-legendarny { background: #eab308; color:#000; }
-        .badge-chromatyczny { background: linear-gradient(135deg,#ff6bff,#ffb347); color:#000; }
-        .badge-golden { background: linear-gradient(135deg,#ffd700,#b8860b); color:#000; }
-        .badge-rainbow { background: linear-gradient(135deg,red,orange,yellow,green,blue,indigo,violet); color:#000; }
-        .badge-summer { background: linear-gradient(135deg,#00bfff,#ffd700); color:#000; }
-        .collection-card { opacity: 0.5; filter: grayscale(0.6); }
-        .collection-card.owned { opacity: 1; filter: none; border-color: #4ade80; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 200; display: none; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: #16162a; padding: 25px; border-radius: 20px; max-width: 500px; width: 90%; text-align: center; }
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #222; padding: 8px 18px; border-radius: 20px; z-index: 300; font-weight: 600; animation: toastAnim 2.5s forwards; }
-        @keyframes toastAnim { 0% { opacity: 0; transform: translateX(-50%) translateY(-20px); } 15% { opacity: 1; transform: translateX(-50%) translateY(0); } 85% { opacity: 1; } 100% { opacity: 0; } }
-        .island-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 15px; margin-top: 15px; }
-        .island-tile { background: var(--panel); border-radius: 16px; padding: 15px; text-align: center; border: 2px solid var(--border); cursor: pointer; }
-        .island-tile.locked { filter: blur(3px); background: #0a0a14; cursor: not-allowed; }
-        .random-trade-card { background: var(--panel); border-radius: 16px; padding: 15px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; }
-        .reset-option { background: #1e1e32; border-radius: 12px; padding: 12px; margin: 10px 0; cursor: pointer; border: 2px solid var(--border); }
-        .reset-option:hover { border-color: #ff4444; }
-        hr { border-color: var(--border); margin: 10px 0; }
-        input, select { background: #1a1a2e; border: 2px solid var(--border); color: #fff; border-radius: 12px; padding: 8px 12px; width: 100%; margin: 5px 0; }
-        .opening-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 400; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        .opening-box { width: 140px; height: 140px; background: linear-gradient(135deg,#3b2f5a,#1e1635); border: 3px solid #8e7cc3; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 4rem; }
-        .opening-box.shake { animation: shake 0.5s ease; }
-        @keyframes shake { 0%,100%{ transform: rotate(0); } 25%{ transform: rotate(-5deg); } 50%{ transform: rotate(5deg); } }
-        .reveal-area { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 410; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; padding: 20px; cursor: pointer; }
-        .reveal-card { background: #1a1a30; border-radius: 14px; padding: 12px; width: 110px; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid #555; animation: cardJump 0.6s ease-out; }
-        @keyframes cardJump { 0% { opacity: 0; transform: translateY(50px) rotateY(90deg); } 100% { opacity: 1; transform: translateY(0) rotateY(0); } }
 
-        .custom-alert-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 999;
-            display: flex; align-items: center; justify-content: center; animation: fadeIn 0.5s ease;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .custom-alert-box {
-            background: #1a1a2e; border: 2px solid #8b5cf6; border-radius: 24px; padding: 35px 30px;
-            max-width: 520px; width: 92%; text-align: center; box-shadow: 0 0 60px rgba(139,92,246,0.3);
-        }
-        .custom-alert-box h2 { font-size: 1.8rem; color: #ff6b6b; border-bottom: none; margin-bottom: 10px; }
-        .custom-alert-box .subtitle { color: #ffb347; font-weight: 700; font-size: 1.1rem; margin-bottom: 15px; }
-        .custom-alert-box .message { color: #ccc; line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px; }
-        .custom-alert-box .message .highlight { color: #ff6b6b; font-weight: 700; }
-        .custom-alert-box .btn-group { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 10px; }
-        .custom-alert-box .btn-group .btn { min-width: 140px; padding: 12px 24px; font-size: 1rem; }
-        .custom-alert-box .btn-group .btn-primary { background: linear-gradient(135deg,#ff6b6b,#ee5a24); }
-        .custom-alert-box .btn-group .btn-secondary { background: linear-gradient(135deg,#6c5ce7,#341f97); }
-        .custom-alert-box .btn-group .btn-primary:hover { box-shadow: 0 0 30px rgba(255,107,107,0.5); }
-        .custom-alert-box .btn-group .btn-secondary:hover { box-shadow: 0 0 30px rgba(108,92,231,0.5); }
-        @keyframes fadeIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
 
-        .blocked-btn { opacity: 0.4 !important; cursor: not-allowed !important; pointer-events: none !important; filter: grayscale(0.8); }
-        .blocked-btn:hover { transform: none !important; box-shadow: none !important; }
-        .blocked-label { font-size: 0.7rem; color: #ff6b6b; display: block; margin-top: 2px; }
-        .settings-section .blocked-note {
-            background: #2a1a1a; border: 1px solid #ff6b6b; border-radius: 12px;
-            padding: 12px 16px; margin-top: 8px; color: #ffb3b3; font-size: 0.9rem;
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--orange-bg);
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            user-select: none;
+            -webkit-user-select: none;
         }
-        .settings-section .blocked-note strong { color: #ff6b6b; }
+
+        /* ============ TŁO Z EMOTKAMI ============ */
+        .emotes-background {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .emote {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.55;
+            animation: floatEmote linear infinite;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+            will-change: transform;
+        }
+
+        @keyframes floatEmote {
+            0% {
+                transform: translateY(105vh) rotate(0deg) scale(0.6);
+                opacity: 0;
+            }
+            5% {
+                opacity: 0.55;
+            }
+            15% {
+                transform: translateY(75vh) rotate(30deg) scale(1);
+                opacity: 0.65;
+            }
+            50% {
+                transform: translateY(35vh) rotate(180deg) scale(1.1);
+                opacity: 0.5;
+            }
+            85% {
+                transform: translateY(5vh) rotate(300deg) scale(0.9);
+                opacity: 0.55;
+            }
+            95% {
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(-15vh) rotate(360deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        /* Delikatne chmurki w tle */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: cloudFloat linear infinite;
+        }
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: 50%;
+        }
+        .cloud-1 {
+            width: 180px;
+            height: 70px;
+            top: 20%;
+            animation-duration: 35s;
+            animation-delay: 0s;
+        }
+        .cloud-1::before {
+            width: 80px;
+            height: 80px;
+            top: -40px;
+            left: 30px;
+        }
+        .cloud-1::after {
+            width: 100px;
+            height: 60px;
+            top: -30px;
+            left: 70px;
+        }
+        .cloud-2 {
+            width: 220px;
+            height: 80px;
+            top: 55%;
+            animation-duration: 40s;
+            animation-delay: -15s;
+        }
+        .cloud-2::before {
+            width: 90px;
+            height: 90px;
+            top: -45px;
+            left: 40px;
+        }
+        .cloud-2::after {
+            width: 110px;
+            height: 65px;
+            top: -35px;
+            left: 90px;
+        }
+        .cloud-3 {
+            width: 160px;
+            height: 60px;
+            top: 75%;
+            animation-duration: 30s;
+            animation-delay: -8s;
+        }
+        .cloud-3::before {
+            width: 70px;
+            height: 70px;
+            top: -35px;
+            left: 25px;
+        }
+        .cloud-3::after {
+            width: 90px;
+            height: 55px;
+            top: -25px;
+            left: 60px;
+        }
+
+        @keyframes cloudFloat {
+            0% {
+                left: -250px;
+            }
+            100% {
+                left: 110vw;
+            }
+        }
+
+        /* ============ EKRAN ŁADOWANIA ============ */
+        .loading-screen {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        .loading-logo {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            animation: logoPulse 1.2s ease-in-out infinite;
+            text-align: center;
+        }
+
+        @keyframes logoPulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.04);
+            }
+        }
+
+        .loading-cloud-icon {
+            font-size: 4rem;
+            animation: cloudBounce 0.8s ease-in-out infinite;
+            filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.25));
+        }
+
+        @keyframes cloudBounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-18px);
+            }
+            60% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .progress-container {
+            width: 320px;
+            max-width: 85vw;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 30px;
+            height: 22px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3),
+                0 4px 12px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #fff, #ffe0b2, #fff);
+            border-radius: 30px;
+            width: 0%;
+            transition: width 0.08s linear;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6),
+                inset 0 1px 2px rgba(255, 255, 255, 0.7);
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            right: 4px;
+            top: 3px;
+            bottom: 3px;
+            width: 30px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            filter: blur(4px);
+        }
+
+        .progress-text {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============ DIALOG BŁĘDU ============ */
+        .error-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .error-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .error-dialog {
+            background: var(--dialog-bg);
+            border: 2px solid var(--dialog-border);
+            border-radius: 20px;
+            padding: 36px 30px 30px;
+            max-width: 460px;
+            width: 90vw;
+            text-align: center;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 0 8px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            animation: dialogIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+        }
+
+        @keyframes dialogIn {
+            0% {
+                transform: scale(0.7) translateY(30px);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .error-icon-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .error-icon {
+            font-size: 3.5rem;
+            animation: errorShake 0.6s ease-in-out;
+        }
+
+        @keyframes errorShake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            15% {
+                transform: translateX(-10px);
+            }
+            30% {
+                transform: translateX(10px);
+            }
+            45% {
+                transform: translateX(-7px);
+            }
+            60% {
+                transform: translateX(7px);
+            }
+            75% {
+                transform: translateX(-3px);
+            }
+            90% {
+                transform: translateX(3px);
+            }
+        }
+
+        .error-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--red-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 6px;
+        }
+
+        .error-message {
+            font-size: 1rem;
+            color: #d4d4d4;
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+        .error-message strong {
+            color: #fff;
+        }
+        .error-reason {
+            font-size: 0.95rem;
+            color: #fbbf24;
+            font-weight: 600;
+            margin-bottom: 16px;
+            background: rgba(251, 191, 36, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .error-divider {
+            width: 60px;
+            height: 3px;
+            background: var(--dialog-border);
+            margin: 14px auto;
+            border-radius: 2px;
+        }
+
+        .error-encouragement {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: #fff;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(249, 115, 22, 0.6);
+            background: linear-gradient(135deg, #fb923c, #f97316);
+        }
+        .btn-download:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+            transition: all 0.1s ease;
+        }
+
+        .btn-download .btn-emoji {
+            font-size: 1.4rem;
+        }
+
+        /* Ruchome kropki dekoracyjne w dialogu */
+        .dialog-dots {
+            position: absolute;
+            top: 12px;
+            left: 16px;
+            display: flex;
+            gap: 6px;
+        }
+        .dialog-dots span {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        .dot-red {
+            background: #ef4444;
+        }
+        .dot-yellow {
+            background: #f59e0b;
+        }
+        .dot-green {
+            background: #22c55e;
+        }
+
+        /* ============ RESPONSYWNOŚĆ ============ */
+        @media (max-width: 480px) {
+            .loading-logo {
+                font-size: 2rem;
+                letter-spacing: 1px;
+            }
+            .loading-cloud-icon {
+                font-size: 3rem;
+            }
+            .progress-container {
+                width: 260px;
+                height: 18px;
+                border-radius: 20px;
+            }
+            .progress-bar {
+                border-radius: 20px;
+            }
+            .error-dialog {
+                padding: 28px 18px 22px;
+                border-radius: 16px;
+            }
+            .error-icon {
+                font-size: 2.8rem;
+            }
+            .btn-download {
+                padding: 12px 22px;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
 
-<!-- CUSTOM ALERT -->
-<div class="custom-alert-overlay" id="customAlert">
-    <div class="custom-alert-box">
-        <h2>⚠️ Koniec wsparcia</h2>
-        <div class="subtitle">Zooventures – wersja końcowa</div>
-        <div class="message">
-            <p>Gra zakończyła wsparcie. Kod może zawierać <span class="highlight">przestarzałe linijki</span> i być częściowo zepsuty.</p>
-            <p style="margin-top:10px;">Twórcy pracują nad nową grą – <strong>Chinchilla</strong>! 🎮</p>
+    <!-- ============ TŁO Z EMOTKAMI ZWIERZĄT ============ -->
+    <div class="emotes-background" id="emotesBg"></div>
+
+    <!-- Chmurki dekoracyjne -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+
+    <!-- ============ EKRAN ŁADOWANIA ============ -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-cloud-icon">☁️</div>
+        <div class="loading-logo">Zooventures</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
         </div>
-        <div class="btn-group">
-            <a href="https://twin-pixels-studio.itch.io/chinchilla" target="_blank" class="btn btn-primary">⬇️ Pobierz grę</a>
-            <button class="btn btn-secondary" onclick="document.getElementById('customAlert').style.display='none'">Kontynułuj grę</button>
-        </div>
+        <div class="progress-text" id="progressText">0%</div>
+        <div class="loading-subtitle">Łączenie z chmurą...</div>
+    </div>
+
+    <!-- ============ DIALOG BŁĘDU ============ -->
+    <div class="error-overlay" id="errorOverlay">
+        <div class="error-dialog">
+            <div class="dialog-dots">
+                <span class="dot-red"></span>
+                <span class="dot-yellow"></span>
+                <span class="dot-green"></span>
+            </div>
+            <div class="error-icon-row">
+                <span class="error-icon">⚠️</span>
+                <span class="error-icon" style="font-size:2.5rem;">🔌</span>
+            </div>
+            <div class="error-title">Błąd połączenia</div>
+            <p class="error-message">
+                Nie udało się połączyć z chmurą <strong>Zooventures</strong>
+            </p>
+            <span class="error-reason">Powód: Gra została zamknięta.</span>
+            <div class="error-divider"></div>
+            <p class="error-encouragement">
+                Zachęcamy do pobrania<br><strong>Chinchilla Clicker</strong> 🐹
+            </p>
+            <a href="https://twin-pixels-studio.itch.io/chinchilla"
+            class="btn-download"
+            target="_blank"
+            rel="noopener noreferrer">
+            <span class="btn-emoji">🐹</span> Pobierz Chinchilla Clicker
+            <span class="btn-emoji">🖱️</span>
+        </a>
     </div>
 </div>
-
-<!-- TOP BAR -->
-<div class="top-bar">
-    <div class="logo">🐾 ZOOVENTURES</div>
-    <div class="currency">
-        <div class="coin">🪙 <span id="coinsDisplay">100</span></div>
-        <div class="gem">💎 <span id="gemsDisplay">5</span></div>
-        <div class="diamond">💠 <span id="diamondsDisplay">0</span></div>
-        <button class="btn" onclick="document.getElementById('codeModal').classList.add('active')">🎟️ Kody</button>
-    </div>
-    <div class="nav-tabs">
-        <div class="nav-tab active" onclick="switchView('shop')">🏪 Sklep</div>
-        <div class="nav-tab" onclick="switchView('targ')">🏷️ Targ</div>
-        <div class="nav-tab" onclick="switchView('inventory')">🎒 Ekwipunek</div>
-        <div class="nav-tab" onclick="switchView('collection')">📚 Kolekcja</div>
-        <div class="nav-tab" onclick="switchView('sell')">💰 Sprzedaż</div>
-        <div class="nav-tab" onclick="switchView('trade')">🔄 Trady</div>
-        <div class="nav-tab" onclick="switchView('daily')">🎁 Nagrody</div>
-        <div class="nav-tab" onclick="switchView('leaderboard')">🏆 Top 10</div>
-        <div class="nav-tab" onclick="switchView('ranked')">⚔️ Ranking</div>
-        <div class="nav-tab" onclick="switchView('island')">🏝️ Wyspa</div>
-        <div class="nav-tab" onclick="switchView('settings')">⚙️ Ustawienia</div>
-    </div>
-</div>
-
-<!-- CONTAINER -->
-<div class="container">
-    <div class="view active" id="shopView">
-        <h2>🧪 Paczki</h2>
-        <div class="shop-grid" id="shopGrid"></div>
-        <div style="background:var(--panel);border-radius:16px;padding:20px;margin-top:15px;text-align:center;">
-            <h3>💎 Wymiana Gemów na Monety</h3>
-            <button class="btn" onclick="exchangeGems(1)">💎1 → 🪙80</button>
-            <button class="btn" onclick="exchangeGems(5)">💎5 → 🪙400</button>
-            <button class="btn" onclick="exchangeGems(10)">💎10 → 🪙800</button>
-        </div>
-    </div>
-    <div class="view" id="targView"><h2>🏷️ Targ</h2><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>🥇 Gold Machine</h3><div id="goldMachineContainer"></div></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>🌈 Rainbow Machine</h3><div id="rainbowMachineContainer"></div></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>💎 Diamond Machine</h3><div id="diamondMachineContainer"></div></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>🏖️ Summer Machine</h3><div id="summerTimer"></div><div id="summerMachineContainer"></div></div></div>
-    <div class="view" id="inventoryView"><h2>🎒 Ekwipunek</h2><div class="card-grid" id="inventoryGrid"></div></div>
-    <div class="view" id="collectionView"><h2>📚 Kolekcja (<span id="collectionCount">0/0</span>)</h2><div class="card-grid" id="collectionGrid"></div></div>
-    <div class="view" id="sellView"><h2>💰 Sprzedaż</h2><div id="sellContainer"></div></div>
-    <div class="view" id="tradeView"><h2>🔄 Wyślij przedmioty</h2><input type="email" id="tradeEmail" placeholder="Email odbiorcy"><div><strong>💎 Gemy</strong> (masz: <span id="tradeGemsCount">0</span>)<div><input type="number" id="tradeGemAmount" placeholder="Ilość" value="0"><button class="btn" onclick="sendGems()">📤 Wyślij Gemy</button></div></div><h3>🃏 Karty</h3><div id="tradeCardsContainer"></div><hr><h3>🎲 Random Trade (co godz.)</h3><div id="randomTradeContainer"></div></div>
-    <div class="view" id="dailyView"><h2>🎁 Nagrody</h2><button class="btn" onclick="toast('Nagrody dzienne dostępne')">📅 Kalendarz</button></div>
-    <div class="view" id="leaderboardView"><h2>🏆 Top 10</h2><div id="leaderboardList"></div></div>
-    <div class="view" id="rankedView"><h2>⚔️ Tryb rankingowy</h2><select id="rankedRaritySelect"><option value="Rzadki">Rzadki</option><option value="Bardzo Rzadki">Bardzo Rzadki</option><option value="Epicki">Epicki</option><option value="Mityczny">Mityczny</option><option value="Legendarny">Legendarny</option><option value="Chromatyczny">Chromatyczny</option></select><button class="btn" onclick="startRankedMode()">Zagraj</button><div id="rankedBattleArea"></div></div>
-    <div class="view" id="islandView"><h2>🏝️ Wyspa</h2><div id="islandGrid" class="island-grid"></div><div id="islandAssignArea"></div></div>
-    <div class="view" id="settingsView">
-        <h2>⚙️ Ustawienia</h2>
-        <div class="settings-section">
-            <label>🔊 Muzyka: <span id="musicVal">70</span>%</label>
-            <input type="range" id="musicSlider" min="0" max="100" value="70" oninput="updateMusic(this.value)">
-            <label>🔔 SFX: <span id="sfxVal">80</span>%</label>
-            <input type="range" id="sfxSlider" min="0" max="100" value="80" oninput="updateSfx(this.value)">
-        </div>
-        <div class="settings-section">
-            <h3>🔐 Konto</h3>
-            <div id="authSection">
-                <button class="btn blocked-btn">🎮 Discord</button>
-                <span class="blocked-label">⛔ Zablokowane – koniec wsparcia</span>
-                <div style="margin:12px 0;color:#aaa;">lub</div>
-                <input type="email" placeholder="Email" disabled>
-                <input type="password" placeholder="Hasło" disabled>
-                <button class="btn blocked-btn">Zarejestruj</button>
-                <button class="btn blocked-btn">Zaloguj</button>
-            </div>
-        </div>
-        <div class="settings-section">
-            <h3>🔄 Reset gry</h3>
-            <div id="resetOptions">
-                <div class="reset-option" onclick="resetGame(true,false)">Usuń tylko zwierzęta (zostaw paczki)</div>
-                <div class="reset-option" onclick="resetGame(false,true)">Resetuj walutę</div>
-                <div class="reset-option" onclick="resetGame(true,true)">Resetuj WSZYSTKO</div>
-            </div>
-        </div>
-        <div class="settings-section">
-            <div class="blocked-note">
-                <strong>⚠️ Gra może być zepsuta</strong><br>
-                Gra ma dużo błędów przez to nie będzie do pobrania na Android i Windows.<br>
-                Za utrudnienia przepraszamy.
-            </div>
-        </div>
-        <div class="settings-section" style="color:#aaa;">
-            <div><b>Zooventures</b> v7.0 – koniec wsparcia</div>
-            <div>© SzyszoTeam</div>
-        </div>
-    </div>
-</div>
-
-<!-- MODALE -->
-<div class="modal" id="dailyModal"><div class="modal-content"><h2>🎁 Codzienne</h2><div id="dailyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;"></div><button class="btn" onclick="claimDaily()">Odbierz</button><button class="btn" onclick="document.getElementById('dailyModal').classList.remove('active')">Zamknij</button></div></div>
-<div class="modal" id="codeModal"><div class="modal-content"><h2>🎟️ Kod</h2><input type="text" id="codeInput"><button class="btn" onclick="redeemCode()">Zrealizuj</button><button class="btn" onclick="document.getElementById('codeModal').classList.remove('active')">Zamknij</button></div></div>
-<div class="modal" id="reportModal"><div class="modal-content"><h2>📢 Report</h2><input type="email" id="reportEmail" placeholder="Twój email"><select id="reportType"><option>Błąd</option><option>Problem</option></select><textarea id="reportMessage" placeholder="Opis" rows="3"></textarea><button class="btn" onclick="sendReport()">Wyślij</button><button class="btn" onclick="document.getElementById('reportModal').classList.remove('active')">Zamknij</button></div></div>
-<div class="modal" id="purchaseModal"><div class="modal-content"><h2 id="purchaseTitle">Kup</h2><input type="range" id="purchaseSlider" min="1" max="10" value="1" oninput="updatePurchaseQty(this.value)"><span id="purchaseQty">1</span><p>Koszt: <span id="purchaseCost">0</span> 🪙</p><button class="btn" id="confirmPurchaseBtn">Kup</button><button class="btn" onclick="document.getElementById('purchaseModal').classList.remove('active')">Anuluj</button></div></div>
-<div class="modal" id="rankedPickModal"><div class="modal-content"><h2>Wybierz zwierzę</h2><div id="rankedPickList"></div><button class="btn" onclick="document.getElementById('rankedPickModal').classList.remove('active')">Anuluj</button></div></div>
 
 <script>
-// ============================================================
-//  ZMIENNE GLOBALNE
-// ============================================================
-let coins = 100, gems = 5, diamonds = 0;
-let inv = [];
-let collected = new Set();
-let dailyStreak = 1, dailyLastDate = null, dailyClaimed = false;
-let usedCodes = {}, musicVol = 70, sfxVol = 80;
-let packsOpened = 0;
-let isOpening = false;
+    (function() {
+        // ============ GENEROWANIE EMOTEK W TLE ============
+        const emotesContainer = document.getElementById('emotesBg');
+        const animalEmotes = [
+            '🐶', '🐱', '🐰', '🦊', '🐼', '🐨', '🐸', '🦁',
+            '🐮', '🐷', '🐭', '🐹', '🐻', '🐔', '🐧', '🐦',
+            '🦄', '🐙', '🦋', '🐞', '🐢', '🦜', '🦩', '🐳',
+            '🦝', '🐿️', '🦔', '🐾', '🐕', '🐈', '🐇', '🦚',
+            '🐒', '🦉', '🐊', '🦎', '🐠', '🦭', '🐡', '🦥'
+        ];
 
-let islandTiles = [
-    { id:0, name:"🌲 Las", unlocked:true, animalAssigned:null, lastEarn:0, purchasable:false },
-    { id:1, name:"🏔️ Góry", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-    { id:2, name:"🌊 Jezioro", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-    { id:3, name:"🔥 Wulkan", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-    { id:4, name:"❄️ Lodowa", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-    { id:5, name:"🏜️ Pustynia", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:true, price:100 },
-    { id:6, name:"🌴 Dżungla", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-    { id:7, name:"🌋 Pustkowie", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false }
-];
-let randomTradeOffer = null, randomTradeExpiry = 0;
+        function createEmote() {
+            const emote = document.createElement('span');
+            emote.classList.add('emote');
+            emote.textContent = animalEmotes[Math.floor(Math.random() * animalEmotes.length)];
 
-// ============================================================
-//  ANIMALS (200 starych + 324 nowe = 524)
-// ============================================================
-const oldAnimals = {
-    "Rzadki": [{n:"Lew",e:"🦁"},{n:"Wilk",e:"🐺"},{n:"Jeleń",e:"🦌"},{n:"Żółw",e:"🐢"},{n:"Żaba",e:"🐸"},{n:"Kura",e:"🐔"},{n:"Jeż",e:"🦔"},{n:"Koala",e:"🐨"},{n:"Mysza",e:"🐁"},{n:"Śnieżna",e:"🦭"},{n:"Dziki",e:"🐗"},{n:"Kurczaczek",e:"🐥"},{n:"Chrząszcz",e:"🪲"}],
-    "Bardzo Rzadki": [{n:"Lis",e:"🦊"},{n:"Sowa",e:"🦉"},{n:"Papuga",e:"🦜"},{n:"Pingwin",e:"🐧"},{n:"Baran",e:"🐏"},{n:"Wiewiórka",e:"🐿️"},{n:"Biedronka",e:"🐞"},{n:"Ślimak",e:"🐌"},{n:"Szop",e:"🦝"},{n:"Jaszczurka",e:"🦎"},{n:"Mrówka",e:"🐜"},{n:"Świnia",e:"🐷"},{n:"Komar",e:"🪰"},{n:"Osioł",e:"🫏"},{n:"Robak",e:"🪱"},{n:"Krowa",e:"🐮"},{n:"Hipopotan",e:"🦛"},{n:"Kameleon",e:"🦎"},{n:"Cricket",e:"🦗"},{n:"Tropikalna Ryba",e:"🐠"},{n:"Rozdymka",e:"🐡"},{n:"Byk",e:"🦬"},{n:"Bóbr",e:"🦫"},{n:"Indyk",e:"🦃"},{n:"Ćma",e:"🐛"}],
-    "Epicki": [{n:"Tygrys",e:"🐯"},{n:"Orzeł",e:"🦅"},{n:"Wąż",e:"🐍"},{n:"Ryba",e:"🐟"},{n:"Krab",e:"🦀"},{n:"Świnka morska",e:"🐹"},{n:"Motyl",e:"🦋"},{n:"Miś",e:"🐻"},{n:"Flamingo",e:"🦩"},{n:"Kraken",e:"🦑"},{n:"Królik",e:"🐇"},{n:"Shadow Bat",e:"🦇"},{n:"Pająk",e:"🕷️"},{n:"Kogut",e:"🐓"},{n:"Słoń",e:"🐘"},{n:"Pszczoła",e:"🐝"},{n:"Gorilla",e:"🦍"},{n:"Lama",e:"🦙"},{n:"Zebra",e:"🦓"},{n:"Łoś",e:"🫎"},{n:"Kangur",e:"🦘"},{n:"Homar",e:"🦞"},{n:"DoDo",e:"🦤"}],
-    "Mityczny": [{n:"Rekin",e:"🦈"},{n:"Panda",e:"🐼"},{n:"Kot",e:"🐈"},{n:"Pies",e:"🐕"},{n:"Krewetka",e:"🦐"},{n:"Delfin",e:"🐬"},{n:"T-Rex",e:"🦖"},{n:"Łabędź",e:"🦢"},{n:"Kozioł",e:"🐐"},{n:"Gołąb",e:"🕊️"},{n:"Małpa",e:"🐒"},{n:"Peacock",e:"🦚"},{n:"Skorpion",e:"🦂"}],
-    "Legendarny": [{n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"},{n:"Szynszyla",e:"🐿️"},{n:"Salamandra Ognista",e:"🦎"},{n:"Kot Void",e:"🐈‍⬛"},{n:"Orangutan",e:"🦧"},{n:"Zimowy Niedźwiedź",e:"🐻‍❄️"},{n:"Żyrafa",e:"🦒"},{n:"Mustang",e:"🐎"}],
-    "Chromatyczny": [{n:"Krokodyl",e:"🐊"},{n:"Smok Gór",e:"🐉"},{n:"Phoenix",e:"🐦‍🔥"},{n:"Kosmiczna Ośmiornica",e:"🐙"},{n:"Crystal Hydra",e:"💎"},{n:"Unicorn",e:"🦄"},{n:"Jellyfish",e:"🪼"},{n:"Crystal Lis",e:"🦊✨"}]
-};
-const przedrostki = ["Płomienny","Mroźny","Burzowy","Kamienny","Szmaragdowy","Rubinowy","Złoty","Srebrny","Miedziany","Żelazny","Drewniany","Szklisty","Perłowy","Opalowy","Kryształowy","Mgławicowy","Gwiezdny","Księżycowy","Słoneczny","Ciemny","Jasny","Leśny","Górski","Rzeczny","Morski","Piaskowy","Wulkaniczny","Lodowy","Wietrzny","Deszczowy","Gromowy","Piorunowy","Ognisty","Żarzący","Parzący","Dymny","Sadzowy","Iskrzący","Błyskawiczny","Mglisty","Rosisty","Mechowy","Paprociowy","Kwiatowy","Owocowy","Miodowy","Nektarowy","Trawiasty","Łąkowy","Polny","Bagienny","Trzęsawiskowy","Jaskiniowy","Podziemny","Nebularny"];
-const rdzenie = ["Wilk","Lis","Niedźwiedź","Orzeł","Sokół","Jastrząb","Kruk","Sowa","Wąż","Jaszczur","Krokodyl","Żółw","Rekin","Delfin","Wieloryb","Ośmiornica","Krab","Skorpion","Pająk","Mrówka","Żuk","Motyl","Pszczoła","Mucha","Komar","Świerszcz","Konik","Żaba","Ropucha","Salamandra","Smok","Feniks","Gryf","Jednorożec","Bazyliszek","Hydra","Chimera","Golem","Troll","Duch","Upior","Widmo","Cień","Mgła","Burza","Huragan","Cyklon","Monsun","Wir","Kryształ","Diament","Szafir","Ametyst","Topaz","Onyks","Jadeit","Koral","Perła","Bursztyn"];
-const ANIMALS = JSON.parse(JSON.stringify(oldAnimals));
-for(let i=0; i<324; i++){
-    let pre = przedrostki[i % przedrostki.length];
-    let rdzen = rdzenie[i % rdzenie.length];
-    let name = pre + " " + rdzen;
-    let rar = ["Rzadki","Bardzo Rzadki","Epicki","Mityczny","Legendarny","Chromatyczny"][Math.floor(Math.random()*6)];
-    let emojiList = ["🐺","🦊","🐻","🦅","🦉","🐍","🦎","🐊","🐢","🦈","🐬","🐋","🐙","🦀","🦂","🕷️","🐜","🪲","🦋","🐝","🦟","🦗","🐸","🦎","🐉","🐦‍🔥","🦄","👹","🗿","👻","🌫️","⚡","💨","💎","🔮"];
-    let emoji = emojiList[i % emojiList.length];
-    if(!ANIMALS[rar]) ANIMALS[rar] = [];
-    ANIMALS[rar].push({ n: name, e: emoji });
-}
-const RARITY = { "Rzadki":{up:0.20,price:8, col:"#22c55e"}, "Bardzo Rzadki":{up:0.15,price:20, col:"#3b82f6"}, "Epicki":{up:0.10,price:55, col:"#a855f7"}, "Mityczny":{up:0.05,price:130, col:"#ef4444"}, "Legendarny":{up:0.01,price:350, col:"#eab308"}, "Chromatyczny":{up:0,price:900, col:"#ff6bff"} };
-const RORDER = Object.keys(RARITY);
+            // Losowa pozycja startowa X
+            const x = Math.random() * 90; // 0-90% szerokości
+            emote.style.left = x + '%';
 
-// ============================================================
-//  FUNKCJE POMOCNICZE
-// ============================================================
-function getEmoji(name){ for(let arr of Object.values(ANIMALS)){ let f=arr.find(a=>a.n===name); if(f) return f.e; } return '🐾'; }
-function getRarityClass(r){ let map={Rzadki:"rzadki","Bardzo Rzadki":"bardzo",Epicki:"epicki",Mityczny:"mityczny",Legendarny:"legendarny",Chromatyczny:"chromatyczny",Hyper:"hyper",Golden:"golden",Rainbow:"rainbow",Summer:"summer"}; return map[r]||r; }
-function getAnimalPrice(item){
-    let base=0;
-    if(item.r==='Hyper') base=2*(RARITY[item.baseRarity]?.price||0);
-    else if(item.r==='Golden') base=5*(RARITY[item.baseRarity]?.price||0);
-    else if(item.r==='Rainbow') base=25*(RARITY[item.baseRarity]?.price||0);
-    else if(item.r==='Summer') base=10*(RARITY[item.baseRarity]?.price||0);
-    else base=RARITY[item.r]?.price||0;
-    return base*(item.mult||1);
-}
-function toast(msg,bg='#222'){ let t=document.createElement('div'); t.className='toast'; t.textContent=msg; t.style.background=bg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
-function updateUI(){ document.getElementById('coinsDisplay').textContent=Math.floor(coins); document.getElementById('gemsDisplay').textContent=gems; document.getElementById('diamondsDisplay').textContent=diamonds; }
-function saveLocal(){ localStorage.setItem('zooventures_data',JSON.stringify({coins,gems,diamonds,inv,collected:[...collected],dailyStreak,dailyLastDate,dailyClaimed,usedCodes,musicVol,sfxVol,packsOpened,islandTiles,randomTradeOffer,randomTradeExpiry})); }
-function loadLocal(){
-    let d=JSON.parse(localStorage.getItem('zooventures_data')||'{}');
-    if(d && Object.keys(d).length>0){
-        coins=d.coins??100; gems=d.gems??5; diamonds=d.diamonds??0; inv=d.inv??[]; collected=new Set(d.collected??[]);
-        dailyStreak=d.dailyStreak??1; dailyLastDate=d.dailyLastDate??null; dailyClaimed=d.dailyClaimed??false;
-        usedCodes=d.usedCodes??{}; musicVol=d.musicVol??70; sfxVol=d.sfxVol??80; packsOpened=d.packsOpened??0;
-        if(d.islandTiles) islandTiles=d.islandTiles;
-        randomTradeOffer=d.randomTradeOffer??null; randomTradeExpiry=d.randomTradeExpiry??0;
-        inv = inv.filter(i => i.r !== 'Owoc'); // usunięcie owoców
-    }
-}
-loadLocal();
+            // Losowy rozmiar
+            const size = 1.2 + Math.random() * 2.8; // 1.2rem - 4rem
+            emote.style.fontSize = size + 'rem';
 
-// ============================================================
-//  NAWIGACJA
-// ============================================================
-function switchView(view){
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(view + 'View').classList.add('active');
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`.nav-tab[onclick*="${view}"]`)?.classList.add('active');
-    refreshAll();
-}
+            // Losowy czas animacji (8-18 sekund)
+            const duration = 8 + Math.random() * 14;
+            emote.style.animationDuration = duration + 's';
 
-// ============================================================
-//  SKLEP
-// ============================================================
-function renderShop(){
-    document.getElementById('shopGrid').innerHTML = `
-        <div class="shop-card"><div class="pack-icon">📦</div><h3>Podstawowa</h3><p>🪙10</p><button class="btn" onclick="buyPack('basic')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('basic')">Do Inv</button></div>
-        <div class="shop-card"><div class="pack-icon">🌸</div><h3>Wiosenne Pudło</h3><p>🪙250</p><button class="btn" onclick="buyPack('spring')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('spring')">Do Inv</button></div>
-        <div class="shop-card"><div class="pack-icon">🏖️</div><h3>Plażowa</h3><p>🪙150</p><button class="btn" onclick="buyPack('beach')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('beach')">Do Inv</button></div>
-        <div class="shop-card"><div class="pack-icon">⚡</div><h3>Hyper</h3><p>🪙1000</p><button class="btn" onclick="buyPack('hyper')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('hyper')">Do Inv</button></div>
-        <div class="shop-card"><div class="pack-icon">✨</div><h3>Gold</h3><p>🪙5000</p><button class="btn" onclick="buyPack('gold')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('gold')">Do Inv</button></div>
-    `;
-}
+            // Losowe opóźnienie startowe
+            const delay = Math.random() * 10;
+            emote.style.animationDelay = delay + 's';
 
-function buyPack(pack){
-    let priceMap={basic:10, spring:250, beach:150, hyper:1000, gold:5000};
-    if(coins < priceMap[pack]){ toast('Za mało monet'); return; }
-    coins -= priceMap[pack];
-    updateUI(); saveLocal();
-    openPackAnimation(pack);
-    refreshAll();
-}
+            // Losowa przezroczystość
+            const opacity = 0.25 + Math.random() * 0.45;
+            emote.style.opacity = opacity;
 
-function buyToInventory(pack){
-    let priceMap={basic:10, spring:250, beach:150, hyper:1000, gold:5000};
-    if(coins < priceMap[pack]){ toast('Za mało monet'); return; }
-    coins -= priceMap[pack];
-    updateUI(); saveLocal();
-    let names={basic:"Podstawowa Paczka", spring:"Wiosenne Pudło", beach:"Plażowa Paczka", hyper:"Hyper Paczka", gold:"Gold Paczka"};
-    let emojis={basic:"📦", spring:"🌸", beach:"🏖️", hyper:"⚡", gold:"✨"};
-    let exist = inv.find(i => i.n === names[pack]);
-    if(exist) exist.q++;
-    else inv.push({ n:names[pack], e:emojis[pack], r:'Specjalny', q:1 });
-    refreshAll(); toast(`Dodano ${names[pack]} do ekwipunku`);
-}
+            emotesContainer.appendChild(emote);
 
-// ============================================================
-//  OTWIERANIE PACZKI (ANIMACJA)
-// ============================================================
-function openPackAnimation(packType){
-    if(isOpening){ toast('Poczekaj na otwarcie poprzedniej paczki'); return; }
-    isOpening = true;
-    let curRar = "Rzadki";
-    let clicksLeft = 5;
-    let maxClicks = 5;
-    let boost = (packType === 'spring') ? 3 : 1;
-
-    let ov = document.createElement('div');
-    ov.className = 'opening-overlay';
-    ov.innerHTML = `
-        <div class="opening-box" id="openingBox">❓</div>
-        <div class="rarity-text" id="rarityLabel" style="color:#fff; background:${RARITY[curRar].col}; padding:5px 15px; border-radius:10px;">${curRar}</div>
-        <div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div>
-        <p style="color:#aaa;">Kliknij aby ulepszyć</p>
-        <p style="color:#f0c060;">SPACJA = otwórz teraz</p>
-    `;
-    let box = ov.querySelector('#openingBox');
-    let rarityLabel = ov.querySelector('#rarityLabel');
-    let clicksSpan = ov.querySelector('#clicksCount');
-    let finished = false;
-
-    function upgrade(){
-        if(finished || clicksLeft <= 0 || curRar === "Chromatyczny"){ finish(); return; }
-        clicksLeft--;
-        if(box) box.classList.add('shake');
-        setTimeout(() => box.classList.remove('shake'), 500);
-        let eff = RARITY[curRar].up * boost;
-        if(Math.random() < eff){
-            let idx = RORDER.indexOf(curRar);
-            if(idx < RORDER.length - 1) curRar = RORDER[idx + 1];
-        }
-        rarityLabel.textContent = curRar;
-        rarityLabel.style.backgroundColor = RARITY[curRar].col;
-        clicksSpan.textContent = clicksLeft;
-        if(clicksLeft <= 0 || curRar === "Chromatyczny") setTimeout(finish, 600);
-    }
-
-    function finish(){
-        if(finished) return;
-        finished = true;
-        ov.remove();
-        let count = curRar === "Chromatyczny" ? 5 : (curRar === "Legendarny" ? 4 : (curRar === "Mityczny" ? 3 : 2));
-        let cards = [];
-        for(let i=0; i<count; i++){
-            let animalList = ANIMALS[curRar] || ANIMALS["Rzadki"];
-            let animal = animalList[Math.floor(Math.random() * animalList.length)];
-            let entry = inv.find(x => x.n === animal.n && x.r === curRar);
-            if(entry) entry.q++;
-            else inv.push({ n:animal.n, e:animal.e, r:curRar, q:1 });
-            collected.add(animal.n);
-            cards.push({ n:animal.n, e:animal.e, rarity:curRar });
-        }
-        packsOpened++;
-        saveLocal();
-        let reveal = document.createElement('div');
-        reveal.className = 'reveal-area';
-        cards.forEach((c, idx) => {
+            // Usuwanie po zakończeniu animacji, aby nie zaśmiecać DOM
+            const totalTime = (delay + duration) * 1000;
             setTimeout(() => {
-                let cardDiv = document.createElement('div');
-                cardDiv.className = 'reveal-card';
-                cardDiv.innerHTML = `<div style="font-size:2.5rem;">${c.e}</div><div style="font-weight:700;">${c.n}</div><div class="badge badge-${getRarityClass(c.rarity)}">${c.rarity}</div>`;
-                reveal.appendChild(cardDiv);
-            }, idx * 150);
+                if (emote.parentNode) {
+                    emote.remove();
+                }
+            }, totalTime + 500);
+        }
+
+        // Tworzenie początkowych emojis
+        const initialEmoteCount = 20;
+        for (let i = 0; i < initialEmoteCount; i++) {
+            // Rozłóż początkowe emotki w różnych fazach animacji
+            setTimeout(() => {
+                createEmote();
+            }, i * 200);
+        }
+
+        // Ciągłe dodawanie nowych emojis
+        setInterval(() => {
+            createEmote();
+        }, 800);
+
+        // ============ LOGIKA ŁADOWANIA ============
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const loadingScreen = document.getElementById('loadingScreen');
+        const errorOverlay = document.getElementById('errorOverlay');
+
+        const totalDuration = 3000; // 3 sekundy
+        const updateInterval = 40; // aktualizacja co ~40ms dla płynności
+        const steps = totalDuration / updateInterval; // ~75 kroków
+        const incrementPerStep = 100 / steps;
+
+        let currentProgress = 0;
+        const startTime = performance.now();
+
+        function updateProgress(timestamp) {
+            const elapsed = timestamp - startTime;
+            const targetProgress = Math.min((elapsed / totalDuration) * 100, 100);
+
+            // Płynne dochodzenie do wartości docelowej
+            if (currentProgress < targetProgress) {
+                currentProgress = Math.min(currentProgress + incrementPerStep * 1.1, targetProgress);
+                if (currentProgress > 100) currentProgress = 100;
+            }
+
+            const displayProgress = Math.round(currentProgress);
+            progressBar.style.width = displayProgress + '%';
+            progressText.textContent = displayProgress + '%';
+
+            if (currentProgress < 100) {
+                requestAnimationFrame(updateProgress);
+            } else {
+                // Ładowanie zakończone - pokaż dialog błędu
+                progressBar.style.width = '100%';
+                progressText.textContent = '100%';
+                onLoadingComplete();
+            }
+        }
+
+        function onLoadingComplete() {
+            // Krótkie opóźnienie przed ukryciem ekranu ładowania
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                // Pokaż overlay błędu po krótkim fade-out ładowania
+                setTimeout(() => {
+                    errorOverlay.classList.add('visible');
+                    // Dodaj animację shake do ikony błędu
+                    const errorIcon = errorOverlay.querySelector('.error-icon');
+                    if (errorIcon) {
+                        errorIcon.style.animation = 'none';
+                        errorIcon.offsetHeight; // reflow
+                        errorIcon.style.animation = 'errorShake 0.6s ease-in-out';
+                    }
+                }, 400);
+            }, 250);
+        }
+
+        // Start ładowania
+        requestAnimationFrame(updateProgress);
+
+        // ============ DODATKOWE EFEKTY ============
+        // Po kliknięciu przycisku - subtelny feedback
+        const btnDownload = document.querySelector('.btn-download');
+        btnDownload.addEventListener('click', function(e) {
+            // Krótki efekt kliknięcia
+            this.style.transform = 'scale(0.94)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
         });
-        reveal.addEventListener('click', () => reveal.remove());
-        document.body.appendChild(reveal);
-        updateUI();
-        isOpening = false;
-        refreshAll();
-    }
 
-    ov.addEventListener('click', upgrade);
-    document.addEventListener('keydown', function(e){
-        if(e.code === 'Space'){ e.preventDefault(); if(!finished) finish(); }
-    });
-    document.body.appendChild(ov);
-}
-
-// ============================================================
-//  EKWIPUNEK
-// ============================================================
-function renderInventory(){
-    let grid = document.getElementById('inventoryGrid');
-    grid.innerHTML = '';
-    inv.forEach(i => {
-        let d = document.createElement('div');
-        d.className = 'card';
-        let isPack = (i.r === 'Specjalny' || i.n.includes('Paczka') || i.n.includes('Pudło')) && !i.n.includes('Zwierzak');
-        if(isPack){
-            d.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-specjalny">Paczka</div><div>x${i.q}</div><button class="btn" onclick="openPackFromInventory('${i.n}')">Otwórz</button>`;
-        } else {
-            let price = getAnimalPrice(i);
-            d.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-${getRarityClass(i.r)}">${i.r}</div><div>x${i.q}</div><div>🪙${price}</div><button class="btn sell-btn" onclick="sellOne('${i.n}','${i.r}')">Sprzedaj 1</button>`;
-        }
-        grid.appendChild(d);
-    });
-}
-
-function openPackFromInventory(name){
-    let packType = null;
-    if(name === 'Podstawowa Paczka') packType = 'basic';
-    else if(name === 'Wiosenne Pudło') packType = 'spring';
-    else if(name === 'Plażowa Paczka') packType = 'beach';
-    else if(name === 'Hyper Paczka') packType = 'hyper';
-    else if(name === 'Gold Paczka') packType = 'gold';
-    if(!packType){ toast('Nieznana paczka'); return; }
-    let idx = inv.findIndex(i => i.n === name);
-    if(idx === -1) return;
-    inv[idx].q--;
-    if(inv[idx].q <= 0) inv.splice(idx, 1);
-    saveLocal();
-    openPackAnimation(packType);
-    refreshAll();
-}
-
-// ============================================================
-//  SPRZEDAŻ
-// ============================================================
-function sellOne(name, rarity){
-    let idx = inv.findIndex(i => i.n === name && i.r === rarity);
-    if(idx === -1) return;
-    let price = getAnimalPrice(inv[idx]);
-    inv[idx].q--;
-    if(inv[idx].q <= 0) inv.splice(idx, 1);
-    coins += price;
-    updateUI(); saveLocal(); refreshAll();
-    toast(`Sprzedano ${name} za ${price}🪙`);
-}
-
-function renderSell(){
-    let cont = document.getElementById('sellContainer');
-    cont.innerHTML = '';
-    let sellable = inv.filter(i => i.r !== 'Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło'));
-    sellable.forEach(i => {
-        let price = getAnimalPrice(i);
-        let d = document.createElement('div');
-        d.style.cssText = 'display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #2a2a40;';
-        d.innerHTML = `<span>${i.e} ${i.n} [${i.r}] x${i.q}</span><span>🪙${price}/szt</span><span><button class="btn sell-btn" onclick="sellOne('${i.n}','${i.r}')">1</button><button class="btn sell-btn" onclick="sellAll('${i.n}','${i.r}')">Wszystkie</button></span>`;
-        cont.appendChild(d);
-    });
-}
-
-function sellAll(name, rarity){
-    let idx = inv.findIndex(i => i.n === name && i.r === rarity);
-    if(idx === -1) return;
-    let price = getAnimalPrice(inv[idx]);
-    let total = price * inv[idx].q;
-    coins += total;
-    inv.splice(idx, 1);
-    updateUI(); saveLocal(); refreshAll();
-    toast(`Sprzedano wszystkie za ${total}🪙`);
-}
-
-// ============================================================
-//  KOLEKCJA
-// ============================================================
-function renderCollection(){
-    let grid = document.getElementById('collectionGrid');
-    grid.innerHTML = '';
-    let total = 0, owned = 0;
-    for(let [rar, animals] of Object.entries(ANIMALS)){
-        animals.forEach(a => {
-            total++;
-            let has = collected.has(a.n);
-            if(has) owned++;
-            let div = document.createElement('div');
-            div.className = `card collection-card ${has?'owned':''}`;
-            div.innerHTML = `<div class="emoji">${a.e}</div><div class="name">${a.n}</div><div class="badge badge-${getRarityClass(rar)}">${rar}</div>`;
-            grid.appendChild(div);
-        });
-    }
-    document.getElementById('collectionCount').innerText = `${owned}/${total}`;
-}
-
-// ============================================================
-//  TRADE
-// ============================================================
-function renderTrade(){
-    document.getElementById('tradeGemsCount').innerText = gems;
-    let cont = document.getElementById('tradeCardsContainer');
-    cont.innerHTML = '';
-    let tradable = inv.filter(i => i.r !== 'Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło'));
-    tradable.forEach(i => {
-        let d = document.createElement('div');
-        d.style.cssText = 'background:var(--panel);border-radius:12px;padding:10px;margin:5px 0;display:flex;justify-content:space-between;';
-        d.innerHTML = `<span>${i.e} ${i.n} (${i.r}) x${i.q}</span><div><input type="number" id="tradeQty_${i.n}_${i.r}" min="0" max="${i.q}" value="0" style="width:60px;"><button class="btn" onclick="sendCard('${i.n}','${i.r}')">📤</button></div>`;
-        cont.appendChild(d);
-    });
-}
-
-function sendCard(name, rarity){
-    let email = document.getElementById('tradeEmail').value.trim();
-    if(!email){ toast('Wpisz email odbiorcy'); return; }
-    let qtyInput = document.getElementById(`tradeQty_${name}_${rarity}`);
-    if(!qtyInput) return;
-    let amt = parseInt(qtyInput.value);
-    if(amt < 1 || amt > 9999){ toast('Nieprawidłowa ilość'); return; }
-    let idx = inv.findIndex(i => i.n === name && i.r === rarity);
-    if(idx === -1 || inv[idx].q < amt){ toast('Nie masz tylu kart'); return; }
-    inv[idx].q -= amt;
-    if(inv[idx].q <= 0) inv.splice(idx, 1);
-    saveLocal(); refreshAll();
-    toast(`Wysłano ${amt}x ${name} do ${email}`);
-}
-
-function sendGems(){
-    let email = document.getElementById('tradeEmail').value.trim();
-    if(!email){ toast('Wpisz email odbiorcy'); return; }
-    let amt = parseInt(document.getElementById('tradeGemAmount').value);
-    if(amt < 1 || amt > gems){ toast('Nieprawidłowa ilość gemów'); return; }
-    gems -= amt;
-    updateUI(); saveLocal(); refreshAll();
-    toast(`Wysłano ${amt}💎 do ${email}`);
-}
-
-// ============================================================
-//  MASZYNY (TARG)
-// ============================================================
-function renderGoldMachine(){
-    let c = document.getElementById('goldMachineContainer');
-    c.innerHTML = '';
-    let groups = {};
-    inv.forEach(i => {
-        if(i.r !== 'Golden' && i.r !== 'Rainbow' && i.r !== 'Hyper' && i.r !== 'Summer' && !i.n.includes('Paczka') && !i.n.includes('Pudło')){
-            let key = i.n + '|' + i.r;
-            if(!groups[key]) groups[key] = {name:i.n, rarity:i.r, count:0, emoji:i.e};
-            groups[key].count += i.q;
-        }
-    });
-    let valid = Object.values(groups).filter(g => g.count >= 10);
-    if(valid.length === 0){ c.innerHTML = '<p>Brak 10 takich samych</p>'; return; }
-    valid.forEach(g => {
-        let btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.textContent = `${g.emoji} ${g.name} (${g.rarity}) x${g.count} → Złoty`;
-        btn.onclick = function(){
-            let toRemove = 10;
-            for(let i=inv.length-1; i>=0 && toRemove>0; i--){
-                if(inv[i].n === g.name && inv[i].r === g.rarity){
-                    let rem = Math.min(inv[i].q, toRemove);
-                    inv[i].q -= rem;
-                    toRemove -= rem;
-                    if(inv[i].q <= 0) inv.splice(i, 1);
-                }
-            }
-            let golden = { n:g.name, e:g.emoji, r:'Golden', q:1, baseRarity:g.rarity };
-            let exist = inv.find(i => i.n === g.name && i.r === 'Golden');
-            if(exist) exist.q++;
-            else inv.push(golden);
-            saveLocal(); refreshAll(); updateUI();
-            toast(`Stworzono Złotego ${g.name}`);
-        };
-        c.appendChild(btn);
-    });
-}
-
-function renderRainbowMachine(){
-    let c = document.getElementById('rainbowMachineContainer');
-    c.innerHTML = '';
-    let groups = {};
-    inv.forEach(i => {
-        if(i.r === 'Golden'){
-            if(!groups[i.n]) groups[i.n] = {name:i.n, count:0, emoji:i.e, baseRarity:i.baseRarity};
-            groups[i.n].count += i.q;
-        }
-    });
-    let valid = Object.values(groups).filter(g => g.count >= 5);
-    if(valid.length === 0){ c.innerHTML = '<p>Brak 5 Złotych</p>'; return; }
-    valid.forEach(g => {
-        let btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.textContent = `${g.emoji} ${g.name} x${g.count} → Tęczowy`;
-        btn.onclick = function(){
-            let toRemove = 5;
-            for(let i=inv.length-1; i>=0 && toRemove>0; i--){
-                if(inv[i].n === g.name && inv[i].r === 'Golden'){
-                    let rem = Math.min(inv[i].q, toRemove);
-                    inv[i].q -= rem;
-                    toRemove -= rem;
-                    if(inv[i].q <= 0) inv.splice(i, 1);
-                }
-            }
-            let rainbow = { n:g.name, e:g.emoji, r:'Rainbow', q:1, baseRarity:g.baseRarity };
-            let exist = inv.find(i => i.n === g.name && i.r === 'Rainbow');
-            if(exist) exist.q++;
-            else inv.push(rainbow);
-            saveLocal(); refreshAll(); updateUI();
-            toast(`Stworzono Tęczowego ${g.name}`);
-        };
-        c.appendChild(btn);
-    });
-}
-
-function renderDiamondMachine(){
-    let c = document.getElementById('diamondMachineContainer');
-    c.innerHTML = '';
-    let groups = {};
-    inv.forEach(i => {
-        if(i.r === 'Rainbow'){
-            if(!groups[i.n]) groups[i.n] = {name:i.n, count:0, emoji:i.e};
-            groups[i.n].count += i.q;
-        }
-    });
-    let valid = Object.values(groups).filter(g => g.count >= 5);
-    if(valid.length === 0){ c.innerHTML = '<p>Brak 5 Tęczowych</p>'; return; }
-    valid.forEach(g => {
-        let btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.textContent = `${g.emoji} ${g.name} x${g.count} → 1 Diament`;
-        btn.onclick = function(){
-            let toRemove = 5;
-            for(let i=inv.length-1; i>=0 && toRemove>0; i--){
-                if(inv[i].n === g.name && inv[i].r === 'Rainbow'){
-                    let rem = Math.min(inv[i].q, toRemove);
-                    inv[i].q -= rem;
-                    toRemove -= rem;
-                    if(inv[i].q <= 0) inv.splice(i, 1);
-                }
-            }
-            diamonds++;
-            saveLocal(); refreshAll(); updateUI();
-            toast(`+1 Diament`);
-        };
-        c.appendChild(btn);
-    });
-}
-
-function renderSummerMachine(){
-    let c = document.getElementById('summerMachineContainer');
-    if(c) c.innerHTML = '<p>Letnia maszyna aktywna (30 zwierząt → Letni)</p>';
-}
-
-// ============================================================
-//  WYSPA
-// ============================================================
-function renderIsland(){
-    let grid = document.getElementById('islandGrid');
-    grid.innerHTML = '';
-    islandTiles.forEach(tile => {
-        let div = document.createElement('div');
-        div.className = `island-tile ${tile.unlocked?'unlocked':'locked'}`;
-        div.innerHTML = `<h3>${tile.name}</h3><p>${tile.unlocked ? (tile.animalAssigned ? `🐾 ${tile.animalAssigned.n}` : 'Brak zwierzęcia') : (tile.purchasable ? `🔒 Kup za ${tile.price}💎` : '🔒 Zablokowane')}</p>`;
-        if(!tile.unlocked && tile.purchasable){
-            let buyBtn = document.createElement('button');
-            buyBtn.className = 'btn';
-            buyBtn.textContent = `Kup za ${tile.price}💎`;
-            buyBtn.onclick = function(){
-                if(gems >= tile.price){
-                    gems -= tile.price;
-                    tile.unlocked = true;
-                    saveLocal(); renderIsland(); updateUI();
-                    toast(`Odblokowano ${tile.name}!`);
-                } else toast('Za mało gemów');
-            };
-            div.appendChild(buyBtn);
-        }
-        if(tile.unlocked && !tile.animalAssigned){
-            let assignBtn = document.createElement('button');
-            assignBtn.className = 'btn';
-            assignBtn.textContent = 'Przydziel';
-            assignBtn.onclick = function(){ showAssignAnimal(tile.id); };
-            div.appendChild(assignBtn);
-        }
-        if(tile.unlocked && tile.animalAssigned){
-            let collectBtn = document.createElement('button');
-            collectBtn.className = 'btn';
-            collectBtn.textContent = 'Zbierz';
-            collectBtn.onclick = function(){ collectIslandEarn(tile.id); };
-            div.appendChild(collectBtn);
-        }
-        grid.appendChild(div);
-    });
-    // Odblokowanie co 2h
-    let now = Date.now();
-    let lastUnlock = localStorage.getItem('lastIslandUnlock') || '0';
-    if(now - parseInt(lastUnlock) > 7200000){
-        let locked = islandTiles.find(t => !t.unlocked && !t.purchasable);
-        if(locked){
-            locked.unlocked = true;
-            localStorage.setItem('lastIslandUnlock', now);
-            toast(`Odblokowano ${locked.name}`);
-            saveLocal(); renderIsland();
-        }
-    }
-}
-
-function showAssignAnimal(tileId){
-    let area = document.getElementById('islandAssignArea');
-    let available = inv.filter(i => i.r !== 'Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło'));
-    if(available.length === 0){ toast('Brak zwierząt'); return; }
-    area.innerHTML = '<h3>Wybierz zwierzę:</h3>';
-    available.forEach(animal => {
-        let btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.textContent = `${animal.e} ${animal.n} (${animal.r})`;
-        btn.onclick = function(){
-            let tile = islandTiles.find(t => t.id === tileId);
-            if(tile){
-                tile.animalAssigned = { n:animal.n, e:animal.e, r:animal.r, mult:animal.mult||1 };
-                tile.lastEarn = Date.now();
-                saveLocal(); renderIsland(); area.innerHTML = '';
-                toast(`Przydzielono ${animal.n}`);
-            }
-        };
-        area.appendChild(btn);
-    });
-}
-
-function collectIslandEarn(tileId){
-    let tile = islandTiles.find(t => t.id === tileId);
-    if(!tile || !tile.animalAssigned) return;
-    let now = Date.now();
-    let hours = (now - tile.lastEarn) / 3600000;
-    if(hours < 1){ toast('Zbieraj co godzinę'); return; }
-    let basePrice = getAnimalPrice(tile.animalAssigned);
-    let earned = Math.floor(basePrice * hours);
-    coins += earned;
-    tile.lastEarn = now;
-    updateUI(); saveLocal();
-    toast(`Zarobiono ${earned}🪙 z ${tile.name}`);
-    renderIsland();
-}
-
-// ============================================================
-//  RANDOM TRADE
-// ============================================================
-function generateRandomTrade(){
-    let allAnimals = [];
-    for(let [rar, arr] of Object.entries(ANIMALS)){
-        arr.forEach(a => allAnimals.push({n:a.n, e:a.e, rarity:rar}));
-    }
-    let rand = allAnimals[Math.floor(Math.random() * allAnimals.length)];
-    let price = 0;
-    switch(rand.rarity){
-        case "Rzadki": price = 100; break;
-        case "Bardzo Rzadki": price = 250; break;
-        case "Epicki": price = 600; break;
-        case "Mityczny": price = 1500; break;
-        case "Legendarny": price = 3500; break;
-        case "Chromatyczny": price = 5000; break;
-    }
-    randomTradeOffer = { animal:rand, price:price };
-    randomTradeExpiry = Date.now() + 3600000;
-    saveLocal();
-}
-
-function renderRandomTrade(){
-    let c = document.getElementById('randomTradeContainer');
-    if(!c) return;
-    if(!randomTradeOffer || Date.now() > randomTradeExpiry) generateRandomTrade();
-    let timeLeft = Math.max(0, randomTradeExpiry - Date.now());
-    let minutes = Math.floor(timeLeft / 60000);
-    let seconds = Math.floor((timeLeft % 60000) / 1000);
-    c.innerHTML = `
-        <div class="random-trade-card">
-            <div>${randomTradeOffer.animal.e} ${randomTradeOffer.animal.n} (${randomTradeOffer.animal.rarity})</div>
-            <div>🪙 ${randomTradeOffer.price}</div>
-            <button class="btn" onclick="buyRandomTrade()">Kup</button>
-        </div>
-        <div>Odświeżenie za: ${minutes}m ${seconds}s</div>
-    `;
-}
-
-function buyRandomTrade(){
-    if(!randomTradeOffer){ toast('Brak oferty'); return; }
-    if(coins < randomTradeOffer.price){ toast('Za mało monet'); return; }
-    coins -= randomTradeOffer.price;
-    let exist = inv.find(i => i.n === randomTradeOffer.animal.n && i.r === randomTradeOffer.animal.rarity);
-    if(exist) exist.q++;
-    else inv.push({ n:randomTradeOffer.animal.n, e:randomTradeOffer.animal.e, r:randomTradeOffer.animal.rarity, q:1 });
-    collected.add(randomTradeOffer.animal.n);
-    updateUI(); saveLocal(); refreshAll();
-    toast(`Kupiono ${randomTradeOffer.animal.n}`);
-    generateRandomTrade();
-    renderRandomTrade();
-}
-
-// ============================================================
-//  RANKING (TRYB RANKINGOWY)
-// ============================================================
-function startRankedMode(){
-    let rarity = document.getElementById('rankedRaritySelect').value;
-    let myAnimals = inv.filter(i => i.r === rarity && i.r !== 'Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło'));
-    if(myAnimals.length === 0){ toast(`Brak zwierząt o rzadkości ${rarity}`); return; }
-    let modal = document.getElementById('rankedPickModal');
-    let list = document.getElementById('rankedPickList');
-    list.innerHTML = '';
-    myAnimals.forEach(animal => {
-        let btn = document.createElement('button');
-        btn.className = 'btn';
-        btn.textContent = `${animal.e} ${animal.n}`;
-        btn.onclick = function(){
-            modal.classList.remove('active');
-            let botAnimal = ANIMALS[rarity][Math.floor(Math.random() * ANIMALS[rarity].length)];
-            let botNick = "Bot_" + Math.random().toString(36).substring(2,6);
-            let myValue = getAnimalPrice(animal);
-            let botValue = RARITY[rarity].price;
-            let win = myValue >= botValue;
-            let reward = win ? Math.floor(botValue * 0.8) : 0;
-            if(reward > 0){ coins += reward; updateUI(); saveLocal(); }
-            document.getElementById('rankedBattleArea').innerHTML = `
-                <div style="background:var(--panel);padding:20px;border-radius:16px;">
-                    <p>🐺 Twój: ${animal.e} ${animal.n} (${myValue})</p>
-                    <p>🤖 ${botNick}: ${botAnimal.e} ${botAnimal.n} (${botValue})</p>
-                    <p><strong>${win ? "Wygrałeś!" : "Przegrałeś"}</strong> ${reward > 0 ? `+${reward}🪙` : ''}</p>
-                    <button class="btn" onclick="startRankedMode()">Zagraj ponownie</button>
-                </div>
-            `;
-        };
-        list.appendChild(btn);
-    });
-    modal.classList.add('active');
-}
-
-// ============================================================
-//  TOP 10 (LEADERBOARD)
-// ============================================================
-async function loadLeaderboard(){
-    let list = document.getElementById('leaderboardList');
-    list.innerHTML = 'Ładowanie...';
-    try {
-        let supabase = window.supabase?.createClient?.('https://wjbzishechoxiafyfypr.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqYnppc2hlY2hveGlhZnlmeXByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTIwODAsImV4cCI6MjA5NDAyODA4MH0.x8aOXVkB0WLDwmuLDBAhUyn1laTF8gxSi4hMFc2u_sg');
-        if(!supabase){ list.innerHTML = 'Brak połączenia z Supabase'; return; }
-        let {data, error} = await supabase.from('profiles').select('username,coins').order('coins', {ascending:false}).limit(10);
-        if(error){ list.innerHTML = 'Błąd ładowania'; return; }
-        if(!data || data.length === 0){ list.innerHTML = 'Brak graczy'; return; }
-        list.innerHTML = data.map((p,i) => `<div style="padding:5px;border-bottom:1px solid #2a2a40;">${i+1}. ${p.username || 'Anonim'} – 🪙 ${Math.floor(p.coins)}</div>`).join('');
-    } catch(e){
-        list.innerHTML = 'Błąd ładowania';
-    }
-}
-
-// ============================================================
-//  WYMIANA GEMÓW
-// ============================================================
-function exchangeGems(amt){
-    if(gems < amt){ toast('Za mało gemów'); return; }
-    gems -= amt;
-    coins += amt * 80;
-    updateUI(); saveLocal();
-    toast(`Wymieniono ${amt}💎 → ${amt*80}🪙`);
-}
-
-// ============================================================
-//  RESET GRY
-// ============================================================
-function resetGame(deleteAnimals, deleteCurrency){
-    if(deleteAnimals) inv = inv.filter(i => i.r === 'Specjalny' || i.n.includes('Paczka') || i.n.includes('Pudło'));
-    if(deleteCurrency){ coins = 100; gems = 5; diamonds = 0; }
-    if(deleteAnimals && deleteCurrency){
-        collected.clear();
-        dailyStreak = 1; dailyClaimed = false; usedCodes = {}; packsOpened = 0;
-        islandTiles.forEach((t,i) => { t.unlocked = (i===0); t.animalAssigned = null; t.lastEarn = 0; if(t.purchasable) t.unlocked = false; });
-        randomTradeOffer = null;
-        inv = inv.filter(i => i.r === 'Specjalny' || i.n.includes('Paczka') || i.n.includes('Pudło'));
-    }
-    saveLocal(); updateUI(); refreshAll();
-    toast('Zresetowano grę');
-}
-
-// ============================================================
-//  KODY
-// ============================================================
-function redeemCode(){
-    let code = document.getElementById('codeInput').value.trim();
-    if(!code){ toast('Wpisz kod'); return; }
-    if(code === 'CardZoo' && !usedCodes.CardZoo){
-        gems += 50;
-        usedCodes.CardZoo = true;
-        toast('+50💎');
-    } else if(code === 'TrailerOfficial' && !usedCodes.TrailerOfficial){
-        gems += 5;
-        usedCodes.TrailerOfficial = true;
-        toast('+5💎');
-    } else {
-        toast('Zły kod lub już wykorzystany');
-        return;
-    }
-    updateUI(); saveLocal();
-    document.getElementById('codeModal').classList.remove('active');
-    document.getElementById('codeInput').value = '';
-}
-
-// ============================================================
-//  USTAWIENIA (MUZYKA/SFX)
-// ============================================================
-function updateMusic(val){ musicVol = val; document.getElementById('musicVal').innerText = val; saveLocal(); }
-function updateSfx(val){ sfxVol = val; document.getElementById('sfxVal').innerText = val; saveLocal(); }
-
-// ============================================================
-//  ODŚWIEŻANIE WSZYSTKIEGO
-// ============================================================
-function refreshAll(){
-    renderShop();
-    renderInventory();
-    renderCollection();
-    renderSell();
-    renderTrade();
-    renderGoldMachine();
-    renderRainbowMachine();
-    renderDiamondMachine();
-    renderSummerMachine();
-    renderIsland();
-    renderRandomTrade();
-    updateUI();
-}
-
-// ============================================================
-//  START
-// ============================================================
-refreshAll();
-setInterval(() => {
-    renderRandomTrade();
-    renderIsland();
-}, 10000);
-
-// Przywracamy zapisane ustawienia suwaków
-document.getElementById('musicSlider').value = musicVol;
-document.getElementById('sfxSlider').value = sfxVol;
-document.getElementById('musicVal').innerText = musicVol;
-document.getElementById('sfxVal').innerText = sfxVol;
-
+        console.log('🐾 Zooventures Cloud Connector v1.0');
+        console.log('🌐 Próba połączenia z chmurą Zooventures...');
+        console.log('❌ Serwer odrzucił połączenie - gra została zamknięta.');
+        console.log('🐹 Polecamy: Chinchilla Clicker na itch.io!');
+    })();
 </script>
 </body>
 </html>
