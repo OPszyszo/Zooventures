@@ -18,6 +18,8 @@
   </a>
 </p>
 
+**GAME IS CLOSED!!!**
+
 Zooventures to wciągająca gra kolekcjonerska, w której otwierasz paczki pełne niezwykłych zwierzaków i budujesz swoją własną, unikalną kolekcję. Każda paczka kryje losowe stworzenia o różnych poziomach rzadkości — od zwykłych rzadkich zwierzaków aż po potężne Chromatyczne, Golden i Rainbow Pety.
 
 ## 🎮 Co możesz robić w grze?
