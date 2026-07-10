@@ -37,6 +37,7 @@
         .shop-card { background: var(--panel); border: 2px solid var(--border); border-radius: 18px; padding: 20px; text-align: center; transition: 0.3s; }
         .btn { display: inline-block; padding: 8px 18px; border-radius: 25px; background: linear-gradient(135deg,#8b5cf6,#6d28d9); color: #fff; font-weight: 700; cursor: pointer; font-size: 0.85rem; margin: 4px; border: none; transition: 0.2s; }
         .btn:hover { transform: scale(1.02); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
         .sell-btn { background: #ff5e5e; font-size: 0.75rem; padding: 4px 10px; }
         .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; margin-top: 10px; }
         .card { background: #1a1a2e; border: 2px solid #282845; border-radius: 14px; padding: 10px; text-align: center; }
@@ -73,367 +74,902 @@
         .reveal-area { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 410; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 15px; padding: 20px; cursor: pointer; }
         .reveal-card { background: #1a1a30; border-radius: 14px; padding: 12px; width: 110px; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid #555; animation: cardJump 0.6s ease-out; }
         @keyframes cardJump { 0% { opacity: 0; transform: translateY(50px) rotateY(90deg); } 100% { opacity: 1; transform: translateY(0) rotateY(0); } }
-        .warning-message { background: #331100; border: 2px solid #ff8800; border-radius: 16px; padding: 15px; margin: 15px 0; color: #ffaa66; }
-        .warning-message h4 { color: #ffaa00; margin-bottom: 8px; }
+
+        .custom-alert-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 999;
+            display: flex; align-items: center; justify-content: center; animation: fadeIn 0.5s ease;
+        }
+        .custom-alert-box {
+            background: #1a1a2e; border: 2px solid #8b5cf6; border-radius: 24px; padding: 35px 30px;
+            max-width: 520px; width: 92%; text-align: center; box-shadow: 0 0 60px rgba(139,92,246,0.3);
+        }
+        .custom-alert-box h2 { font-size: 1.8rem; color: #ff6b6b; border-bottom: none; margin-bottom: 10px; }
+        .custom-alert-box .subtitle { color: #ffb347; font-weight: 700; font-size: 1.1rem; margin-bottom: 15px; }
+        .custom-alert-box .message { color: #ccc; line-height: 1.6; font-size: 0.95rem; margin-bottom: 20px; }
+        .custom-alert-box .message .highlight { color: #ff6b6b; font-weight: 700; }
+        .custom-alert-box .btn-group { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 10px; }
+        .custom-alert-box .btn-group .btn { min-width: 140px; padding: 12px 24px; font-size: 1rem; }
+        .custom-alert-box .btn-group .btn-primary { background: linear-gradient(135deg,#ff6b6b,#ee5a24); }
+        .custom-alert-box .btn-group .btn-secondary { background: linear-gradient(135deg,#6c5ce7,#341f97); }
+        .custom-alert-box .btn-group .btn-primary:hover { box-shadow: 0 0 30px rgba(255,107,107,0.5); }
+        .custom-alert-box .btn-group .btn-secondary:hover { box-shadow: 0 0 30px rgba(108,92,231,0.5); }
+        @keyframes fadeIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+
+        .blocked-btn { opacity: 0.4 !important; cursor: not-allowed !important; pointer-events: none !important; filter: grayscale(0.8); }
+        .blocked-btn:hover { transform: none !important; box-shadow: none !important; }
+        .blocked-label { font-size: 0.7rem; color: #ff6b6b; display: block; margin-top: 2px; }
+        .settings-section .blocked-note {
+            background: #2a1a1a; border: 1px solid #ff6b6b; border-radius: 12px;
+            padding: 12px 16px; margin-top: 8px; color: #ffb3b3; font-size: 0.9rem;
+        }
+        .settings-section .blocked-note strong { color: #ff6b6b; }
     </style>
 </head>
 <body>
+
+<!-- CUSTOM ALERT -->
+<div class="custom-alert-overlay" id="customAlert">
+    <div class="custom-alert-box">
+        <h2>⚠️ Koniec wsparcia</h2>
+        <div class="subtitle">Zooventures – wersja końcowa</div>
+        <div class="message">
+            <p>Gra zakończyła wsparcie. Kod może zawierać <span class="highlight">przestarzałe linijki</span> i być częściowo zepsuty.</p>
+            <p style="margin-top:10px;">Twórcy pracują nad nową grą – <strong>Chinchilla</strong>! 🎮</p>
+        </div>
+        <div class="btn-group">
+            <a href="https://twin-pixels-studio.itch.io/chinchilla" target="_blank" class="btn btn-primary">⬇️ Pobierz grę</a>
+            <button class="btn btn-secondary" onclick="document.getElementById('customAlert').style.display='none'">Kontynułuj grę</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOP BAR -->
 <div class="top-bar">
     <div class="logo">🐾 ZOOVENTURES</div>
     <div class="currency">
         <div class="coin">🪙 <span id="coinsDisplay">100</span></div>
         <div class="gem">💎 <span id="gemsDisplay">5</span></div>
         <div class="diamond">💠 <span id="diamondsDisplay">0</span></div>
-        <button class="btn" id="openCodeBtn">🎟️ Kody</button>
+        <button class="btn" onclick="document.getElementById('codeModal').classList.add('active')">🎟️ Kody</button>
     </div>
     <div class="nav-tabs">
-        <div class="nav-tab active" data-view="shop">🏪 Sklep</div>
-        <div class="nav-tab" data-view="targ">🏷️ Targ</div>
-        <div class="nav-tab" data-view="inventory">🎒 Ekwipunek</div>
-        <div class="nav-tab" data-view="collection">📚 Kolekcja</div>
-        <div class="nav-tab" data-view="sell">💰 Sprzedaż</div>
-        <div class="nav-tab" data-view="trade">🔄 Trady</div>
-        <div class="nav-tab" data-view="daily">🎁 Nagrody</div>
-        <div class="nav-tab" data-view="leaderboard">🏆 Top 10</div>
-        <div class="nav-tab" data-view="ranked">⚔️ Ranking</div>
-        <div class="nav-tab" data-view="island">🏝️ Wyspa</div>
-        <div class="nav-tab" data-view="settings">⚙️ Ustawienia</div>
+        <div class="nav-tab active" onclick="switchView('shop')">🏪 Sklep</div>
+        <div class="nav-tab" onclick="switchView('targ')">🏷️ Targ</div>
+        <div class="nav-tab" onclick="switchView('inventory')">🎒 Ekwipunek</div>
+        <div class="nav-tab" onclick="switchView('collection')">📚 Kolekcja</div>
+        <div class="nav-tab" onclick="switchView('sell')">💰 Sprzedaż</div>
+        <div class="nav-tab" onclick="switchView('trade')">🔄 Trady</div>
+        <div class="nav-tab" onclick="switchView('daily')">🎁 Nagrody</div>
+        <div class="nav-tab" onclick="switchView('leaderboard')">🏆 Top 10</div>
+        <div class="nav-tab" onclick="switchView('ranked')">⚔️ Ranking</div>
+        <div class="nav-tab" onclick="switchView('island')">🏝️ Wyspa</div>
+        <div class="nav-tab" onclick="switchView('settings')">⚙️ Ustawienia</div>
     </div>
 </div>
 
+<!-- CONTAINER -->
 <div class="container">
-    <div class="view active" id="shopView"><h2>🧪 Paczki</h2><div class="shop-grid" id="shopGrid"></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-top:15px;text-align:center;"><h3>💎 Wymiana Gemów na Monety</h3><button class="btn exchange-btn" data-amount="1">💎1 → 🪙80</button><button class="btn exchange-btn" data-amount="5">💎5 → 🪙400</button><button class="btn exchange-btn" data-amount="10">💎10 → 🪙800</button></div></div>
+    <div class="view active" id="shopView">
+        <h2>🧪 Paczki</h2>
+        <div class="shop-grid" id="shopGrid"></div>
+        <div style="background:var(--panel);border-radius:16px;padding:20px;margin-top:15px;text-align:center;">
+            <h3>💎 Wymiana Gemów na Monety</h3>
+            <button class="btn" onclick="exchangeGems(1)">💎1 → 🪙80</button>
+            <button class="btn" onclick="exchangeGems(5)">💎5 → 🪙400</button>
+            <button class="btn" onclick="exchangeGems(10)">💎10 → 🪙800</button>
+        </div>
+    </div>
     <div class="view" id="targView"><h2>🏷️ Targ</h2><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>🥇 Gold Machine</h3><div id="goldMachineContainer"></div></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>🌈 Rainbow Machine</h3><div id="rainbowMachineContainer"></div></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>💎 Diamond Machine</h3><div id="diamondMachineContainer"></div></div><div style="background:var(--panel);border-radius:16px;padding:20px;margin-bottom:15px;"><h3>🏖️ Summer Machine</h3><div id="summerTimer"></div><div id="summerMachineContainer"></div></div></div>
     <div class="view" id="inventoryView"><h2>🎒 Ekwipunek</h2><div class="card-grid" id="inventoryGrid"></div></div>
     <div class="view" id="collectionView"><h2>📚 Kolekcja (<span id="collectionCount">0/0</span>)</h2><div class="card-grid" id="collectionGrid"></div></div>
     <div class="view" id="sellView"><h2>💰 Sprzedaż</h2><div id="sellContainer"></div></div>
-    <div class="view" id="tradeView"><h2>🔄 Wyślij przedmioty</h2><input type="email" id="tradeEmail" placeholder="Email odbiorcy"><div><strong>💎 Gemy</strong> (masz: <span id="tradeGemsCount">0</span>)<div><input type="number" id="tradeGemAmount" placeholder="Ilość" value="0"><button class="btn" id="sendGemBtn">📤 Wyślij Gemy</button></div></div><h3>🃏 Karty</h3><div id="tradeCardsContainer"></div><hr><h3>🎲 Random Trade (co godz.)</h3><div id="randomTradeContainer"></div></div>
-    <div class="view" id="dailyView"><h2>🎁 Nagrody</h2><button class="btn" id="openDailyBtn">📅 Kalendarz</button></div>
+    <div class="view" id="tradeView"><h2>🔄 Wyślij przedmioty</h2><input type="email" id="tradeEmail" placeholder="Email odbiorcy"><div><strong>💎 Gemy</strong> (masz: <span id="tradeGemsCount">0</span>)<div><input type="number" id="tradeGemAmount" placeholder="Ilość" value="0"><button class="btn" onclick="sendGems()">📤 Wyślij Gemy</button></div></div><h3>🃏 Karty</h3><div id="tradeCardsContainer"></div><hr><h3>🎲 Random Trade (co godz.)</h3><div id="randomTradeContainer"></div></div>
+    <div class="view" id="dailyView"><h2>🎁 Nagrody</h2><button class="btn" onclick="toast('Nagrody dzienne dostępne')">📅 Kalendarz</button></div>
     <div class="view" id="leaderboardView"><h2>🏆 Top 10</h2><div id="leaderboardList"></div></div>
-    <div class="view" id="rankedView"><h2>⚔️ Tryb rankingowy</h2><select id="rankedRaritySelect"><option value="Rzadki">Rzadki</option><option value="Bardzo Rzadki">Bardzo Rzadki</option><option value="Epicki">Epicki</option><option value="Mityczny">Mityczny</option><option value="Legendarny">Legendarny</option><option value="Chromatyczny">Chromatyczny</option></select><button class="btn" id="startRankedBtn">Zagraj</button><div id="rankedBattleArea"></div></div>
+    <div class="view" id="rankedView"><h2>⚔️ Tryb rankingowy</h2><select id="rankedRaritySelect"><option value="Rzadki">Rzadki</option><option value="Bardzo Rzadki">Bardzo Rzadki</option><option value="Epicki">Epicki</option><option value="Mityczny">Mityczny</option><option value="Legendarny">Legendarny</option><option value="Chromatyczny">Chromatyczny</option></select><button class="btn" onclick="startRankedMode()">Zagraj</button><div id="rankedBattleArea"></div></div>
     <div class="view" id="islandView"><h2>🏝️ Wyspa</h2><div id="islandGrid" class="island-grid"></div><div id="islandAssignArea"></div></div>
-    <div class="view" id="settingsView"><h2>⚙️ Ustawienia</h2>
-        <div class="warning-message">
-            <h4>⚠️ Gra może być zepsuta ⚠️</h4>
-            <p>Gra ma dużo błędów przez to nie będzie do pobrania na Android i Windows, za utrudnienia przepraszamy.</p>
+    <div class="view" id="settingsView">
+        <h2>⚙️ Ustawienia</h2>
+        <div class="settings-section">
+            <label>🔊 Muzyka: <span id="musicVal">70</span>%</label>
+            <input type="range" id="musicSlider" min="0" max="100" value="70" oninput="updateMusic(this.value)">
+            <label>🔔 SFX: <span id="sfxVal">80</span>%</label>
+            <input type="range" id="sfxSlider" min="0" max="100" value="80" oninput="updateSfx(this.value)">
         </div>
-        <div class="settings-section"><label>🔊 Muzyka: <span id="musicVal">70</span>%</label><input type="range" id="musicSlider" min="0" max="100" value="70"><label>🔔 SFX: <span id="sfxVal">80</span>%</label><input type="range" id="sfxSlider" min="0" max="100" value="80"></div>
-        <div class="settings-section"><h3>🔐 Konto</h3><div id="authSection"><button class="btn" id="loginDiscordBtn">🎮 Discord</button><div>lub</div><input type="email" id="authEmail" placeholder="Email"><input type="password" id="authPassword" placeholder="Hasło"><button class="btn" id="signUpBtn">Zarejestruj</button><button class="btn" id="signInBtn">Zaloguj</button><p id="authError" style="color:red;"></p></div><div id="userInfoBlock" style="display:none;"><p>Zalogowano: <strong id="userNameDisplay"></strong></p><button class="btn" id="saveDataBtn">💾 Save Cloud</button><button class="btn" id="loadDataBtn">📂 Load Cloud</button><button class="btn" id="signOutBtn">Wyloguj</button></div></div>
-        <div class="settings-section"><h3>🔄 Reset gry</h3><div id="resetOptions"></div></div>
-        <div class="settings-section"><h3>🏅 Odznaki</h3><div id="badgesContainer"></div></div>
-        <div class="settings-section"><h3>📢 Zgłoś problem</h3><button class="btn report-btn" id="openReportBtn">Report</button></div>
-        <div class="settings-section"><div>Zooventures v6.3</div><div>© SzyszoTeam</div></div>
+        <div class="settings-section">
+            <h3>🔐 Konto</h3>
+            <div id="authSection">
+                <button class="btn blocked-btn">🎮 Discord</button>
+                <span class="blocked-label">⛔ Zablokowane – koniec wsparcia</span>
+                <div style="margin:12px 0;color:#aaa;">lub</div>
+                <input type="email" placeholder="Email" disabled>
+                <input type="password" placeholder="Hasło" disabled>
+                <button class="btn blocked-btn">Zarejestruj</button>
+                <button class="btn blocked-btn">Zaloguj</button>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h3>🔄 Reset gry</h3>
+            <div id="resetOptions">
+                <div class="reset-option" onclick="resetGame(true,false)">Usuń tylko zwierzęta (zostaw paczki)</div>
+                <div class="reset-option" onclick="resetGame(false,true)">Resetuj walutę</div>
+                <div class="reset-option" onclick="resetGame(true,true)">Resetuj WSZYSTKO</div>
+            </div>
+        </div>
+        <div class="settings-section">
+            <div class="blocked-note">
+                <strong>⚠️ Gra może być zepsuta</strong><br>
+                Gra ma dużo błędów przez to nie będzie do pobrania na Android i Windows.<br>
+                Za utrudnienia przepraszamy.
+            </div>
+        </div>
+        <div class="settings-section" style="color:#aaa;">
+            <div><b>Zooventures</b> v7.0 – koniec wsparcia</div>
+            <div>© SzyszoTeam</div>
+        </div>
     </div>
 </div>
 
-<!-- Modale -->
-<div class="modal" id="dailyModal"><div class="modal-content"><h2>🎁 Codzienne</h2><div id="dailyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;"></div><button class="btn" id="claimDailyBtn">Odbierz</button><button class="btn" id="closeDailyModalBtn">Zamknij</button></div></div>
-<div class="modal" id="codeModal"><div class="modal-content"><h2>🎟️ Kod</h2><input type="text" id="codeInput"><button class="btn" id="redeemCodeBtn">Zrealizuj</button><button class="btn" id="closeCodeModalBtn">Zamknij</button></div></div>
-<div class="modal" id="reportModal"><div class="modal-content"><h2>📢 Report</h2><input type="email" id="reportEmail" placeholder="Twój email"><select id="reportType"><option>Błąd</option><option>Problem</option></select><textarea id="reportMessage" placeholder="Opis" rows="3"></textarea><button class="btn" id="sendReportBtn">Wyślij</button><button class="btn" id="closeReportModalBtn">Zamknij</button></div></div>
-<div class="modal" id="purchaseModal"><div class="modal-content"><h2 id="purchaseTitle">Kup</h2><input type="range" id="purchaseSlider" min="1" max="10" value="1"><span id="purchaseQty">1</span><p>Koszt: <span id="purchaseCost">0</span> 🪙</p><button class="btn" id="confirmPurchaseBtn">Kup</button><button class="btn" id="cancelPurchaseBtn">Anuluj</button></div></div>
-<div class="modal" id="rankedPickModal"><div class="modal-content"><h2>Wybierz zwierzę</h2><div id="rankedPickList"></div><button class="btn" id="cancelRankedBtn">Anuluj</button></div></div>
+<!-- MODALE -->
+<div class="modal" id="dailyModal"><div class="modal-content"><h2>🎁 Codzienne</h2><div id="dailyGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;"></div><button class="btn" onclick="claimDaily()">Odbierz</button><button class="btn" onclick="document.getElementById('dailyModal').classList.remove('active')">Zamknij</button></div></div>
+<div class="modal" id="codeModal"><div class="modal-content"><h2>🎟️ Kod</h2><input type="text" id="codeInput"><button class="btn" onclick="redeemCode()">Zrealizuj</button><button class="btn" onclick="document.getElementById('codeModal').classList.remove('active')">Zamknij</button></div></div>
+<div class="modal" id="reportModal"><div class="modal-content"><h2>📢 Report</h2><input type="email" id="reportEmail" placeholder="Twój email"><select id="reportType"><option>Błąd</option><option>Problem</option></select><textarea id="reportMessage" placeholder="Opis" rows="3"></textarea><button class="btn" onclick="sendReport()">Wyślij</button><button class="btn" onclick="document.getElementById('reportModal').classList.remove('active')">Zamknij</button></div></div>
+<div class="modal" id="purchaseModal"><div class="modal-content"><h2 id="purchaseTitle">Kup</h2><input type="range" id="purchaseSlider" min="1" max="10" value="1" oninput="updatePurchaseQty(this.value)"><span id="purchaseQty">1</span><p>Koszt: <span id="purchaseCost">0</span> 🪙</p><button class="btn" id="confirmPurchaseBtn">Kup</button><button class="btn" onclick="document.getElementById('purchaseModal').classList.remove('active')">Anuluj</button></div></div>
+<div class="modal" id="rankedPickModal"><div class="modal-content"><h2>Wybierz zwierzę</h2><div id="rankedPickList"></div><button class="btn" onclick="document.getElementById('rankedPickModal').classList.remove('active')">Anuluj</button></div></div>
 
 <script>
-(function(){
-    const SUPA_URL = 'https://wjbzishechoxiafyfypr.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqYnppc2hlY2hveGlhZnlmeXByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTIwODAsImV4cCI6MjA5NDAyODA4MH0.x8aOXVkB0WLDwmuLDBAhUyn1laTF8gxSi4hMFc2u_sg';
-    let supabaseClient = null;
-    try { supabaseClient = window.supabase?.createClient?.(SUPA_URL, SUPA_KEY) || null; } catch(e) {}
+// ============================================================
+//  ZMIENNE GLOBALNE
+// ============================================================
+let coins = 100, gems = 5, diamonds = 0;
+let inv = [];
+let collected = new Set();
+let dailyStreak = 1, dailyLastDate = null, dailyClaimed = false;
+let usedCodes = {}, musicVol = 70, sfxVol = 80;
+let packsOpened = 0;
+let isOpening = false;
 
-    let coins = 100, gems = 5, diamonds = 0;
-    let inv = [];
-    let collected = new Set();
-    let dailyStreak = 1, dailyLastDate = null, dailyClaimed = false;
-    let usedCodes = {}, musicVol = 70, sfxVol = 80, currentUser = null;
-    let usedReport = false, usedExchange = false, packsOpened = 0;
-    let shownBadgeAlerts = new Set();
+let islandTiles = [
+    { id:0, name:"🌲 Las", unlocked:true, animalAssigned:null, lastEarn:0, purchasable:false },
+    { id:1, name:"🏔️ Góry", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
+    { id:2, name:"🌊 Jezioro", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
+    { id:3, name:"🔥 Wulkan", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
+    { id:4, name:"❄️ Lodowa", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
+    { id:5, name:"🏜️ Pustynia", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:true, price:100 },
+    { id:6, name:"🌴 Dżungla", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
+    { id:7, name:"🌋 Pustkowie", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false }
+];
+let randomTradeOffer = null, randomTradeExpiry = 0;
 
-    let islandTiles = [
-        { id:0, name:"🌲 Las", unlocked:true, animalAssigned:null, lastEarn:0, purchasable:false },
-        { id:1, name:"🏔️ Góry", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-        { id:2, name:"🌊 Jezioro", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-        { id:3, name:"🔥 Wulkan", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-        { id:4, name:"❄️ Lodowa", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-        { id:5, name:"🏜️ Pustynia", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:true, price:100 },
-        { id:6, name:"🌴 Dżungla", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false },
-        { id:7, name:"🌋 Pustkowie", unlocked:false, animalAssigned:null, lastEarn:0, purchasable:false }
-    ];
-    let randomTradeOffer = null, randomTradeExpiry = 0;
+// ============================================================
+//  ANIMALS (200 starych + 324 nowe = 524)
+// ============================================================
+const oldAnimals = {
+    "Rzadki": [{n:"Lew",e:"🦁"},{n:"Wilk",e:"🐺"},{n:"Jeleń",e:"🦌"},{n:"Żółw",e:"🐢"},{n:"Żaba",e:"🐸"},{n:"Kura",e:"🐔"},{n:"Jeż",e:"🦔"},{n:"Koala",e:"🐨"},{n:"Mysza",e:"🐁"},{n:"Śnieżna",e:"🦭"},{n:"Dziki",e:"🐗"},{n:"Kurczaczek",e:"🐥"},{n:"Chrząszcz",e:"🪲"}],
+    "Bardzo Rzadki": [{n:"Lis",e:"🦊"},{n:"Sowa",e:"🦉"},{n:"Papuga",e:"🦜"},{n:"Pingwin",e:"🐧"},{n:"Baran",e:"🐏"},{n:"Wiewiórka",e:"🐿️"},{n:"Biedronka",e:"🐞"},{n:"Ślimak",e:"🐌"},{n:"Szop",e:"🦝"},{n:"Jaszczurka",e:"🦎"},{n:"Mrówka",e:"🐜"},{n:"Świnia",e:"🐷"},{n:"Komar",e:"🪰"},{n:"Osioł",e:"🫏"},{n:"Robak",e:"🪱"},{n:"Krowa",e:"🐮"},{n:"Hipopotan",e:"🦛"},{n:"Kameleon",e:"🦎"},{n:"Cricket",e:"🦗"},{n:"Tropikalna Ryba",e:"🐠"},{n:"Rozdymka",e:"🐡"},{n:"Byk",e:"🦬"},{n:"Bóbr",e:"🦫"},{n:"Indyk",e:"🦃"},{n:"Ćma",e:"🐛"}],
+    "Epicki": [{n:"Tygrys",e:"🐯"},{n:"Orzeł",e:"🦅"},{n:"Wąż",e:"🐍"},{n:"Ryba",e:"🐟"},{n:"Krab",e:"🦀"},{n:"Świnka morska",e:"🐹"},{n:"Motyl",e:"🦋"},{n:"Miś",e:"🐻"},{n:"Flamingo",e:"🦩"},{n:"Kraken",e:"🦑"},{n:"Królik",e:"🐇"},{n:"Shadow Bat",e:"🦇"},{n:"Pająk",e:"🕷️"},{n:"Kogut",e:"🐓"},{n:"Słoń",e:"🐘"},{n:"Pszczoła",e:"🐝"},{n:"Gorilla",e:"🦍"},{n:"Lama",e:"🦙"},{n:"Zebra",e:"🦓"},{n:"Łoś",e:"🫎"},{n:"Kangur",e:"🦘"},{n:"Homar",e:"🦞"},{n:"DoDo",e:"🦤"}],
+    "Mityczny": [{n:"Rekin",e:"🦈"},{n:"Panda",e:"🐼"},{n:"Kot",e:"🐈"},{n:"Pies",e:"🐕"},{n:"Krewetka",e:"🦐"},{n:"Delfin",e:"🐬"},{n:"T-Rex",e:"🦖"},{n:"Łabędź",e:"🦢"},{n:"Kozioł",e:"🐐"},{n:"Gołąb",e:"🕊️"},{n:"Małpa",e:"🐒"},{n:"Peacock",e:"🦚"},{n:"Skorpion",e:"🦂"}],
+    "Legendarny": [{n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"},{n:"Szynszyla",e:"🐿️"},{n:"Salamandra Ognista",e:"🦎"},{n:"Kot Void",e:"🐈‍⬛"},{n:"Orangutan",e:"🦧"},{n:"Zimowy Niedźwiedź",e:"🐻‍❄️"},{n:"Żyrafa",e:"🦒"},{n:"Mustang",e:"🐎"}],
+    "Chromatyczny": [{n:"Krokodyl",e:"🐊"},{n:"Smok Gór",e:"🐉"},{n:"Phoenix",e:"🐦‍🔥"},{n:"Kosmiczna Ośmiornica",e:"🐙"},{n:"Crystal Hydra",e:"💎"},{n:"Unicorn",e:"🦄"},{n:"Jellyfish",e:"🪼"},{n:"Crystal Lis",e:"🦊✨"}]
+};
+const przedrostki = ["Płomienny","Mroźny","Burzowy","Kamienny","Szmaragdowy","Rubinowy","Złoty","Srebrny","Miedziany","Żelazny","Drewniany","Szklisty","Perłowy","Opalowy","Kryształowy","Mgławicowy","Gwiezdny","Księżycowy","Słoneczny","Ciemny","Jasny","Leśny","Górski","Rzeczny","Morski","Piaskowy","Wulkaniczny","Lodowy","Wietrzny","Deszczowy","Gromowy","Piorunowy","Ognisty","Żarzący","Parzący","Dymny","Sadzowy","Iskrzący","Błyskawiczny","Mglisty","Rosisty","Mechowy","Paprociowy","Kwiatowy","Owocowy","Miodowy","Nektarowy","Trawiasty","Łąkowy","Polny","Bagienny","Trzęsawiskowy","Jaskiniowy","Podziemny","Nebularny"];
+const rdzenie = ["Wilk","Lis","Niedźwiedź","Orzeł","Sokół","Jastrząb","Kruk","Sowa","Wąż","Jaszczur","Krokodyl","Żółw","Rekin","Delfin","Wieloryb","Ośmiornica","Krab","Skorpion","Pająk","Mrówka","Żuk","Motyl","Pszczoła","Mucha","Komar","Świerszcz","Konik","Żaba","Ropucha","Salamandra","Smok","Feniks","Gryf","Jednorożec","Bazyliszek","Hydra","Chimera","Golem","Troll","Duch","Upior","Widmo","Cień","Mgła","Burza","Huragan","Cyklon","Monsun","Wir","Kryształ","Diament","Szafir","Ametyst","Topaz","Onyks","Jadeit","Koral","Perła","Bursztyn"];
+const ANIMALS = JSON.parse(JSON.stringify(oldAnimals));
+for(let i=0; i<324; i++){
+    let pre = przedrostki[i % przedrostki.length];
+    let rdzen = rdzenie[i % rdzenie.length];
+    let name = pre + " " + rdzen;
+    let rar = ["Rzadki","Bardzo Rzadki","Epicki","Mityczny","Legendarny","Chromatyczny"][Math.floor(Math.random()*6)];
+    let emojiList = ["🐺","🦊","🐻","🦅","🦉","🐍","🦎","🐊","🐢","🦈","🐬","🐋","🐙","🦀","🦂","🕷️","🐜","🪲","🦋","🐝","🦟","🦗","🐸","🦎","🐉","🐦‍🔥","🦄","👹","🗿","👻","🌫️","⚡","💨","💎","🔮"];
+    let emoji = emojiList[i % emojiList.length];
+    if(!ANIMALS[rar]) ANIMALS[rar] = [];
+    ANIMALS[rar].push({ n: name, e: emoji });
+}
+const RARITY = { "Rzadki":{up:0.20,price:8, col:"#22c55e"}, "Bardzo Rzadki":{up:0.15,price:20, col:"#3b82f6"}, "Epicki":{up:0.10,price:55, col:"#a855f7"}, "Mityczny":{up:0.05,price:130, col:"#ef4444"}, "Legendarny":{up:0.01,price:350, col:"#eab308"}, "Chromatyczny":{up:0,price:900, col:"#ff6bff"} };
+const RORDER = Object.keys(RARITY);
 
-    // 524 zwierzęta (200 starych + 324 nowe)
-    const oldAnimals = {
-        "Rzadki": [{n:"Lew",e:"🦁"},{n:"Wilk",e:"🐺"},{n:"Jeleń",e:"🦌"},{n:"Żółw",e:"🐢"},{n:"Żaba",e:"🐸"},{n:"Kura",e:"🐔"},{n:"Jeż",e:"🦔"},{n:"Koala",e:"🐨"},{n:"Mysza",e:"🐁"},{n:"Śnieżna",e:"🦭"},{n:"Dziki",e:"🐗"},{n:"Kurczaczek",e:"🐥"},{n:"Chrząszcz",e:"🪲"}],
-        "Bardzo Rzadki": [{n:"Lis",e:"🦊"},{n:"Sowa",e:"🦉"},{n:"Papuga",e:"🦜"},{n:"Pingwin",e:"🐧"},{n:"Baran",e:"🐏"},{n:"Wiewiórka",e:"🐿️"},{n:"Biedronka",e:"🐞"},{n:"Ślimak",e:"🐌"},{n:"Szop",e:"🦝"},{n:"Jaszczurka",e:"🦎"},{n:"Mrówka",e:"🐜"},{n:"Świnia",e:"🐷"},{n:"Komar",e:"🪰"},{n:"Osioł",e:"🫏"},{n:"Robak",e:"🪱"},{n:"Krowa",e:"🐮"},{n:"Hipopotan",e:"🦛"},{n:"Kameleon",e:"🦎"},{n:"Cricket",e:"🦗"},{n:"Tropikalna Ryba",e:"🐠"},{n:"Rozdymka",e:"🐡"},{n:"Byk",e:"🦬"},{n:"Bóbr",e:"🦫"},{n:"Indyk",e:"🦃"},{n:"Ćma",e:"🐛"}],
-        "Epicki": [{n:"Tygrys",e:"🐯"},{n:"Orzeł",e:"🦅"},{n:"Wąż",e:"🐍"},{n:"Ryba",e:"🐟"},{n:"Krab",e:"🦀"},{n:"Świnka morska",e:"🐹"},{n:"Motyl",e:"🦋"},{n:"Miś",e:"🐻"},{n:"Flamingo",e:"🦩"},{n:"Kraken",e:"🦑"},{n:"Królik",e:"🐇"},{n:"Shadow Bat",e:"🦇"},{n:"Pająk",e:"🕷️"},{n:"Kogut",e:"🐓"},{n:"Słoń",e:"🐘"},{n:"Pszczoła",e:"🐝"},{n:"Gorilla",e:"🦍"},{n:"Lama",e:"🦙"},{n:"Zebra",e:"🦓"},{n:"Łoś",e:"🫎"},{n:"Kangur",e:"🦘"},{n:"Homar",e:"🦞"},{n:"DoDo",e:"🦤"}],
-        "Mityczny": [{n:"Rekin",e:"🦈"},{n:"Panda",e:"🐼"},{n:"Kot",e:"🐈"},{n:"Pies",e:"🐕"},{n:"Krewetka",e:"🦐"},{n:"Delfin",e:"🐬"},{n:"T-Rex",e:"🦖"},{n:"Łabędź",e:"🦢"},{n:"Kozioł",e:"🐐"},{n:"Gołąb",e:"🕊️"},{n:"Małpa",e:"🐒"},{n:"Peacock",e:"🦚"},{n:"Skorpion",e:"🦂"}],
-        "Legendarny": [{n:"Wieloryb",e:"🐋"},{n:"Koń",e:"🐴"},{n:"Szynszyla",e:"🐿️"},{n:"Salamandra Ognista",e:"🦎"},{n:"Kot Void",e:"🐈‍⬛"},{n:"Orangutan",e:"🦧"},{n:"Zimowy Niedźwiedź",e:"🐻‍❄️"},{n:"Żyrafa",e:"🦒"},{n:"Mustang",e:"🐎"}],
-        "Chromatyczny": [{n:"Krokodyl",e:"🐊"},{n:"Smok Gór",e:"🐉"},{n:"Phoenix",e:"🐦‍🔥"},{n:"Kosmiczna Ośmiornica",e:"🐙"},{n:"Crystal Hydra",e:"💎"},{n:"Unicorn",e:"🦄"},{n:"Jellyfish",e:"🪼"},{n:"Crystal Lis",e:"🦊✨"}]
-    };
-    const noweNazwy = [];
-    const przedrostki = ["Płomienny","Mroźny","Burzowy","Kamienny","Szmaragdowy","Rubinowy","Złoty","Srebrny","Miedziany","Żelazny","Drewniany","Szklisty","Perłowy","Opalowy","Kryształowy","Mgławicowy","Gwiezdny","Księżycowy","Słoneczny","Ciemny","Jasny","Leśny","Górski","Rzeczny","Morski","Piaskowy","Wulkaniczny","Lodowy","Wietrzny","Deszczowy","Gromowy","Piorunowy","Ognisty","Żarzący","Parzący","Dymny","Sadzowy","Iskrzący","Błyskawiczny","Mglisty","Rosisty","Mechowy","Paprociowy","Kwiatowy","Owocowy","Miodowy","Nektarowy","Trawiasty","Łąkowy","Polny","Bagienny","Trzęsawiskowy","Jaskiniowy","Podziemny","Nebularny"];
-    const rdzenie = ["Wilk","Lis","Niedźwiedź","Orzeł","Sokół","Jastrząb","Kruk","Sowa","Wąż","Jaszczur","Krokodyl","Żółw","Rekin","Delfin","Wieloryb","Ośmiornica","Krab","Skorpion","Pająk","Mrówka","Żuk","Motyl","Pszczoła","Mucha","Komar","Świerszcz","Konik","Żaba","Ropucha","Salamandra","Smok","Feniks","Gryf","Jednorożec","Bazyliszek","Hydra","Chimera","Golem","Troll","Duch","Upior","Widmo","Cień","Mgła","Burza","Huragan","Cyklon","Monsun","Wir","Kryształ","Diament","Szafir","Ametyst","Topaz","Onyks","Jadeit","Koral","Perła","Bursztyn"];
-    for(let i=0; i<324; i++){
-        let pre = przedrostki[i % przedrostki.length];
-        let rdzen = rdzenie[i % rdzenie.length];
-        let name = pre + " " + rdzen;
-        let rar = ["Rzadki","Bardzo Rzadki","Epicki","Mityczny","Legendarny","Chromatyczny"][Math.floor(Math.random()*6)];
-        let emojiList = ["🐺","🦊","🐻","🦅","🦉","🐍","🦎","🐊","🐢","🦈","🐬","🐋","🐙","🦀","🦂","🕷️","🐜","🪲","🦋","🐝","🦟","🦗","🐸","🦎","🐉","🐦‍🔥","🦄","👹","🗿","👻","🌫️","⚡","💨","💎","🔮"];
-        let emoji = emojiList[i % emojiList.length];
-        noweNazwy.push({ n: name, e: emoji, rarity: rar });
-    }
-    const ANIMALS = JSON.parse(JSON.stringify(oldAnimals));
-    for(let anim of noweNazwy){
-        if(!ANIMALS[anim.rarity]) ANIMALS[anim.rarity] = [];
-        ANIMALS[anim.rarity].push({ n: anim.n, e: anim.e });
-    }
-    const RARITY = { "Rzadki":{up:0.20,price:8, col:"#22c55e"}, "Bardzo Rzadki":{up:0.15,price:20, col:"#3b82f6"}, "Epicki":{up:0.10,price:55, col:"#a855f7"}, "Mityczny":{up:0.05,price:130, col:"#ef4444"}, "Legendarny":{up:0.01,price:350, col:"#eab308"}, "Chromatyczny":{up:0,price:900, col:"#ff6bff"} };
-    const RORDER = Object.keys(RARITY);
-
-    function getEmoji(name){ for(const arr of Object.values(ANIMALS)){ const f=arr.find(a=>a.n===name); if(f) return f.e; } return '🐾'; }
-    function getRarityClass(r){ const map={Rzadki:"rzadki","Bardzo Rzadki":"bardzo",Epicki:"epicki",Mityczny:"mityczny",Legendarny:"legendarny",Chromatyczny:"chromatyczny",Hyper:"hyper",Golden:"golden",Rainbow:"rainbow",Summer:"summer"}; return map[r]||r; }
-    function getAnimalPrice(item){
-        let base=0;
-        if(item.r==='Hyper') base=2*(RARITY[item.baseRarity]?.price||0);
-        else if(item.r==='Golden') base=5*(RARITY[item.baseRarity]?.price||0);
-        else if(item.r==='Rainbow') base=25*(RARITY[item.baseRarity]?.price||0);
-        else if(item.r==='Summer') base=10*(RARITY[item.baseRarity]?.price||0);
-        else base=RARITY[item.r]?.price||0;
-        return base*(item.mult||1);
-    }
-    function toast(msg,bg='#222'){ let t=document.createElement('div'); t.className='toast'; t.textContent=msg; t.style.background=bg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
-    function updateUI(){ document.getElementById('coinsDisplay').textContent=Math.floor(coins); document.getElementById('gemsDisplay').textContent=gems; document.getElementById('diamondsDisplay').textContent=diamonds; }
-    function saveLocal(){ localStorage.setItem('zooventures_data',JSON.stringify({coins,gems,diamonds,inv,collected:[...collected],dailyStreak,dailyLastDate,dailyClaimed,usedCodes,musicVol,sfxVol,usedReport,usedExchange,packsOpened,shownBadgeAlerts:[...shownBadgeAlerts],islandTiles,randomTradeOffer,randomTradeExpiry})); }
-    function loadLocal(){
-        let d=JSON.parse(localStorage.getItem('zooventures_data')||'{}');
-        if(!d||Object.keys(d).length===0){ const old=localStorage.getItem('zooventures_final'); if(old) d=JSON.parse(old); }
+// ============================================================
+//  FUNKCJE POMOCNICZE
+// ============================================================
+function getEmoji(name){ for(let arr of Object.values(ANIMALS)){ let f=arr.find(a=>a.n===name); if(f) return f.e; } return '🐾'; }
+function getRarityClass(r){ let map={Rzadki:"rzadki","Bardzo Rzadki":"bardzo",Epicki:"epicki",Mityczny:"mityczny",Legendarny:"legendarny",Chromatyczny:"chromatyczny",Hyper:"hyper",Golden:"golden",Rainbow:"rainbow",Summer:"summer"}; return map[r]||r; }
+function getAnimalPrice(item){
+    let base=0;
+    if(item.r==='Hyper') base=2*(RARITY[item.baseRarity]?.price||0);
+    else if(item.r==='Golden') base=5*(RARITY[item.baseRarity]?.price||0);
+    else if(item.r==='Rainbow') base=25*(RARITY[item.baseRarity]?.price||0);
+    else if(item.r==='Summer') base=10*(RARITY[item.baseRarity]?.price||0);
+    else base=RARITY[item.r]?.price||0;
+    return base*(item.mult||1);
+}
+function toast(msg,bg='#222'){ let t=document.createElement('div'); t.className='toast'; t.textContent=msg; t.style.background=bg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
+function updateUI(){ document.getElementById('coinsDisplay').textContent=Math.floor(coins); document.getElementById('gemsDisplay').textContent=gems; document.getElementById('diamondsDisplay').textContent=diamonds; }
+function saveLocal(){ localStorage.setItem('zooventures_data',JSON.stringify({coins,gems,diamonds,inv,collected:[...collected],dailyStreak,dailyLastDate,dailyClaimed,usedCodes,musicVol,sfxVol,packsOpened,islandTiles,randomTradeOffer,randomTradeExpiry})); }
+function loadLocal(){
+    let d=JSON.parse(localStorage.getItem('zooventures_data')||'{}');
+    if(d && Object.keys(d).length>0){
         coins=d.coins??100; gems=d.gems??5; diamonds=d.diamonds??0; inv=d.inv??[]; collected=new Set(d.collected??[]);
-        inv = inv.filter(i => i.r !== 'Owoc');
         dailyStreak=d.dailyStreak??1; dailyLastDate=d.dailyLastDate??null; dailyClaimed=d.dailyClaimed??false;
-        usedCodes=d.usedCodes??{}; musicVol=d.musicVol??70; sfxVol=d.sfxVol??80; usedReport=d.usedReport??false; usedExchange=d.usedExchange??false; packsOpened=d.packsOpened??0;
-        shownBadgeAlerts=new Set(d.shownBadgeAlerts??[]);
+        usedCodes=d.usedCodes??{}; musicVol=d.musicVol??70; sfxVol=d.sfxVol??80; packsOpened=d.packsOpened??0;
         if(d.islandTiles) islandTiles=d.islandTiles;
         randomTradeOffer=d.randomTradeOffer??null; randomTradeExpiry=d.randomTradeExpiry??0;
+        inv = inv.filter(i => i.r !== 'Owoc'); // usunięcie owoców
     }
-    loadLocal();
-    async function saveCloud(){ if(!supabaseClient||!currentUser){ toast('Zaloguj się'); return; } await supabaseClient.from('profiles').upsert({ id:currentUser.id, coins:Math.floor(coins), gems, diamenty:diamonds, daily_streak:dailyStreak, daily_last_date:dailyLastDate, daily_claimed_today:dailyClaimed, used_codes:usedCodes, collected_animals:[...collected], packs_opened:packsOpened }); await supabaseClient.from('user_inventory').delete().eq('user_id',currentUser.id); const rows=inv.map(i=>({ user_id:currentUser.id, animal_name:i.n, rarity:i.r, quantity:i.q, base_rarity:i.baseRarity||null })); if(rows.length) await supabaseClient.from('user_inventory').insert(rows); saveLocal(); toast('Zapisano w chmurze'); }
-    async function loadCloud(){ if(!supabaseClient||!currentUser){ toast('Zaloguj się'); return; } const {data:p}=await supabaseClient.from('profiles').select('*').eq('id',currentUser.id).single(); if(p){ coins=Math.floor(p.coins); gems=p.gems; diamonds=p.diamenty??0; dailyStreak=p.daily_streak; dailyLastDate=p.daily_last_date; dailyClaimed=p.daily_claimed_today; usedCodes=p.used_codes||{}; collected=new Set(p.collected_animals||[]); packsOpened=p.packs_opened||0; } else { await supabaseClient.from('profiles').insert({ id:currentUser.id }); } const {data:invData}=await supabaseClient.from('user_inventory').select('*').eq('user_id',currentUser.id); inv=invData.map(i=>({ n:i.animal_name, e:getEmoji(i.animal_name), r:i.rarity, q:i.quantity, baseRarity:i.base_rarity })); inv = inv.filter(i => i.r !== 'Owoc'); saveLocal(); updateUI(); refreshViews(); toast('Wczytano'); }
-    
-    function renderInventory(){
-        const g=document.getElementById('inventoryGrid'); if(!g) return;
-        g.innerHTML='';
-        inv.forEach(i=>{
-            let d=document.createElement('div'); d.className='card';
-            const isPack = (i.r === 'Specjalny' || i.n.includes('Paczka') || i.n.includes('Pudło')) && !i.n.includes('Zwierzak');
-            if(isPack){
-                d.innerHTML=`<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-specjalny">Paczka</div><div>x${i.q}</div><button class="btn open-pack-inv">Otwórz</button>`;
-                const btn = d.querySelector('.open-pack-inv');
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    let packType = null;
-                    if(i.n === 'Podstawowa Paczka') packType = 'basic';
-                    else if(i.n === 'Plażowa Paczka') packType = 'beach';
-                    else if(i.n === 'Hyper Paczka') packType = 'hyper';
-                    else if(i.n === 'Gold Paczka') packType = 'gold';
-                    else if(i.n === 'Wiosenne Pudło') packType = 'spring'; // DODANE
-                    if(packType){
-                        i.q--;
-                        if(i.q <= 0) inv = inv.filter(x => !(x.n === i.n && x.r === i.r));
-                        saveLocal();
-                        openPackAnimation(packType);
-                        refreshViews();
-                    } else toast('Nieznana paczka');
-                });
-            } else {
-                let price=getAnimalPrice(i);
-                d.innerHTML=`<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-${getRarityClass(i.r)}">${i.r}</div><div>x${i.q}</div><div>🪙${price}</div><button class="btn sell-btn" data-name="${i.n}" data-rarity="${i.r}">Sprzedaj 1</button>`;
-                d.querySelector('.sell-btn').addEventListener('click',()=>sellOne(i.n,i.r));
-            }
-            g.appendChild(d);
+}
+loadLocal();
+
+// ============================================================
+//  NAWIGACJA
+// ============================================================
+function switchView(view){
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(view + 'View').classList.add('active');
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`.nav-tab[onclick*="${view}"]`)?.classList.add('active');
+    refreshAll();
+}
+
+// ============================================================
+//  SKLEP
+// ============================================================
+function renderShop(){
+    document.getElementById('shopGrid').innerHTML = `
+        <div class="shop-card"><div class="pack-icon">📦</div><h3>Podstawowa</h3><p>🪙10</p><button class="btn" onclick="buyPack('basic')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('basic')">Do Inv</button></div>
+        <div class="shop-card"><div class="pack-icon">🌸</div><h3>Wiosenne Pudło</h3><p>🪙250</p><button class="btn" onclick="buyPack('spring')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('spring')">Do Inv</button></div>
+        <div class="shop-card"><div class="pack-icon">🏖️</div><h3>Plażowa</h3><p>🪙150</p><button class="btn" onclick="buyPack('beach')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('beach')">Do Inv</button></div>
+        <div class="shop-card"><div class="pack-icon">⚡</div><h3>Hyper</h3><p>🪙1000</p><button class="btn" onclick="buyPack('hyper')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('hyper')">Do Inv</button></div>
+        <div class="shop-card"><div class="pack-icon">✨</div><h3>Gold</h3><p>🪙5000</p><button class="btn" onclick="buyPack('gold')">Kup i otwórz</button><button class="btn" onclick="buyToInventory('gold')">Do Inv</button></div>
+    `;
+}
+
+function buyPack(pack){
+    let priceMap={basic:10, spring:250, beach:150, hyper:1000, gold:5000};
+    if(coins < priceMap[pack]){ toast('Za mało monet'); return; }
+    coins -= priceMap[pack];
+    updateUI(); saveLocal();
+    openPackAnimation(pack);
+    refreshAll();
+}
+
+function buyToInventory(pack){
+    let priceMap={basic:10, spring:250, beach:150, hyper:1000, gold:5000};
+    if(coins < priceMap[pack]){ toast('Za mało monet'); return; }
+    coins -= priceMap[pack];
+    updateUI(); saveLocal();
+    let names={basic:"Podstawowa Paczka", spring:"Wiosenne Pudło", beach:"Plażowa Paczka", hyper:"Hyper Paczka", gold:"Gold Paczka"};
+    let emojis={basic:"📦", spring:"🌸", beach:"🏖️", hyper:"⚡", gold:"✨"};
+    let exist = inv.find(i => i.n === names[pack]);
+    if(exist) exist.q++;
+    else inv.push({ n:names[pack], e:emojis[pack], r:'Specjalny', q:1 });
+    refreshAll(); toast(`Dodano ${names[pack]} do ekwipunku`);
+}
+
+// ============================================================
+//  OTWIERANIE PACZKI (ANIMACJA)
+// ============================================================
+function openPackAnimation(packType){
+    if(isOpening){ toast('Poczekaj na otwarcie poprzedniej paczki'); return; }
+    isOpening = true;
+    let curRar = "Rzadki";
+    let clicksLeft = 5;
+    let maxClicks = 5;
+    let boost = (packType === 'spring') ? 3 : 1;
+
+    let ov = document.createElement('div');
+    ov.className = 'opening-overlay';
+    ov.innerHTML = `
+        <div class="opening-box" id="openingBox">❓</div>
+        <div class="rarity-text" id="rarityLabel" style="color:#fff; background:${RARITY[curRar].col}; padding:5px 15px; border-radius:10px;">${curRar}</div>
+        <div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div>
+        <p style="color:#aaa;">Kliknij aby ulepszyć</p>
+        <p style="color:#f0c060;">SPACJA = otwórz teraz</p>
+    `;
+    let box = ov.querySelector('#openingBox');
+    let rarityLabel = ov.querySelector('#rarityLabel');
+    let clicksSpan = ov.querySelector('#clicksCount');
+    let finished = false;
+
+    function upgrade(){
+        if(finished || clicksLeft <= 0 || curRar === "Chromatyczny"){ finish(); return; }
+        clicksLeft--;
+        if(box) box.classList.add('shake');
+        setTimeout(() => box.classList.remove('shake'), 500);
+        let eff = RARITY[curRar].up * boost;
+        if(Math.random() < eff){
+            let idx = RORDER.indexOf(curRar);
+            if(idx < RORDER.length - 1) curRar = RORDER[idx + 1];
+        }
+        rarityLabel.textContent = curRar;
+        rarityLabel.style.backgroundColor = RARITY[curRar].col;
+        clicksSpan.textContent = clicksLeft;
+        if(clicksLeft <= 0 || curRar === "Chromatyczny") setTimeout(finish, 600);
+    }
+
+    function finish(){
+        if(finished) return;
+        finished = true;
+        ov.remove();
+        let count = curRar === "Chromatyczny" ? 5 : (curRar === "Legendarny" ? 4 : (curRar === "Mityczny" ? 3 : 2));
+        let cards = [];
+        for(let i=0; i<count; i++){
+            let animalList = ANIMALS[curRar] || ANIMALS["Rzadki"];
+            let animal = animalList[Math.floor(Math.random() * animalList.length)];
+            let entry = inv.find(x => x.n === animal.n && x.r === curRar);
+            if(entry) entry.q++;
+            else inv.push({ n:animal.n, e:animal.e, r:curRar, q:1 });
+            collected.add(animal.n);
+            cards.push({ n:animal.n, e:animal.e, rarity:curRar });
+        }
+        packsOpened++;
+        saveLocal();
+        let reveal = document.createElement('div');
+        reveal.className = 'reveal-area';
+        cards.forEach((c, idx) => {
+            setTimeout(() => {
+                let cardDiv = document.createElement('div');
+                cardDiv.className = 'reveal-card';
+                cardDiv.innerHTML = `<div style="font-size:2.5rem;">${c.e}</div><div style="font-weight:700;">${c.n}</div><div class="badge badge-${getRarityClass(c.rarity)}">${c.rarity}</div>`;
+                reveal.appendChild(cardDiv);
+            }, idx * 150);
         });
+        reveal.addEventListener('click', () => reveal.remove());
+        document.body.appendChild(reveal);
+        updateUI();
+        isOpening = false;
+        refreshAll();
     }
-    let isOpening = false;
-    function openPackAnimation(packType){
-        if(isOpening){ toast('Poczekaj na otwarcie poprzedniej paczki'); return; }
-        isOpening = true;
-        let curRar="Rzadki";
-        let clicksLeft=5;
-        let maxClicks=5;
-        // Dla paczki wiosennej (spring) zwiększamy szansę na upgrade (x3)
-        let luckMulti = (packType === 'spring') ? 3 : 1;
-        let ov=document.createElement('div'); ov.className='opening-overlay';
-        ov.innerHTML=`<div class="opening-box" id="openingBox">❓</div><div class="rarity-text" id="rarityLabel" style="color:#fff; background:${RARITY[curRar].col}; padding:5px 15px; border-radius:10px;">${curRar}</div><div class="clicks-left">Kliknięcia: <span id="clicksCount">${clicksLeft}</span> / ${maxClicks}</div><p style="color:#aaa;">Kliknij aby ulepszyć</p><p style="color:#f0c060;">SPACJA = otwórz teraz</p>`;
-        let box=ov.querySelector('#openingBox');
-        let rarityLabel=ov.querySelector('#rarityLabel');
-        let clicksSpan=ov.querySelector('#clicksCount');
-        let finished = false;
-        function upgrade(){
-            if(finished) return;
-            if(clicksLeft<=0 || curRar==="Chromatyczny") { finish(); return; }
-            clicksLeft--;
-            if(box) box.classList.add('shake'); setTimeout(()=>box.classList.remove('shake'),500);
-            let eff = RARITY[curRar].up * luckMulti;
-            if(Math.random()<eff){
-                let idx=RORDER.indexOf(curRar);
-                if(idx<RORDER.length-1) curRar=RORDER[idx+1];
-            }
-            rarityLabel.textContent=curRar;
-            rarityLabel.style.backgroundColor=RARITY[curRar].col;
-            clicksSpan.textContent=clicksLeft;
-            if(clicksLeft<=0 || curRar==="Chromatyczny") setTimeout(finish,600);
-        }
-        function finish(){
-            if(finished) return;
-            finished = true;
-            ov.remove();
-            let count = curRar==="Chromatyczny"?5:(curRar==="Legendarny"?4:(curRar==="Mityczny"?3:2));
-            let cards=[];
-            for(let i=0;i<count;i++){
-                let animalList=ANIMALS[curRar];
-                if(!animalList || animalList.length===0) animalList=ANIMALS["Rzadki"];
-                let animal=animalList[Math.floor(Math.random()*animalList.length)];
-                let entry=inv.find(x=>x.n===animal.n&&x.r===curRar);
-                if(entry) entry.q++;
-                else inv.push({ n:animal.n, e:animal.e, r:curRar, q:1 });
-                collected.add(animal.n);
-                cards.push({ n:animal.n, e:animal.e, rarity:curRar });
-            }
-            packsOpened++;
-            saveLocal();
-            let reveal=document.createElement('div'); reveal.className='reveal-area';
-            cards.forEach((c,idx)=>{
-                setTimeout(()=>{
-                    let cardDiv=document.createElement('div'); cardDiv.className='reveal-card';
-                    cardDiv.innerHTML=`<div style="font-size:2.5rem;">${c.e}</div><div style="font-weight:700;">${c.n}</div><div class="badge badge-${getRarityClass(c.rarity)}">${c.rarity}</div>`;
-                    reveal.appendChild(cardDiv);
-                }, idx*150);
-            });
-            reveal.addEventListener('click',()=>reveal.remove());
-            document.body.appendChild(reveal);
-            updateUI();
-            isOpening = false;
-            refreshViews();
-        }
-        function onKey(e){ if(e.code==='Space'){ e.preventDefault(); if(!finished) finish(); } }
-        ov.addEventListener('click', upgrade);
-        document.addEventListener('keydown', onKey);
-        ov._keyHandler=onKey;
-        ov.addEventListener('remove',()=>document.removeEventListener('keydown',onKey));
-        document.body.appendChild(ov);
-    }
-    
-    function renderCollection(){ const g=document.getElementById('collectionGrid'); if(!g) return; g.innerHTML=''; let total=0, owned=0; for(let [rar,animals] of Object.entries(ANIMALS)){ animals.forEach(a=>{ total++; let has=collected.has(a.n); if(has) owned++; let div=document.createElement('div'); div.className=`card collection-card ${has?'owned':''}`; div.innerHTML=`<div class="emoji">${a.e}</div><div class="name">${a.n}</div><div class="badge badge-${getRarityClass(rar)}">${rar}</div>`; g.appendChild(div); }); } document.getElementById('collectionCount').innerText=`${owned}/${total}`; }
-    function renderSell(){ const c=document.getElementById('sellContainer'); if(!c) return; c.innerHTML=''; const sellable=inv.filter(i=>i.r!=='Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło')); sellable.forEach(i=>{ let p=getAnimalPrice(i); let d=document.createElement('div'); d.style.cssText='display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #2a2a40;'; d.innerHTML=`<span>${i.e} ${i.n} [${i.r}] x${i.q}</span><span>🪙${p}/szt</span><span><button class="btn sell-one">1</button><button class="btn sell-all">Wszystkie</button></span>`; d.querySelector('.sell-one').addEventListener('click',()=>sellOne(i.n,i.r)); d.querySelector('.sell-all').addEventListener('click',()=>sellAll(i.n,i.r)); c.appendChild(d); }); }
-    function renderTrade(){ document.getElementById('tradeGemsCount').innerText=gems; const c=document.getElementById('tradeCardsContainer'); if(!c) return; c.innerHTML=''; const tradable=inv.filter(i=>i.r!=='Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło')); tradable.forEach(i=>{ let d=document.createElement('div'); d.style.cssText='background:var(--panel);border-radius:12px;padding:10px;margin:5px 0;display:flex;justify-content:space-between;'; d.innerHTML=`<span>${i.e} ${i.n} (${i.r}) x${i.q}</span><div><input type="number" class="trade-qty" min="0" max="${i.q}" value="0" style="width:60px;"><button class="btn send-trade">📤</button></div>`; d.querySelector('.send-trade').addEventListener('click',()=>{ let amt=parseInt(d.querySelector('.trade-qty').value); let email=document.getElementById('tradeEmail').value; if(!email||amt<1||amt>i.q) return toast('Błąd'); i.q-=amt; if(i.q<=0) inv=inv.filter(x=>!(x.n===i.n&&x.r===i.r)); saveLocal(); refreshViews(); toast(`Wysłano ${amt}x ${i.n} do ${email}`); }); c.appendChild(d); }); }
-    function sellOne(name,rarity){ let idx=inv.findIndex(i=>i.n===name&&i.r===rarity); if(idx===-1) return; let price=getAnimalPrice(inv[idx]); inv[idx].q--; if(inv[idx].q<=0) inv.splice(idx,1); coins+=price; updateUI(); saveLocal(); refreshViews(); toast(`Sprzedano ${name} za ${price}🪙`); }
-    function sellAll(name,rarity){ let idx=inv.findIndex(i=>i.n===name&&i.r===rarity); if(idx===-1) return; let price=getAnimalPrice(inv[idx]); let total=price*inv[idx].q; coins+=total; inv.splice(idx,1); updateUI(); saveLocal(); refreshViews(); toast(`Sprzedano wszystkie za ${total}🪙`); }
-    function exchangeGems(amt){ if(gems>=amt){ gems-=amt; coins+=amt*80; updateUI(); saveLocal(); toast(`Wymieniono ${amt}💎→${amt*80}🪙`); usedExchange=true; } else toast('Za mało gemów'); }
-    
-    function renderGoldMachine(){ let c=document.getElementById('goldMachineContainer'); if(!c) return; c.innerHTML=''; let groups={}; inv.forEach(i=>{ if(i.r!=='Golden'&&i.r!=='Rainbow'&&i.r!=='Hyper'&&i.r!=='Summer'&&!i.n.includes('Paczka')&&!i.n.includes('Pudło')){ let key=i.n+'|'+i.r; if(!groups[key]) groups[key]={name:i.n,rarity:i.r,count:0,emoji:i.e}; groups[key].count+=i.q; } }); let valid=Object.values(groups).filter(g=>g.count>=10); if(valid.length===0){ c.innerHTML='<p>Brak 10 takich samych</p>'; return; } valid.forEach(g=>{ let btn=document.createElement('button'); btn.className='btn'; btn.textContent=`${g.emoji} ${g.name} (${g.rarity}) x${g.count} → Złoty`; btn.onclick=()=>{ let toRemove=10; for(let i=inv.length-1;i>=0&&toRemove>0;i--){ if(inv[i].n===g.name&&inv[i].r===g.rarity){ let rem=Math.min(inv[i].q,toRemove); inv[i].q-=rem; toRemove-=rem; if(inv[i].q<=0) inv.splice(i,1); } } let golden={ n:g.name, e:g.emoji, r:'Golden', q:1, baseRarity:g.rarity }; let exist=inv.find(i=>i.n===g.name&&i.r==='Golden'); if(exist) exist.q++; else inv.push(golden); saveLocal(); refreshViews(); updateUI(); toast(`Stworzono Złotego ${g.name}`); }; c.appendChild(btn); }); }
-    function renderRainbowMachine(){ let c=document.getElementById('rainbowMachineContainer'); if(!c) return; c.innerHTML=''; let groups={}; inv.forEach(i=>{ if(i.r==='Golden'){ if(!groups[i.n]) groups[i.n]={name:i.n,count:0,emoji:i.e,baseRarity:i.baseRarity}; groups[i.n].count+=i.q; } }); let valid=Object.values(groups).filter(g=>g.count>=5); if(valid.length===0){ c.innerHTML='<p>Brak 5 Złotych</p>'; return; } valid.forEach(g=>{ let btn=document.createElement('button'); btn.className='btn'; btn.textContent=`${g.emoji} ${g.name} x${g.count} → Tęczowy`; btn.onclick=()=>{ let toRemove=5; for(let i=inv.length-1;i>=0&&toRemove>0;i--){ if(inv[i].n===g.name&&inv[i].r==='Golden'){ let rem=Math.min(inv[i].q,toRemove); inv[i].q-=rem; toRemove-=rem; if(inv[i].q<=0) inv.splice(i,1); } } let rainbow={ n:g.name, e:g.emoji, r:'Rainbow', q:1, baseRarity:g.baseRarity }; let exist=inv.find(i=>i.n===g.name&&i.r==='Rainbow'); if(exist) exist.q++; else inv.push(rainbow); saveLocal(); refreshViews(); updateUI(); toast(`Stworzono Tęczowego ${g.name}`); }; c.appendChild(btn); }); }
-    function renderDiamondMachine(){ let c=document.getElementById('diamondMachineContainer'); if(!c) return; c.innerHTML=''; let groups={}; inv.forEach(i=>{ if(i.r==='Rainbow'){ if(!groups[i.n]) groups[i.n]={name:i.n,count:0,emoji:i.e}; groups[i.n].count+=i.q; } }); let valid=Object.values(groups).filter(g=>g.count>=5); if(valid.length===0){ c.innerHTML='<p>Brak 5 Tęczowych</p>'; return; } valid.forEach(g=>{ let btn=document.createElement('button'); btn.className='btn'; btn.textContent=`${g.emoji} ${g.name} x${g.count} → 1 Diament`; btn.onclick=()=>{ let toRemove=5; for(let i=inv.length-1;i>=0&&toRemove>0;i--){ if(inv[i].n===g.name&&inv[i].r==='Rainbow'){ let rem=Math.min(inv[i].q,toRemove); inv[i].q-=rem; toRemove-=rem; if(inv[i].q<=0) inv.splice(i,1); } } diamonds++; saveLocal(); refreshViews(); updateUI(); toast(`+1 Diament`); }; c.appendChild(btn); }); }
-    function renderSummerMachine(){ let c=document.getElementById('summerMachineContainer'); if(c) c.innerHTML='<p>Letnia maszyna aktywna (30 zwierząt → Letni)</p>'; }
-    
-    function renderIsland(){
-        let g=document.getElementById('islandGrid'); if(!g) return;
-        g.innerHTML='';
-        islandTiles.forEach(tile=>{
-            let div=document.createElement('div'); div.className=`island-tile ${tile.unlocked?'unlocked':'locked'}`;
-            div.innerHTML=`<h3>${tile.name}</h3><p>${tile.unlocked?(tile.animalAssigned?`🐾 ${tile.animalAssigned.n}`:'Brak zwierzęcia'):(tile.purchasable?`🔒 Kup za ${tile.price}💎`:'🔒 Zablokowane')}</p>`;
-            if(!tile.unlocked && tile.purchasable){
-                let buyBtn=document.createElement('button'); buyBtn.className='btn'; buyBtn.textContent=`Kup za ${tile.price}💎`;
-                buyBtn.onclick=()=>{ if(gems>=tile.price){ gems-=tile.price; tile.unlocked=true; saveLocal(); renderIsland(); toast(`Odblokowano ${tile.name}!`); updateUI(); } else toast('Za mało gemów'); };
-                div.appendChild(buyBtn);
-            }
-            if(tile.unlocked && !tile.animalAssigned){
-                let btn=document.createElement('button'); btn.className='btn'; btn.textContent='Przydziel'; btn.onclick=()=>showAssignAnimal(tile.id);
-                div.appendChild(btn);
-            }
-            if(tile.unlocked && tile.animalAssigned){
-                let btn=document.createElement('button'); btn.className='btn'; btn.textContent='Zbierz'; btn.onclick=()=>collectIslandEarn(tile.id);
-                div.appendChild(btn);
-            }
-            g.appendChild(div);
-        });
-        let now=Date.now(); let lastUnlock=localStorage.getItem('lastIslandUnlock')||'0';
-        if(now-parseInt(lastUnlock)>7200000){
-            let lockedTile=islandTiles.find(t=>!t.unlocked && !t.purchasable);
-            if(lockedTile){ lockedTile.unlocked=true; localStorage.setItem('lastIslandUnlock',now); toast(`Odblokowano ${lockedTile.name}`); saveLocal(); renderIsland(); }
-        }
-    }
-    function showAssignAnimal(tileId){ let area=document.getElementById('islandAssignArea'); let available=inv.filter(i=>i.r!=='Specjalny'&&!i.n.includes('Paczka')&&!i.n.includes('Pudło')); if(available.length===0){ toast('Brak zwierząt'); return; } area.innerHTML='<h3>Wybierz zwierzę:</h3>'; available.forEach(animal=>{ let btn=document.createElement('button'); btn.className='btn'; btn.textContent=`${animal.e} ${animal.n} (${animal.r})`; btn.onclick=()=>{ let tile=islandTiles.find(t=>t.id===tileId); if(tile){ tile.animalAssigned={ n:animal.n, e:animal.e, r:animal.r, mult:animal.mult||1 }; tile.lastEarn=Date.now(); saveLocal(); renderIsland(); area.innerHTML=''; toast(`Przydzielono ${animal.n}`); } }; area.appendChild(btn); }); }
-    function collectIslandEarn(tileId){ let tile=islandTiles.find(t=>t.id===tileId); if(!tile||!tile.animalAssigned) return; let now=Date.now(); let hours=(now-tile.lastEarn)/3600000; if(hours<1){ toast('Zbieraj co godzinę'); return; } let basePrice=getAnimalPrice(tile.animalAssigned); let earned=Math.floor(basePrice*hours); coins+=earned; tile.lastEarn=now; updateUI(); saveLocal(); toast(`Zarobiono ${earned}🪙 z ${tile.name}`); renderIsland(); }
-    
-    function generateRandomTrade(){ let allAnimals=[]; for(let [rar,arr] of Object.entries(ANIMALS)) arr.forEach(a=>allAnimals.push({n:a.n,e:a.e,rarity:rar})); let rand=allAnimals[Math.floor(Math.random()*allAnimals.length)]; let price=0; switch(rand.rarity){ case "Rzadki":price=100; break; case "Bardzo Rzadki":price=250; break; case "Epicki":price=600; break; case "Mityczny":price=1500; break; case "Legendarny":price=3500; break; case "Chromatyczny":price=5000; break; } randomTradeOffer={animal:rand,price:price}; randomTradeExpiry=Date.now()+3600000; saveLocal(); }
-    function updateRandomTradeTimer(){ let c=document.getElementById('randomTradeContainer'); if(!c) return; if(!randomTradeOffer||Date.now()>randomTradeExpiry) generateRandomTrade(); let timeLeft=Math.max(0,randomTradeExpiry-Date.now()); let minutes=Math.floor(timeLeft/60000), seconds=Math.floor((timeLeft%60000)/1000); c.innerHTML=`<div class="random-trade-card"><div>${randomTradeOffer.animal.e} ${randomTradeOffer.animal.n} (${randomTradeOffer.animal.rarity})</div><div>🪙 ${randomTradeOffer.price}</div><button class="btn" id="buyRandomTradeBtn">Kup</button></div><div>Odświeżenie za: ${minutes}m ${seconds}s</div>`; document.getElementById('buyRandomTradeBtn')?.addEventListener('click',()=>{ if(coins<randomTradeOffer.price){ toast('Za mało monet'); return; } coins-=randomTradeOffer.price; let exist=inv.find(i=>i.n===randomTradeOffer.animal.n&&i.r===randomTradeOffer.animal.rarity); if(exist) exist.q++; else inv.push({ n:randomTradeOffer.animal.n, e:randomTradeOffer.animal.e, r:randomTradeOffer.animal.rarity, q:1 }); collected.add(randomTradeOffer.animal.n); updateUI(); saveLocal(); refreshViews(); toast(`Kupiono ${randomTradeOffer.animal.n}`); generateRandomTrade(); }); }
-    
-    function startRankedMode(){ let rarity=document.getElementById('rankedRaritySelect').value; let myAnimals=inv.filter(i=>i.r===rarity&&i.r!=='Specjalny'&&!i.n.includes('Paczka')&&!i.n.includes('Pudło')); if(myAnimals.length===0){ toast(`Brak zwierząt o rzadkości ${rarity}`); return; } let modal=document.getElementById('rankedPickModal'); let list=document.getElementById('rankedPickList'); list.innerHTML=''; myAnimals.forEach(animal=>{ let btn=document.createElement('button'); btn.className='btn'; btn.textContent=`${animal.e} ${animal.n}`; btn.onclick=()=>{ modal.classList.remove('active'); let botAnimal=ANIMALS[rarity][Math.floor(Math.random()*ANIMALS[rarity].length)]; let botNick="Bot_"+Math.random().toString(36).substring(2,6); let myValue=getAnimalPrice(animal); let botValue=RARITY[rarity].price; let win=myValue>=botValue; let reward=win?Math.floor(botValue*0.8):0; if(reward>0){ coins+=reward; updateUI(); saveLocal(); } document.getElementById('rankedBattleArea').innerHTML=`<div><p>🐺 Twój: ${animal.e} ${animal.n} (${myValue})</p><p>🤖 ${botNick}: ${botAnimal.e} ${botAnimal.n} (${botValue})</p><p><strong>${win?"Wygrałeś!":"Przegrałeś"}</strong> ${reward>0?`+${reward}🪙`:''}</p><button class="btn" id="resetRankedBtn">Zagraj ponownie</button></div>`; document.getElementById('resetRankedBtn')?.addEventListener('click',startRankedMode); }; list.appendChild(btn); }); modal.classList.add('active'); document.getElementById('cancelRankedBtn').onclick=()=>modal.classList.remove('active'); }
-    
-    function buyPack(pack, qty=1){
-        let priceMap={basic:10,beach:150,hyper:1000,gold:5000,spring:250}; // spring nie ma w sklepie, ale na wszelki wypadek
-        let total=priceMap[pack]*qty;
-        if(coins<total){ toast('Za mało monet'); return; }
-        coins-=total; updateUI(); saveLocal();
-        for(let i=0;i<qty;i++){ openPackAnimation(pack); }
-        refreshViews();
-    }
-    function buyToInventory(pack){ 
-        let priceMap={basic:10,beach:150,hyper:1000,gold:5000,spring:250};
-        if(coins<priceMap[pack]){ toast('Za mało monet'); return; } 
-        coins-=priceMap[pack]; updateUI(); saveLocal(); 
-        let packName={basic:"Podstawowa Paczka",beach:"Plażowa Paczka",hyper:"Hyper Paczka",gold:"Gold Paczka",spring:"Wiosenne Pudło"}[pack]; 
-        let emoji={basic:"📦",beach:"🏖️",hyper:"⚡",gold:"✨",spring:"🌸"}[pack]; 
-        let exist=inv.find(i=>i.n===packName); 
-        if(exist) exist.q++; 
-        else inv.push({ n:packName, e:emoji, r:'Specjalny', q:1 }); 
-        refreshViews(); 
-        toast(`Dodano ${packName} do ekwipunku`); 
-    }
-    function renderShop(){ 
-        let grid=document.getElementById('shopGrid'); if(!grid) return; 
-        grid.innerHTML=`<div class="shop-card"><div class="pack-icon">📦</div><h3>Podstawowa</h3><p>🪙10</p><button class="btn buy-now" data-pack="basic">Kup i otwórz</button><button class="btn buy-inv" data-pack="basic">Do Inv</button></div>
-                        <div class="shop-card"><div class="pack-icon">🏖️</div><h3>Plażowa</h3><p>🪙150</p><button class="btn buy-now" data-pack="beach">Kup i otwórz</button><button class="btn buy-inv" data-pack="beach">Do Inv</button></div>
-                        <div class="shop-card"><div class="pack-icon">⚡</div><h3>Hyper</h3><p>🪙1000</p><button class="btn buy-now" data-pack="hyper">Kup i otwórz</button><button class="btn buy-inv" data-pack="hyper">Do Inv</button></div>
-                        <div class="shop-card"><div class="pack-icon">✨</div><h3>Gold</h3><p>🪙5000</p><button class="btn buy-now" data-pack="gold">Kup i otwórz</button><button class="btn buy-inv" data-pack="gold">Do Inv</button></div>`;
-        // UWAGA: Wiosennej paczki NIE MA w sklepie, zgodnie z życzeniem
-        document.querySelectorAll('.buy-now').forEach(b=>b.addEventListener('click',()=>{ let pack=b.dataset.pack; buyPack(pack,1); })); 
-        document.querySelectorAll('.buy-inv').forEach(b=>b.addEventListener('click',()=>buyToInventory(b.dataset.pack))); 
-    }
-    
-    async function loadLeaderboard(){ let listDiv=document.getElementById('leaderboardList'); if(!supabaseClient){ listDiv.innerHTML='Zaloguj się, aby zobaczyć ranking.'; return; } let {data,error}=await supabaseClient.from('profiles').select('username,coins').order('coins',{ascending:false}).limit(10); if(error){ listDiv.innerHTML='Błąd ładowania.'; return; } if(!data||data.length===0){ listDiv.innerHTML='Brak graczy.'; return; } listDiv.innerHTML=data.map((p,i)=>`<div style="padding:5px;border-bottom:1px solid #2a2a40;">${i+1}. ${p.username||'Anonim'} – 🪙 ${Math.floor(p.coins)}</div>`).join(''); }
-    
-    function resetGame(deleteAnimals, deleteCurrency){ if(deleteAnimals) inv = inv.filter(i => i.r === 'Specjalny' || i.n.includes('Paczka') || i.n.includes('Pudło')); if(deleteCurrency){ coins=100; gems=5; diamonds=0; } if(deleteAnimals && deleteCurrency) { collected.clear(); dailyStreak=1; dailyClaimed=false; usedCodes={}; packsOpened=0; shownBadgeAlerts.clear(); islandTiles.forEach((t,i)=>{ t.unlocked=(i===0); t.animalAssigned=null; t.lastEarn=0; if(t.purchasable) t.unlocked=false; }); randomTradeOffer=null; inv = inv.filter(i => i.r === 'Specjalny' || i.n.includes('Paczka') || i.n.includes('Pudło')); } saveLocal(); updateUI(); refreshViews(); toast('Zresetowano grę'); }
-    function refreshViews(){ renderInventory(); renderCollection(); renderSell(); renderTrade(); renderGoldMachine(); renderRainbowMachine(); renderDiamondMachine(); renderSummerMachine(); renderIsland(); renderShop(); updateRandomTradeTimer(); loadLeaderboard(); }
-    
-    document.addEventListener('DOMContentLoaded',()=>{
-        document.querySelectorAll('.nav-tab').forEach(t=>t.addEventListener('click',()=>{ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(t.dataset.view+'View').classList.add('active'); document.querySelectorAll('.nav-tab').forEach(nt=>nt.classList.remove('active')); t.classList.add('active'); refreshViews(); }));
-        document.querySelectorAll('.exchange-btn').forEach(b=>b.addEventListener('click',()=>exchangeGems(parseInt(b.dataset.amount))));
-        document.getElementById('startRankedBtn')?.addEventListener('click',startRankedMode);
-        document.getElementById('openDailyBtn')?.addEventListener('click',()=>toast('Nagrody dzienne dostępne'));
-        document.getElementById('openCodeBtn')?.addEventListener('click',()=>document.getElementById('codeModal').classList.add('active'));
-        document.getElementById('redeemCodeBtn')?.addEventListener('click',()=>{ let c=document.getElementById('codeInput').value; if(c==='CardZoo'&&!usedCodes.CardZoo){ gems+=50; usedCodes.CardZoo=true; toast('+50💎'); } else if(c==='TrailerOfficial'){ gems+=5; usedCodes.TrailerOfficial=true; toast('+5💎'); } else toast('Zły kod'); updateUI(); saveLocal(); document.getElementById('codeModal').classList.remove('active'); });
-        document.getElementById('closeCodeModalBtn')?.addEventListener('click',()=>document.getElementById('codeModal').classList.remove('active'));
-        document.getElementById('loginDiscordBtn')?.addEventListener('click',()=>{ if(supabaseClient) supabaseClient.auth.signInWithOAuth({ provider:'discord' }); });
-        document.getElementById('signUpBtn')?.addEventListener('click',async()=>{ let email=document.getElementById('authEmail').value, pass=document.getElementById('authPassword').value; let {error}=await supabaseClient.auth.signUp({email,password:pass}); if(error) document.getElementById('authError').innerText=error.message; else toast('Zarejestrowano'); });
-        document.getElementById('signInBtn')?.addEventListener('click',async()=>{ let email=document.getElementById('authEmail').value, pass=document.getElementById('authPassword').value; let {error}=await supabaseClient.auth.signInWithPassword({email,password:pass}); if(error) document.getElementById('authError').innerText=error.message; else { toast('Zalogowano'); updateAuthUI(); } });
-        document.getElementById('signOutBtn')?.addEventListener('click',async()=>{ await supabaseClient.auth.signOut(); currentUser=null; updateAuthUI(); loadLocal(); updateUI(); refreshViews(); });
-        document.getElementById('saveDataBtn')?.addEventListener('click',saveCloud);
-        document.getElementById('loadDataBtn')?.addEventListener('click',loadCloud);
-        document.getElementById('openReportBtn')?.addEventListener('click',()=>document.getElementById('reportModal').classList.add('active'));
-        document.getElementById('sendReportBtn')?.addEventListener('click',()=>{ toast('Zgłoszenie wysłane'); document.getElementById('reportModal').classList.remove('active'); });
-        document.getElementById('closeReportModalBtn')?.addEventListener('click',()=>document.getElementById('reportModal').classList.remove('active'));
-        document.getElementById('resetOptions').innerHTML=`<div class="reset-option" data-reset-animals>Usuń tylko zwierzęta (zostaw paczki)</div><div class="reset-option" data-reset-currency>Resetuj walutę</div><div class="reset-option" data-reset-all>Resetuj WSZYSTKO</div>`;
-        document.querySelector('[data-reset-animals]')?.addEventListener('click',()=>resetGame(true,false));
-        document.querySelector('[data-reset-currency]')?.addEventListener('click',()=>resetGame(false,true));
-        document.querySelector('[data-reset-all]')?.addEventListener('click',()=>resetGame(true,true));
-        document.getElementById('musicSlider')?.addEventListener('input',function(){ musicVol=this.value; document.getElementById('musicVal').innerText=musicVol; saveLocal(); });
-        document.getElementById('sfxSlider')?.addEventListener('input',function(){ sfxVol=this.value; document.getElementById('sfxVal').innerText=sfxVol; saveLocal(); });
-        document.getElementById('musicSlider').value=musicVol; document.getElementById('sfxSlider').value=sfxVol;
-        document.getElementById('musicVal').innerText=musicVol; document.getElementById('sfxVal').innerText=sfxVol;
-        updateUI(); refreshViews(); setInterval(()=>{ updateRandomTradeTimer(); renderIsland(); },1000);
+
+    ov.addEventListener('click', upgrade);
+    document.addEventListener('keydown', function(e){
+        if(e.code === 'Space'){ e.preventDefault(); if(!finished) finish(); }
     });
-    async function updateAuthUI(){ if(!supabaseClient) return; let {data:{user}}=await supabaseClient.auth.getUser(); currentUser=user; if(currentUser){ document.getElementById('authSection').style.display='none'; document.getElementById('userInfoBlock').style.display='block'; document.getElementById('userNameDisplay').innerText=currentUser.email||'Gracz'; } else { document.getElementById('authSection').style.display='block'; document.getElementById('userInfoBlock').style.display='none'; } }
-    updateAuthUI();
-})();
+    document.body.appendChild(ov);
+}
+
+// ============================================================
+//  EKWIPUNEK
+// ============================================================
+function renderInventory(){
+    let grid = document.getElementById('inventoryGrid');
+    grid.innerHTML = '';
+    inv.forEach(i => {
+        let d = document.createElement('div');
+        d.className = 'card';
+        let isPack = (i.r === 'Specjalny' || i.n.includes('Paczka') || i.n.includes('Pudło')) && !i.n.includes('Zwierzak');
+        if(isPack){
+            d.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-specjalny">Paczka</div><div>x${i.q}</div><button class="btn" onclick="openPackFromInventory('${i.n}')">Otwórz</button>`;
+        } else {
+            let price = getAnimalPrice(i);
+            d.innerHTML = `<div class="emoji">${i.e}</div><div class="name">${i.n}</div><div class="badge badge-${getRarityClass(i.r)}">${i.r}</div><div>x${i.q}</div><div>🪙${price}</div><button class="btn sell-btn" onclick="sellOne('${i.n}','${i.r}')">Sprzedaj 1</button>`;
+        }
+        grid.appendChild(d);
+    });
+}
+
+function openPackFromInventory(name){
+    let packType = null;
+    if(name === 'Podstawowa Paczka') packType = 'basic';
+    else if(name === 'Wiosenne Pudło') packType = 'spring';
+    else if(name === 'Plażowa Paczka') packType = 'beach';
+    else if(name === 'Hyper Paczka') packType = 'hyper';
+    else if(name === 'Gold Paczka') packType = 'gold';
+    if(!packType){ toast('Nieznana paczka'); return; }
+    let idx = inv.findIndex(i => i.n === name);
+    if(idx === -1) return;
+    inv[idx].q--;
+    if(inv[idx].q <= 0) inv.splice(idx, 1);
+    saveLocal();
+    openPackAnimation(packType);
+    refreshAll();
+}
+
+// ============================================================
+//  SPRZEDAŻ
+// ============================================================
+function sellOne(name, rarity){
+    let idx = inv.findIndex(i => i.n === name && i.r === rarity);
+    if(idx === -1) return;
+    let price = getAnimalPrice(inv[idx]);
+    inv[idx].q--;
+    if(inv[idx].q <= 0) inv.splice(idx, 1);
+    coins += price;
+    updateUI(); saveLocal(); refreshAll();
+    toast(`Sprzedano ${name} za ${price}🪙`);
+}
+
+function renderSell(){
+    let cont = document.getElementById('sellContainer');
+    cont.innerHTML = '';
+    let sellable = inv.filter(i => i.r !== 'Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło'));
+    sellable.forEach(i => {
+        let price = getAnimalPrice(i);
+        let d = document.createElement('div');
+        d.style.cssText = 'display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #2a2a40;';
+        d.innerHTML = `<span>${i.e} ${i.n} [${i.r}] x${i.q}</span><span>🪙${price}/szt</span><span><button class="btn sell-btn" onclick="sellOne('${i.n}','${i.r}')">1</button><button class="btn sell-btn" onclick="sellAll('${i.n}','${i.r}')">Wszystkie</button></span>`;
+        cont.appendChild(d);
+    });
+}
+
+function sellAll(name, rarity){
+    let idx = inv.findIndex(i => i.n === name && i.r === rarity);
+    if(idx === -1) return;
+    let price = getAnimalPrice(inv[idx]);
+    let total = price * inv[idx].q;
+    coins += total;
+    inv.splice(idx, 1);
+    updateUI(); saveLocal(); refreshAll();
+    toast(`Sprzedano wszystkie za ${total}🪙`);
+}
+
+// ============================================================
+//  KOLEKCJA
+// ============================================================
+function renderCollection(){
+    let grid = document.getElementById('collectionGrid');
+    grid.innerHTML = '';
+    let total = 0, owned = 0;
+    for(let [rar, animals] of Object.entries(ANIMALS)){
+        animals.forEach(a => {
+            total++;
+            let has = collected.has(a.n);
+            if(has) owned++;
+            let div = document.createElement('div');
+            div.className = `card collection-card ${has?'owned':''}`;
+            div.innerHTML = `<div class="emoji">${a.e}</div><div class="name">${a.n}</div><div class="badge badge-${getRarityClass(rar)}">${rar}</div>`;
+            grid.appendChild(div);
+        });
+    }
+    document.getElementById('collectionCount').innerText = `${owned}/${total}`;
+}
+
+// ============================================================
+//  TRADE
+// ============================================================
+function renderTrade(){
+    document.getElementById('tradeGemsCount').innerText = gems;
+    let cont = document.getElementById('tradeCardsContainer');
+    cont.innerHTML = '';
+    let tradable = inv.filter(i => i.r !== 'Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło'));
+    tradable.forEach(i => {
+        let d = document.createElement('div');
+        d.style.cssText = 'background:var(--panel);border-radius:12px;padding:10px;margin:5px 0;display:flex;justify-content:space-between;';
+        d.innerHTML = `<span>${i.e} ${i.n} (${i.r}) x${i.q}</span><div><input type="number" id="tradeQty_${i.n}_${i.r}" min="0" max="${i.q}" value="0" style="width:60px;"><button class="btn" onclick="sendCard('${i.n}','${i.r}')">📤</button></div>`;
+        cont.appendChild(d);
+    });
+}
+
+function sendCard(name, rarity){
+    let email = document.getElementById('tradeEmail').value.trim();
+    if(!email){ toast('Wpisz email odbiorcy'); return; }
+    let qtyInput = document.getElementById(`tradeQty_${name}_${rarity}`);
+    if(!qtyInput) return;
+    let amt = parseInt(qtyInput.value);
+    if(amt < 1 || amt > 9999){ toast('Nieprawidłowa ilość'); return; }
+    let idx = inv.findIndex(i => i.n === name && i.r === rarity);
+    if(idx === -1 || inv[idx].q < amt){ toast('Nie masz tylu kart'); return; }
+    inv[idx].q -= amt;
+    if(inv[idx].q <= 0) inv.splice(idx, 1);
+    saveLocal(); refreshAll();
+    toast(`Wysłano ${amt}x ${name} do ${email}`);
+}
+
+function sendGems(){
+    let email = document.getElementById('tradeEmail').value.trim();
+    if(!email){ toast('Wpisz email odbiorcy'); return; }
+    let amt = parseInt(document.getElementById('tradeGemAmount').value);
+    if(amt < 1 || amt > gems){ toast('Nieprawidłowa ilość gemów'); return; }
+    gems -= amt;
+    updateUI(); saveLocal(); refreshAll();
+    toast(`Wysłano ${amt}💎 do ${email}`);
+}
+
+// ============================================================
+//  MASZYNY (TARG)
+// ============================================================
+function renderGoldMachine(){
+    let c = document.getElementById('goldMachineContainer');
+    c.innerHTML = '';
+    let groups = {};
+    inv.forEach(i => {
+        if(i.r !== 'Golden' && i.r !== 'Rainbow' && i.r !== 'Hyper' && i.r !== 'Summer' && !i.n.includes('Paczka') && !i.n.includes('Pudło')){
+            let key = i.n + '|' + i.r;
+            if(!groups[key]) groups[key] = {name:i.n, rarity:i.r, count:0, emoji:i.e};
+            groups[key].count += i.q;
+        }
+    });
+    let valid = Object.values(groups).filter(g => g.count >= 10);
+    if(valid.length === 0){ c.innerHTML = '<p>Brak 10 takich samych</p>'; return; }
+    valid.forEach(g => {
+        let btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = `${g.emoji} ${g.name} (${g.rarity}) x${g.count} → Złoty`;
+        btn.onclick = function(){
+            let toRemove = 10;
+            for(let i=inv.length-1; i>=0 && toRemove>0; i--){
+                if(inv[i].n === g.name && inv[i].r === g.rarity){
+                    let rem = Math.min(inv[i].q, toRemove);
+                    inv[i].q -= rem;
+                    toRemove -= rem;
+                    if(inv[i].q <= 0) inv.splice(i, 1);
+                }
+            }
+            let golden = { n:g.name, e:g.emoji, r:'Golden', q:1, baseRarity:g.rarity };
+            let exist = inv.find(i => i.n === g.name && i.r === 'Golden');
+            if(exist) exist.q++;
+            else inv.push(golden);
+            saveLocal(); refreshAll(); updateUI();
+            toast(`Stworzono Złotego ${g.name}`);
+        };
+        c.appendChild(btn);
+    });
+}
+
+function renderRainbowMachine(){
+    let c = document.getElementById('rainbowMachineContainer');
+    c.innerHTML = '';
+    let groups = {};
+    inv.forEach(i => {
+        if(i.r === 'Golden'){
+            if(!groups[i.n]) groups[i.n] = {name:i.n, count:0, emoji:i.e, baseRarity:i.baseRarity};
+            groups[i.n].count += i.q;
+        }
+    });
+    let valid = Object.values(groups).filter(g => g.count >= 5);
+    if(valid.length === 0){ c.innerHTML = '<p>Brak 5 Złotych</p>'; return; }
+    valid.forEach(g => {
+        let btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = `${g.emoji} ${g.name} x${g.count} → Tęczowy`;
+        btn.onclick = function(){
+            let toRemove = 5;
+            for(let i=inv.length-1; i>=0 && toRemove>0; i--){
+                if(inv[i].n === g.name && inv[i].r === 'Golden'){
+                    let rem = Math.min(inv[i].q, toRemove);
+                    inv[i].q -= rem;
+                    toRemove -= rem;
+                    if(inv[i].q <= 0) inv.splice(i, 1);
+                }
+            }
+            let rainbow = { n:g.name, e:g.emoji, r:'Rainbow', q:1, baseRarity:g.baseRarity };
+            let exist = inv.find(i => i.n === g.name && i.r === 'Rainbow');
+            if(exist) exist.q++;
+            else inv.push(rainbow);
+            saveLocal(); refreshAll(); updateUI();
+            toast(`Stworzono Tęczowego ${g.name}`);
+        };
+        c.appendChild(btn);
+    });
+}
+
+function renderDiamondMachine(){
+    let c = document.getElementById('diamondMachineContainer');
+    c.innerHTML = '';
+    let groups = {};
+    inv.forEach(i => {
+        if(i.r === 'Rainbow'){
+            if(!groups[i.n]) groups[i.n] = {name:i.n, count:0, emoji:i.e};
+            groups[i.n].count += i.q;
+        }
+    });
+    let valid = Object.values(groups).filter(g => g.count >= 5);
+    if(valid.length === 0){ c.innerHTML = '<p>Brak 5 Tęczowych</p>'; return; }
+    valid.forEach(g => {
+        let btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = `${g.emoji} ${g.name} x${g.count} → 1 Diament`;
+        btn.onclick = function(){
+            let toRemove = 5;
+            for(let i=inv.length-1; i>=0 && toRemove>0; i--){
+                if(inv[i].n === g.name && inv[i].r === 'Rainbow'){
+                    let rem = Math.min(inv[i].q, toRemove);
+                    inv[i].q -= rem;
+                    toRemove -= rem;
+                    if(inv[i].q <= 0) inv.splice(i, 1);
+                }
+            }
+            diamonds++;
+            saveLocal(); refreshAll(); updateUI();
+            toast(`+1 Diament`);
+        };
+        c.appendChild(btn);
+    });
+}
+
+function renderSummerMachine(){
+    let c = document.getElementById('summerMachineContainer');
+    if(c) c.innerHTML = '<p>Letnia maszyna aktywna (30 zwierząt → Letni)</p>';
+}
+
+// ============================================================
+//  WYSPA
+// ============================================================
+function renderIsland(){
+    let grid = document.getElementById('islandGrid');
+    grid.innerHTML = '';
+    islandTiles.forEach(tile => {
+        let div = document.createElement('div');
+        div.className = `island-tile ${tile.unlocked?'unlocked':'locked'}`;
+        div.innerHTML = `<h3>${tile.name}</h3><p>${tile.unlocked ? (tile.animalAssigned ? `🐾 ${tile.animalAssigned.n}` : 'Brak zwierzęcia') : (tile.purchasable ? `🔒 Kup za ${tile.price}💎` : '🔒 Zablokowane')}</p>`;
+        if(!tile.unlocked && tile.purchasable){
+            let buyBtn = document.createElement('button');
+            buyBtn.className = 'btn';
+            buyBtn.textContent = `Kup za ${tile.price}💎`;
+            buyBtn.onclick = function(){
+                if(gems >= tile.price){
+                    gems -= tile.price;
+                    tile.unlocked = true;
+                    saveLocal(); renderIsland(); updateUI();
+                    toast(`Odblokowano ${tile.name}!`);
+                } else toast('Za mało gemów');
+            };
+            div.appendChild(buyBtn);
+        }
+        if(tile.unlocked && !tile.animalAssigned){
+            let assignBtn = document.createElement('button');
+            assignBtn.className = 'btn';
+            assignBtn.textContent = 'Przydziel';
+            assignBtn.onclick = function(){ showAssignAnimal(tile.id); };
+            div.appendChild(assignBtn);
+        }
+        if(tile.unlocked && tile.animalAssigned){
+            let collectBtn = document.createElement('button');
+            collectBtn.className = 'btn';
+            collectBtn.textContent = 'Zbierz';
+            collectBtn.onclick = function(){ collectIslandEarn(tile.id); };
+            div.appendChild(collectBtn);
+        }
+        grid.appendChild(div);
+    });
+    // Odblokowanie co 2h
+    let now = Date.now();
+    let lastUnlock = localStorage.getItem('lastIslandUnlock') || '0';
+    if(now - parseInt(lastUnlock) > 7200000){
+        let locked = islandTiles.find(t => !t.unlocked && !t.purchasable);
+        if(locked){
+            locked.unlocked = true;
+            localStorage.setItem('lastIslandUnlock', now);
+            toast(`Odblokowano ${locked.name}`);
+            saveLocal(); renderIsland();
+        }
+    }
+}
+
+function showAssignAnimal(tileId){
+    let area = document.getElementById('islandAssignArea');
+    let available = inv.filter(i => i.r !== 'Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło'));
+    if(available.length === 0){ toast('Brak zwierząt'); return; }
+    area.innerHTML = '<h3>Wybierz zwierzę:</h3>';
+    available.forEach(animal => {
+        let btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = `${animal.e} ${animal.n} (${animal.r})`;
+        btn.onclick = function(){
+            let tile = islandTiles.find(t => t.id === tileId);
+            if(tile){
+                tile.animalAssigned = { n:animal.n, e:animal.e, r:animal.r, mult:animal.mult||1 };
+                tile.lastEarn = Date.now();
+                saveLocal(); renderIsland(); area.innerHTML = '';
+                toast(`Przydzielono ${animal.n}`);
+            }
+        };
+        area.appendChild(btn);
+    });
+}
+
+function collectIslandEarn(tileId){
+    let tile = islandTiles.find(t => t.id === tileId);
+    if(!tile || !tile.animalAssigned) return;
+    let now = Date.now();
+    let hours = (now - tile.lastEarn) / 3600000;
+    if(hours < 1){ toast('Zbieraj co godzinę'); return; }
+    let basePrice = getAnimalPrice(tile.animalAssigned);
+    let earned = Math.floor(basePrice * hours);
+    coins += earned;
+    tile.lastEarn = now;
+    updateUI(); saveLocal();
+    toast(`Zarobiono ${earned}🪙 z ${tile.name}`);
+    renderIsland();
+}
+
+// ============================================================
+//  RANDOM TRADE
+// ============================================================
+function generateRandomTrade(){
+    let allAnimals = [];
+    for(let [rar, arr] of Object.entries(ANIMALS)){
+        arr.forEach(a => allAnimals.push({n:a.n, e:a.e, rarity:rar}));
+    }
+    let rand = allAnimals[Math.floor(Math.random() * allAnimals.length)];
+    let price = 0;
+    switch(rand.rarity){
+        case "Rzadki": price = 100; break;
+        case "Bardzo Rzadki": price = 250; break;
+        case "Epicki": price = 600; break;
+        case "Mityczny": price = 1500; break;
+        case "Legendarny": price = 3500; break;
+        case "Chromatyczny": price = 5000; break;
+    }
+    randomTradeOffer = { animal:rand, price:price };
+    randomTradeExpiry = Date.now() + 3600000;
+    saveLocal();
+}
+
+function renderRandomTrade(){
+    let c = document.getElementById('randomTradeContainer');
+    if(!c) return;
+    if(!randomTradeOffer || Date.now() > randomTradeExpiry) generateRandomTrade();
+    let timeLeft = Math.max(0, randomTradeExpiry - Date.now());
+    let minutes = Math.floor(timeLeft / 60000);
+    let seconds = Math.floor((timeLeft % 60000) / 1000);
+    c.innerHTML = `
+        <div class="random-trade-card">
+            <div>${randomTradeOffer.animal.e} ${randomTradeOffer.animal.n} (${randomTradeOffer.animal.rarity})</div>
+            <div>🪙 ${randomTradeOffer.price}</div>
+            <button class="btn" onclick="buyRandomTrade()">Kup</button>
+        </div>
+        <div>Odświeżenie za: ${minutes}m ${seconds}s</div>
+    `;
+}
+
+function buyRandomTrade(){
+    if(!randomTradeOffer){ toast('Brak oferty'); return; }
+    if(coins < randomTradeOffer.price){ toast('Za mało monet'); return; }
+    coins -= randomTradeOffer.price;
+    let exist = inv.find(i => i.n === randomTradeOffer.animal.n && i.r === randomTradeOffer.animal.rarity);
+    if(exist) exist.q++;
+    else inv.push({ n:randomTradeOffer.animal.n, e:randomTradeOffer.animal.e, r:randomTradeOffer.animal.rarity, q:1 });
+    collected.add(randomTradeOffer.animal.n);
+    updateUI(); saveLocal(); refreshAll();
+    toast(`Kupiono ${randomTradeOffer.animal.n}`);
+    generateRandomTrade();
+    renderRandomTrade();
+}
+
+// ============================================================
+//  RANKING (TRYB RANKINGOWY)
+// ============================================================
+function startRankedMode(){
+    let rarity = document.getElementById('rankedRaritySelect').value;
+    let myAnimals = inv.filter(i => i.r === rarity && i.r !== 'Specjalny' && !i.n.includes('Paczka') && !i.n.includes('Pudło'));
+    if(myAnimals.length === 0){ toast(`Brak zwierząt o rzadkości ${rarity}`); return; }
+    let modal = document.getElementById('rankedPickModal');
+    let list = document.getElementById('rankedPickList');
+    list.innerHTML = '';
+    myAnimals.forEach(animal => {
+        let btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.textContent = `${animal.e} ${animal.n}`;
+        btn.onclick = function(){
+            modal.classList.remove('active');
+            let botAnimal = ANIMALS[rarity][Math.floor(Math.random() * ANIMALS[rarity].length)];
+            let botNick = "Bot_" + Math.random().toString(36).substring(2,6);
+            let myValue = getAnimalPrice(animal);
+            let botValue = RARITY[rarity].price;
+            let win = myValue >= botValue;
+            let reward = win ? Math.floor(botValue * 0.8) : 0;
+            if(reward > 0){ coins += reward; updateUI(); saveLocal(); }
+            document.getElementById('rankedBattleArea').innerHTML = `
+                <div style="background:var(--panel);padding:20px;border-radius:16px;">
+                    <p>🐺 Twój: ${animal.e} ${animal.n} (${myValue})</p>
+                    <p>🤖 ${botNick}: ${botAnimal.e} ${botAnimal.n} (${botValue})</p>
+                    <p><strong>${win ? "Wygrałeś!" : "Przegrałeś"}</strong> ${reward > 0 ? `+${reward}🪙` : ''}</p>
+                    <button class="btn" onclick="startRankedMode()">Zagraj ponownie</button>
+                </div>
+            `;
+        };
+        list.appendChild(btn);
+    });
+    modal.classList.add('active');
+}
+
+// ============================================================
+//  TOP 10 (LEADERBOARD)
+// ============================================================
+async function loadLeaderboard(){
+    let list = document.getElementById('leaderboardList');
+    list.innerHTML = 'Ładowanie...';
+    try {
+        let supabase = window.supabase?.createClient?.('https://wjbzishechoxiafyfypr.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqYnppc2hlY2hveGlhZnlmeXByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTIwODAsImV4cCI6MjA5NDAyODA4MH0.x8aOXVkB0WLDwmuLDBAhUyn1laTF8gxSi4hMFc2u_sg');
+        if(!supabase){ list.innerHTML = 'Brak połączenia z Supabase'; return; }
+        let {data, error} = await supabase.from('profiles').select('username,coins').order('coins', {ascending:false}).limit(10);
+        if(error){ list.innerHTML = 'Błąd ładowania'; return; }
+        if(!data || data.length === 0){ list.innerHTML = 'Brak graczy'; return; }
+        list.innerHTML = data.map((p,i) => `<div style="padding:5px;border-bottom:1px solid #2a2a40;">${i+1}. ${p.username || 'Anonim'} – 🪙 ${Math.floor(p.coins)}</div>`).join('');
+    } catch(e){
+        list.innerHTML = 'Błąd ładowania';
+    }
+}
+
+// ============================================================
+//  WYMIANA GEMÓW
+// ============================================================
+function exchangeGems(amt){
+    if(gems < amt){ toast('Za mało gemów'); return; }
+    gems -= amt;
+    coins += amt * 80;
+    updateUI(); saveLocal();
+    toast(`Wymieniono ${amt}💎 → ${amt*80}🪙`);
+}
+
+// ============================================================
+//  RESET GRY
+// ============================================================
+function resetGame(deleteAnimals, deleteCurrency){
+    if(deleteAnimals) inv = inv.filter(i => i.r === 'Specjalny' || i.n.includes('Paczka') || i.n.includes('Pudło'));
+    if(deleteCurrency){ coins = 100; gems = 5; diamonds = 0; }
+    if(deleteAnimals && deleteCurrency){
+        collected.clear();
+        dailyStreak = 1; dailyClaimed = false; usedCodes = {}; packsOpened = 0;
+        islandTiles.forEach((t,i) => { t.unlocked = (i===0); t.animalAssigned = null; t.lastEarn = 0; if(t.purchasable) t.unlocked = false; });
+        randomTradeOffer = null;
+        inv = inv.filter(i => i.r === 'Specjalny' || i.n.includes('Paczka') || i.n.includes('Pudło'));
+    }
+    saveLocal(); updateUI(); refreshAll();
+    toast('Zresetowano grę');
+}
+
+// ============================================================
+//  KODY
+// ============================================================
+function redeemCode(){
+    let code = document.getElementById('codeInput').value.trim();
+    if(!code){ toast('Wpisz kod'); return; }
+    if(code === 'CardZoo' && !usedCodes.CardZoo){
+        gems += 50;
+        usedCodes.CardZoo = true;
+        toast('+50💎');
+    } else if(code === 'TrailerOfficial' && !usedCodes.TrailerOfficial){
+        gems += 5;
+        usedCodes.TrailerOfficial = true;
+        toast('+5💎');
+    } else {
+        toast('Zły kod lub już wykorzystany');
+        return;
+    }
+    updateUI(); saveLocal();
+    document.getElementById('codeModal').classList.remove('active');
+    document.getElementById('codeInput').value = '';
+}
+
+// ============================================================
+//  USTAWIENIA (MUZYKA/SFX)
+// ============================================================
+function updateMusic(val){ musicVol = val; document.getElementById('musicVal').innerText = val; saveLocal(); }
+function updateSfx(val){ sfxVol = val; document.getElementById('sfxVal').innerText = val; saveLocal(); }
+
+// ============================================================
+//  ODŚWIEŻANIE WSZYSTKIEGO
+// ============================================================
+function refreshAll(){
+    renderShop();
+    renderInventory();
+    renderCollection();
+    renderSell();
+    renderTrade();
+    renderGoldMachine();
+    renderRainbowMachine();
+    renderDiamondMachine();
+    renderSummerMachine();
+    renderIsland();
+    renderRandomTrade();
+    updateUI();
+}
+
+// ============================================================
+//  START
+// ============================================================
+refreshAll();
+setInterval(() => {
+    renderRandomTrade();
+    renderIsland();
+}, 10000);
+
+// Przywracamy zapisane ustawienia suwaków
+document.getElementById('musicSlider').value = musicVol;
+document.getElementById('sfxSlider').value = sfxVol;
+document.getElementById('musicVal').innerText = musicVol;
+document.getElementById('sfxVal').innerText = sfxVol;
+
 </script>
 </body>
 </html>
