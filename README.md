@@ -2,21 +2,6 @@
   <img src="https://i.imgur.com/sMDDrvx.png alt="Zooventures" width="300"/>
 </p>
 
-# 
-
-<p align="center">
-  <a href="https://opszyszo.github.io/Zooventures/">
-    <img src="https://i.imgur.com/hOEOSQl.png" width="180" alt="Play Zooventures">
-  </a>
-
-  <a href="https://github.com/OPszyszo/Zooventures/releases/download/1.1.0/Zooventures_launcher_110.apk">
-    <img src="https://i.imgur.com/bo0xxMk.png" width="180" alt="Download Android APK">
-  </a>
-
-  <a href="https://github.com/OPszyszo/Zooventures/releases/download/1.1.0/Zooventures-1.1.0.exe">
-    <img src="https://i.imgur.com/toeP1lp.png" width="180" alt="Download Windows EXE">
-  </a>
-</p>
 
 **GAME IS CLOSED!!!**
 
